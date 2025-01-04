@@ -5,7 +5,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Image.hpp>
 
-const float TEXTURE_SIZE = 64.0f;
+const float TEXTURE_SIZE = 64.0f, SPRITE_SIZE = 108.0f;
 
 class Resources
 {

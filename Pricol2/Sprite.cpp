@@ -7,6 +7,8 @@ Sprite::Sprite(sf::Vector2f pos, float _size, int indText, float _angle)
 	blockmap_coords = (sf::Vector2i)position;
 }
 
+Sprite::Sprite(SpriteDef spDef, MapSprite spMap) : Sprite(spMap.position, spDef.size, spDef.indexTexture, spMap.angle) {}
+
 void Sprite::move(Map& map, sf::Vector2f move)
 {
 	if (move == sf::Vector2f()) return;

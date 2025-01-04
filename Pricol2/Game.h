@@ -17,6 +17,7 @@ public:
 	Game(sf::RenderWindow* window, Map* nowMap);
 	void update(float deltaT);
 	void render();
+	void resetMap();
 private:
 	std::vector<std::shared_ptr<Sprite>> sprites;
 	std::unique_ptr<Player> player;

@@ -13,6 +13,7 @@
 constexpr float PI = 3.14159265359f;
 
 class Map;
+class MapSprite;
 class Sprite;
 
 class Thinker
@@ -34,10 +35,19 @@ private:
 	std::function<void(Sprite&, Map&, float)> fn;
 };
 
+struct SpriteDef
+{
+	std::string name;
+	float size;
+	int indexTexture;
+};
+
 class Sprite
 {
 public:
 	Sprite(sf::Vector2f pos, float size, int indText, float angle = 0.0f);
+	Sprite(SpriteDef spDef, MapSprite spMap);
+	Sprite() = default;
 
 	void move(Map& map, sf::Vector2f move);
 	void setupBlockmap(Map& map);
@@ -50,13 +60,6 @@ public:
 private:
 	bool checkCollision(const Map& map, sf::Vector2f newPos);
 	sf::Vector2i blockmap_coords;
-};
-
-struct SpriteDef
-{
-	std::string name;
-	float size;
-	int indexTexture;
 };
 
 static std::vector<SpriteDef> spriteDef = {

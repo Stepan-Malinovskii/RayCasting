@@ -53,6 +53,7 @@ int main()
 					if (state == State::Editor)
 					{
 						state = State::Game;
+						logic.resetMap();
 						window.setMouseCursorVisible(false);
 						window.setView(window.getDefaultView());
 

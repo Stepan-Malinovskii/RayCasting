@@ -4,12 +4,31 @@
 
 #include "Map.h"
 #include "Resources.h"
+#include "sfmlExtantion.h"
 
 #include <SFML/Graphics/View.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <functional>
 
-constexpr int COUNT_ROW_TEXT = 5;
+constexpr int COUNT_ROW_TEXT = 6;
+
+class EdingButton : public Button
+{
+public:
+	EdingButton(sf::Vector2f _pos, sf::Vector2f _size, sf::Texture& _text, sf::IntRect teztureRect) :
+		Button(_pos, _size, _text, teztureRect) { }
+	EdingButton() = default;
+
+	void setFunc(std::function<void()> _fn) { fn = _fn; }
+
+	void update() override
+	{
+		fn();
+	}
+private:
+	std::function<void()> fn;
+};
 
 class Editor
 {
@@ -21,16 +40,18 @@ public:
 
 	int drawerLayer() const;
 private:
-	bool isFirstMouse;
+	bool isFirstMouse, spriteMode;
 	int nowValue;
 	int nowLayer;
+	SpriteDef nowSpriteDef;
 	sf::RectangleShape cellShape;
 	sf::Vector2i lastMousePos;
 	sf::Vector2i windowMousePos, editorMousePos;
-	std::vector<int> textures;
 	sf::View view;
 	Map* nowMap;
+	std::vector<std::shared_ptr<Button>> buttons;
 
+	void initButton();
 	void windowStateRightClick(sf::RenderWindow& window);
 	void windowStateNoRightClick(sf::RenderWindow& window);
 	void windowStateLeftClick(sf::RenderWindow& window);

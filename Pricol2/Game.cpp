@@ -3,10 +3,10 @@
 Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
 	renderer(), window{ _window }, nowMap{ _nowMap }
 {
-	for (auto sp : _nowMap->getSprites())
+	for (auto sp : nowMap->getMapSprites())
 	{
 		auto def = spriteDef[sp.idx];
-		auto sprite = std::make_shared<Sprite>(sp.position, def.size, def.indexTexture, sp.angle);
+		auto sprite = std::make_shared<Sprite>(def, sp);
 		sprites.push_back(sprite);
 
 		if (sp.idx == 0) {
@@ -16,19 +16,39 @@ Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
 
 	if (!player) {
 		auto def = spriteDef[0];
-		auto sprite = std::make_shared<Sprite>(sf::Vector2f{2,2}, def.size, def.indexTexture, 0);
+		auto sprite = std::make_shared<Sprite>(sf::Vector2f{ 2,2 }, def.size, def.indexTexture, 0);
 		sprites.push_back(sprite);
 		player = std::make_unique<Player>(sprite.get());
 	}
 
-	/*sprites[2]->thinker = std::make_shared<ThinkerLogic>(
-		[](Sprite& sprite, Map& map, float deltaT) {
-			sprite.move(map, sf::Vector2f(0.0f, 0.1f) * deltaT);
-		}
-	);*/
 	for (auto sp : sprites)
 	{
-		nowMap->insertInBlockMap((sf::Vector2i)sp->position,sp.get());
+		nowMap->insertInBlockMap((sf::Vector2i)sp->position, sp.get());
+	}
+}
+
+void Game::resetMap()
+{
+	for (auto sp = sprites.begin(); sp != sprites.end();)
+	{
+		if ((*sp)->texture != -1)
+		{
+			sp = sprites.erase(sp);
+		}
+		else
+		{
+			sp++;
+		}
+	}
+
+	for (auto sp : nowMap->getMapSprites())
+	{
+		if (sp.idx != 0)
+		{
+			auto def = spriteDef[sp.idx];
+			auto sprite = std::make_shared<Sprite>(def, sp);
+			sprites.push_back(sprite);
+		}
 	}
 }
 

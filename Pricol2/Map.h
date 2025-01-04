@@ -41,7 +41,9 @@ public:
 	void insertInBlockMap(sf::Vector2i pos, Sprite* sprite);
 	void removeInBlockMap(sf::Vector2i pos, Sprite* sprite);
 	std::set<Sprite*> getBlockMap(sf::Vector2i pos) const;
-	const std::vector<MapSprite>& getSprites() const;
+	std::vector<MapSprite>& getMapSprites();
+	void setSprites(Sprite& sprite);
+	void deleteSprite(sf::Vector2i mapPos);
 private:
 	std::vector<std::vector<std::array<int, LAYER_COUNT>>> grid;
 	std::vector<std::vector<std::set<Sprite*>>> blockMap;

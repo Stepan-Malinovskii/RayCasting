@@ -45,14 +45,6 @@ void Map::SaveGrid(const std::string& path)
 		}
 	}
 
-	std::vector<MapSprite> sprites =
-	{
-		{0, {2.0f, 2.0f}, 0},
-		{1, {2.5f, 2.5f}, 0},
-		{2, {6.5f, 6.5f}, 0},
-		{3, {8.5f, 8.5f}, 0},
-		{4, {7.5f, 10.5f}, 0}
-	};
 	int numSp = sprites.size();
 	out.write(reinterpret_cast<const char*>(&numSp), sizeof(numSp));
 	for (int i = 0; i < sprites.size(); i++)
@@ -125,7 +117,44 @@ std::set<Sprite*> Map::getBlockMap(sf::Vector2i pos) const
 	return {};
 }
 
-const std::vector<MapSprite>& Map::getSprites() const
+std::vector<MapSprite>& Map::getMapSprites()
 {
 	return sprites;
+}
+
+void Map::setSprites(Sprite& sprite)
+{
+	sf::Vector2i pos = (sf::Vector2i)sprite.position;
+	int l = blockMap[pos.y][pos.x].size();
+	insertInBlockMap((sf::Vector2i)sprite.position, &sprite);
+	if (l != blockMap[pos.y][pos.x].size())
+	{
+		sprites.push_back({ sprite.texture + 1, sprite.position, sprite.angle });
+	}
+}
+
+void Map::deleteSprite(sf::Vector2i mapPos)
+{
+	if (mapPos.x >= 0 && mapPos.y >= 0 && mapPos.y < blockMap.size() && mapPos.x < blockMap[mapPos.y].size())
+	{
+		for (auto sp = blockMap[mapPos.y][mapPos.x].begin(); sp != blockMap[mapPos.y][mapPos.x].end();)
+		{
+			if ((*sp)->texture != -1)
+			{
+				sp = blockMap[mapPos.y][mapPos.x].erase(sp);
+			}
+			else
+			{
+				sp++;
+			}
+		}
+
+		for (int i = 0; i < sprites.size(); i++)
+		{
+			if ((sf::Vector2i)sprites[i].position == mapPos)
+			{
+				sprites.erase(sprites.begin() + i);
+			}
+		}
+	}
 }
