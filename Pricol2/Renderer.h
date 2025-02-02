@@ -33,6 +33,7 @@ private:
 
 	sf::VertexArray walls{ sf::Lines };
 	sf::VertexArray spriteColumns{ sf::Lines };
+	sf::VertexArray debugColumns{ sf::Lines };
 	float* distanceBuffer;
 
 	std::vector<std::jthread>* threads;
@@ -40,7 +41,7 @@ private:
 	void DrawFloor(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, sf::Vector2f& rayPos,
 		const Map& map, int startH, int endH);
 	void DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, const sf::Vector2f& playerPos,
-		std::vector<std::shared_ptr<Sprite>>& sprites, float invDet, float spriteTextSizeY);
+		std::vector<std::shared_ptr<Sprite>>& sprites, float invDet, float plAngle);
 };
 
 #endif // !RENDERER

@@ -11,7 +11,7 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H),"Game");
 	window.setMouseCursorVisible(false);
 
-	sf::RenderWindow editorWindow(sf::VideoMode(500,500), "Editor");
+	sf::RenderWindow editorWindow(sf::VideoMode(450,500), "Editor");
 	editorWindow.setPosition(sf::Vector2i(0, 0));
 	editorWindow.setActive(false);
 	editorWindow.setVisible(false);
@@ -25,11 +25,13 @@ int main()
 	if (!Resources::skyTextures.loadFromFile("Texture/sky_texture1.png")) return 1;
 	Resources::skyTextures.setRepeated(true);
 
-	Map map{};
-	map.LoadGrid("Texture/test.map");
+	std::unique_ptr<Map> map = std::make_unique<Map>();
+	map->LoadGrid("Texture/test.map");
 	Editor editor{};
-	editor.init(window, &map);
-	Game logic(&window, &map);
+	editor.init(window, editorWindow, map.get());
+	Game logic(&window, map.get());
+
+
 
 	sf::Clock gameClock;
 
@@ -67,10 +69,8 @@ int main()
 						editorWindow.setVisible(true);
 						editorWindow.setActive(true);
 					}
-
 				}
-			}
-
+			} 
 			if (state == State::Editor)
 			{
 				editor.windowEvent(event);
@@ -85,6 +85,7 @@ int main()
 				{
 					editorWindow.close();
 				}
+				editor.editorEvent(event);
 			}
 		}
 
@@ -99,7 +100,7 @@ int main()
 			window.clear();
 
 			editor.takeInput(window, editorWindow);
-			map.Draw(window, editor.drawerLayer());
+			map->Draw(window, editor.drawerLayer());
 			editor.drawEditor(editorWindow);
 			
 			editorWindow.display();
@@ -109,5 +110,5 @@ int main()
 		window.setTitle("Game " + std::to_string(1.0f / deltaTime));
 	}
 
-	map.SaveGrid("Texture/test.map");
+	map->SaveGrid("Texture/test.map");
 }

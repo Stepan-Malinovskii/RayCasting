@@ -7,12 +7,23 @@ Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
 	{
 		auto def = spriteDef[sp.idx];
 		auto sprite = std::make_shared<Sprite>(def, sp);
-		sprites.push_back(sprite);
 
 		if (sp.idx == 0) {
 			player = std::make_unique<Player>(sprite.get());
 		}
+		else
+		{
+			sprite->thinker = std::make_shared<ThinkerLogic>([](Sprite& sprite1, Map& map, float deltaT) {
+				sprite1.angle += 100 * deltaT;
+				});
+		}
+
+		sprites.push_back(sprite);
 	}
+
+	/*sprites[2]->thinker = std::make_shared<ThinkerLogic>([](Sprite& sprite, Map& map, float deltaT) {
+		sprite.move(map, sf::Vector2f(0, 0.7f) * deltaT);
+		});*/
 
 	if (!player) {
 		auto def = spriteDef[0];
@@ -24,6 +35,7 @@ Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
 	for (auto sp : sprites)
 	{
 		nowMap->insertInBlockMap((sf::Vector2i)sp->position, sp.get());
+		sp->setupBlockmap(*nowMap);
 	}
 }
 

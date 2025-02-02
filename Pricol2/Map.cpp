@@ -3,25 +3,59 @@
 void Map::Draw(sf::RenderTarget& target, int layerNumber)
 {
 	if (grid.empty()) return;
-
+	
 	sf::RectangleShape cell(sf::Vector2f(TEXTURE_SIZE * 0.95, TEXTURE_SIZE * 0.95));
 	cell.setTexture(&Resources::textures);
 
-	for (int y = 0; y < grid.size(); y++)
+	if (layerNumber != SPRITE_LAYER)
 	{
-		for (int x = 0; x < grid[y].size(); x++)
+		for (int y = 0; y < grid.size(); y++)
 		{
-			int init = grid[y][x][layerNumber];
-			if (init != 0)
+			for (int x = 0; x < grid[y].size(); x++)
 			{
-				cell.setTextureRect(sf::IntRect(sf::Vector2i(TEXTURE_SIZE * (init - 1), 0.0f),
-					sf::Vector2i(TEXTURE_SIZE, TEXTURE_SIZE)));
-				cell.setPosition(TEXTURE_SIZE * (sf::Vector2f(x, y) + sf::Vector2f(0.025, 0.025)));
-				target.draw(cell);
+				int init = grid[y][x][layerNumber];
+				if (init != 0)
+				{
+					cell.setTextureRect(sf::IntRect(sf::Vector2i(TEXTURE_SIZE * (init - 1), 0.0f),
+						sf::Vector2i(TEXTURE_SIZE, TEXTURE_SIZE)));
+					cell.setPosition(TEXTURE_SIZE * (sf::Vector2f(x, y) + sf::Vector2f(0.025, 0.025)));
+					target.draw(cell);
+				}
 			}
 		}
 	}
-	
+	else
+	{
+		cell.setFillColor(sf::Color(255, 255, 255, 100));
+		for (int y = 0; y < grid.size(); y++)
+		{
+			for (int x = 0; x < grid[y].size(); x++)
+			{
+				int init = grid[y][x][WALL_LAYER];
+				if (init != 0)
+				{
+					cell.setTextureRect(sf::IntRect(sf::Vector2i(TEXTURE_SIZE * (init - 1), 0.0f),
+						sf::Vector2i(TEXTURE_SIZE, TEXTURE_SIZE)));
+					cell.setPosition(TEXTURE_SIZE * (sf::Vector2f(x, y) + sf::Vector2f(0.025, 0.025)));
+					target.draw(cell);
+				}
+			}
+		}
+
+		sf::RectangleShape spShape(sf::Vector2f(TEXTURE_SIZE * 0.95, TEXTURE_SIZE * 0.95));
+		spShape.setTexture(&Resources::spritesTexture);
+
+		for (auto sp : sprites)
+		{
+			if (sp.idx != 0)
+			{
+				spShape.setTextureRect(sf::IntRect(sf::Vector2i(0.0f, SPRITE_SIZE * (sp.idx - 1)),
+					sf::Vector2i(SPRITE_SIZE, SPRITE_SIZE)));
+				spShape.setPosition((sf::Vector2f)((int)TEXTURE_SIZE * (sf::Vector2i)sp.position));
+				target.draw(spShape);
+			}
+		}
+	}
 }
 
 void Map::SaveGrid(const std::string& path)

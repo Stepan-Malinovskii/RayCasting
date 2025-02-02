@@ -39,13 +39,15 @@ struct SpriteDef
 {
 	std::string name;
 	float size;
+	float healPoint;
 	int indexTexture;
+	bool isDirectional;
 };
 
 class Sprite
 {
 public:
-	Sprite(sf::Vector2f pos, float size, int indText, float angle = 0.0f);
+	Sprite(sf::Vector2f pos, float size, int indText, float angle = 0.0f, bool isDirect = false, float HP = 100.0f);
 	Sprite(SpriteDef spDef, MapSprite spMap);
 	Sprite() = default;
 
@@ -53,19 +55,23 @@ public:
 	void setupBlockmap(Map& map);
 	sf::Vector2f position;
 	int texture;
-	float angle, size;
+	bool isDirectional;
+	float angle, size, healPoint;
 
 	std::shared_ptr<Thinker> thinker;
 
 private:
-	bool checkCollision(const Map& map, sf::Vector2f newPos);
-	sf::Vector2i blockmap_coords;
+	bool checkCollision(const Map& map, sf::Vector2f newPos, bool xAxis);
+	std::set<std::tuple<int,int>> blockmap_coords;
 };
 
 static std::vector<SpriteDef> spriteDef = {
-	{ "player", 0.3f, -1 },
-	{ "shar", 1.0f, 0 },
-	{ "rog", 1.0f, 1 },
-	{ "gorb", 1.0f, 2 },
-	{ "kozel", 1.0f, 3 }};
+	{ "player", 0.3f, 100.0f, -1, false},
+	{ "shar", 1.0f, 100.f, 0, true },
+	{ "rog", 0.5f, 100.f, 1, true },
+	{ "gorb", 1.0f, 100.f, 2, true },
+	{ "kozel", 1.0f, 100.f, 3, true },
+	{ "robot", 1.0f, 100.f, 4, true},
+	{ "bachka", 1.0f, 100.f, 5, true},
+	{ "pyshka", 1.0f, 100.f, 6, true} };
 #endif // !SPRITE

@@ -59,11 +59,10 @@ void Renderer::Draw3DView(sf::RenderTarget& target, sf::Vector2f position, float
 	std::sort(sprites.begin(), sprites.end(), comperer);
 
 	float invDet = 1.0f / (cameraPlane.x * pDirection.y - cameraPlane.y * pDirection.x);
-	float spriteTextSizeY = Resources::spritesTexture.getSize().y;
 
 	auto sprite_func = [&]() {
 		DrawSprite(pDirection, cameraPlane, position, sprites,
-			invDet, spriteTextSizeY);
+			invDet, angle);
 		};
 
 	for (int cnt = 0; cnt < THREAD_COUNT - 1; cnt++)
@@ -196,13 +195,15 @@ void Renderer::Draw3DView(sf::RenderTarget& target, sf::Vector2f position, float
 	
 	states.texture = &Resources::spritesTexture;
 	target.draw(spriteColumns, states);
+	target.draw(debugColumns);
 
 	spriteColumns.clear();
+	debugColumns.clear();
 	walls.clear();
 }
 
 void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, const sf::Vector2f& playerPos,
-	std::vector<std::shared_ptr<Sprite>>& sprites, float invDet, float spriteTextSizeY)
+	std::vector<std::shared_ptr<Sprite>>& sprites, float invDet, float plAngle)
 {
 
 	for (auto sp : sprites)
@@ -225,17 +226,47 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, c
 		int drawStart = -spriteSize / 2 + screenX;
 		int drawEnd = spriteSize / 2 + screenX;
 
-		float spText = sp->texture * (spriteTextSizeY + 1);
+		float startYtext= sp->texture * SPRITE_SIZE, endYtext = SPRITE_SIZE * (sp->texture + 1);
+		float deltaRotateText = 0.0f;
+		if (sp->isDirectional)
+		{
+			sf::Vector2f dir = spritePos;
+			float len = sqrt(dir.x * dir.x + dir.y * dir.y);
+			dir /= len;
+
+			float spAngle = sp->angle * PI / 180.0f;
+			float angle = spAngle - atan2(dir.y, dir.x);
+			angle = angle * 180.0f / PI;
+			angle = round(angle / 45.0f) * 45.0f;
+			angle = fmod(angle, 360.0f);
+			if (angle < 0.0f)
+			{
+				angle += 360.0f;
+			}
+			deltaRotateText = SPRITE_SIZE * (angle / 45.0f);
+		}
+
+		int spriteStart = -spriteSize * sp->size / 2 + screenX,
+			spriteEnd = spriteSize * sp->size / 2 + screenX;
 		for (int i = std::max(drawStart, 0); i < std::min(drawEnd, (int)SCREEN_W - 1); i++)
 		{
 			if (transforme.y > 0 && transforme.y < distanceBuffer[i])
 			{
-				float textX = spText + (i - drawStart) * spriteTextSizeY / spriteSize;
+				float textX = (i - drawStart) * SPRITE_SIZE / spriteSize;
+				sf::Vector2f textStart(textX + deltaRotateText, startYtext + 0.1f);
+				sf::Vector2f textEnd(textX + deltaRotateText, endYtext);
 
-				spriteColumns.append(sf::Vertex({ (float)i, -spriteSize / 2.0f + SCREEN_H / 2.0f },
-					{ textX, 0 }));
-				spriteColumns.append(sf::Vertex({ (float)i, spriteSize / 2.0f + SCREEN_H / 2.0f },
-					{ textX, spriteTextSizeY }));
+				sf::Vector2f vertStart(i, -spriteSize / 2.0f + SCREEN_H / 2.0f);
+				sf::Vector2f vertEnd(i, spriteSize / 2.0f + SCREEN_H / 2.0f);
+
+				spriteColumns.append(sf::Vertex(vertStart, textStart));
+				spriteColumns.append(sf::Vertex(vertEnd, textEnd));
+
+				if (i == drawStart || i == drawEnd)
+				{
+					debugColumns.append(sf::Vertex(vertStart, sf::Color::Green));
+					debugColumns.append(sf::Vertex(vertEnd, sf::Color::Green));
+				}
 			}
 		}
 

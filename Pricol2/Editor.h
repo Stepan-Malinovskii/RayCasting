@@ -11,7 +11,7 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <functional>
 
-constexpr int COUNT_ROW_TEXT = 6;
+constexpr int COUNT_ROW_TEXT = 7;
 
 class EdingButton : public Button
 {
@@ -33,21 +33,22 @@ private:
 class Editor
 {
 public:
-	void init(sf::RenderWindow& window, Map* map);
+	void init(sf::RenderWindow& window, sf::RenderWindow& editorWindow, Map* map);
 	void takeInput(sf::RenderWindow& window, sf::RenderWindow& editorWindow);
 	void windowEvent(const sf::Event& event);
+	void editorEvent(const sf::Event& event);
 	void drawEditor(sf::RenderWindow& editorWindow);
 
 	int drawerLayer() const;
 private:
-	bool isFirstMouse, spriteMode;
+	bool isFirstMouse;
 	int nowValue;
 	int nowLayer;
 	SpriteDef nowSpriteDef;
 	sf::RectangleShape cellShape;
 	sf::Vector2i lastMousePos;
 	sf::Vector2i windowMousePos, editorMousePos;
-	sf::View view;
+	sf::View windowView, editorView;
 	Map* nowMap;
 	std::vector<std::shared_ptr<Button>> buttons;
 

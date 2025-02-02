@@ -2,12 +2,13 @@
 #include <SFML/Window/Mouse.hpp>
 #include <SFML/Window/Event.hpp>
 
-void Editor::init(sf::RenderWindow& window, Map* map)
+void Editor::init(sf::RenderWindow& window, sf::RenderWindow& editorWindow, Map* map)
 {
 	nowMap = map;
 	nowValue = 1;
 	nowLayer = WALL_LAYER;
-	view = window.getView();
+	windowView = window.getView();
+	editorView = editorWindow.getView();
 	cellShape.setSize(sf::Vector2f(TEXTURE_SIZE, TEXTURE_SIZE));
 	cellShape.setFillColor(sf::Color::Cyan);
 
@@ -23,20 +24,20 @@ void Editor::initButton()
 		b = EdingButton(TEXTURE_SIZE * (sf::Vector2f(x % COUNT_ROW_TEXT, y / COUNT_ROW_TEXT) + sf::Vector2f(0.025f, 0.025f)),
 			{ TEXTURE_SIZE * 0.95, TEXTURE_SIZE * 0.95, }, Resources::textures, { {(int)(x * TEXTURE_SIZE), 0}, {(int)TEXTURE_SIZE, (int)TEXTURE_SIZE} });
 		b.setFunc([=]() { 
-			spriteMode = false;
 			nowValue = x + 1;
 			});
 		
 		buttons.push_back(std::make_shared<EdingButton>(b));
 	}
-	int lastX = x;
+
+	y /= COUNT_ROW_TEXT + 1;
+	y = y * (COUNT_ROW_TEXT - 3);
 	
-	for (x = 0, y += y % COUNT_ROW_TEXT; x < Resources::spritesTexture.getSize().x / SPRITE_SIZE; x++, y++)
+	for (x = 0; x < Resources::spritesTexture.getSize().y / SPRITE_SIZE; x++, y++)
 	{
-		b = EdingButton(SPRITE_SIZE * (sf::Vector2f(x % COUNT_ROW_TEXT, y / COUNT_ROW_TEXT) + sf::Vector2f(0.025f, 0.025f)),
-			{ SPRITE_SIZE, SPRITE_SIZE}, Resources::spritesTexture, { { (int)(x * SPRITE_SIZE), 0 }, {(int)SPRITE_SIZE, (int)SPRITE_SIZE} });
+		b = EdingButton(SPRITE_SIZE * (sf::Vector2f(x % (COUNT_ROW_TEXT - 3), y / (COUNT_ROW_TEXT - 3)) + sf::Vector2f(0.025f, 0.025f)),
+			{ SPRITE_SIZE, SPRITE_SIZE }, Resources::spritesTexture, { { 0, (int)(SPRITE_SIZE * x)}, {(int)SPRITE_SIZE, (int)SPRITE_SIZE}});
 		b.setFunc([=]() { 
-			spriteMode = true;
 			nowSpriteDef = spriteDef[x + 1];
 			});
 		buttons.push_back(std::make_shared<EdingButton>(b));
@@ -63,16 +64,8 @@ void Editor::takeInput(sf::RenderWindow& window, sf::RenderWindow& editorWindow)
 		editorWindowStateLeftClick(editorWindow);
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Tab))
-	{
-		if (window.hasFocus())
-		{
-			nowLayer++;
-			nowLayer = nowLayer % LAYER_COUNT;
-		}
-	}
-
-	window.setView(view);
+	window.setView(windowView);
+	editorWindow.setView(editorView);
 }
 
 void Editor::windowStateRightClick(sf::RenderWindow& window)
@@ -88,7 +81,7 @@ void Editor::windowStateRightClick(sf::RenderWindow& window)
 		{
 			sf::Vector2i deltaMouse = windowMousePos - lastMousePos;
 
-			view.setCenter(view.getCenter() - (sf::Vector2f)deltaMouse);
+			windowView.setCenter(windowView.getCenter() - (sf::Vector2f)deltaMouse);
 
 			sf::Mouse::setPosition(lastMousePos, window);
 		}
@@ -114,7 +107,7 @@ void Editor::windowStateLeftClick(sf::RenderWindow& window)
 			(int)floor(worldPos.y - 0.1f) / TEXTURE_SIZE);
 		cellShape.setPosition((sf::Vector2f)mapPos * TEXTURE_SIZE);
 		window.draw(cellShape);
-		if (!spriteMode)
+		if (nowLayer != SPRITE_LAYER)
 		{
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
 			{
@@ -133,7 +126,7 @@ void Editor::windowStateLeftClick(sf::RenderWindow& window)
 			}
 			else
 			{
-				Sprite sp(nowSpriteDef, { nowSpriteDef.indexTexture, (sf::Vector2f)mapPos, 0.0f });
+				Sprite sp(nowSpriteDef, { nowSpriteDef.indexTexture, { mapPos.x + 0.5f, mapPos.y + 0.5f }, -90.0f });
 				nowMap->setSprites(sp);
 			}
 		}
@@ -144,7 +137,7 @@ void Editor::editorWindowStateLeftClick(sf::RenderWindow& editorWindow)
 {
 	if (editorWindow.hasFocus())
 	{
-		sf::Vector2f worldPos = editorWindow.mapPixelToCoords(editorMousePos);
+		sf::Vector2i worldPos = (sf::Vector2i)editorWindow.mapPixelToCoords(editorMousePos);
 		sf::Vector2i mapPos = sf::Vector2i((int)floor(worldPos.x - 0.1f) / TEXTURE_SIZE,
 			(int)floor(worldPos.y - 0.1f) / TEXTURE_SIZE);
 		cellShape.setPosition((sf::Vector2f)mapPos * TEXTURE_SIZE);
@@ -152,7 +145,7 @@ void Editor::editorWindowStateLeftClick(sf::RenderWindow& editorWindow)
 
 		for (auto b : buttons)
 		{
-			if (b->isClicked(editorMousePos))
+			if (b->isClicked(worldPos))
 			{
 				b->update();
 			}
@@ -173,7 +166,25 @@ void Editor::windowEvent(const sf::Event& event)
 	if (event.type == sf::Event::MouseWheelScrolled)
 	{
 		float zoom = 1.0f - 0.1f * event.mouseWheelScroll.delta;
-		view.zoom(zoom);
+		windowView.zoom(zoom);
+	}
+
+	if (event.type == sf::Event::KeyPressed)
+	{
+		if (event.key.code == sf::Keyboard::Tab)
+		{
+			nowLayer++;
+			nowLayer = nowLayer % ALL_LAYER;
+		}
+	}
+}
+
+void Editor::editorEvent(const sf::Event& event)
+{
+	if (event.type == sf::Event::MouseWheelScrolled)
+	{
+		float deltaScrol = -5 * event.mouseWheelScroll.delta;
+		editorView.move({0, deltaScrol});
 	}
 }
 
