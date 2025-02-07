@@ -36,7 +36,7 @@ class Map
 public:
 	void Draw(sf::RenderTarget& window, int layerNumber);
 	void SetNewOnGrid(int x, int y, int layerNumber, int value);
-	int const GetNewOnGrid(int x, int y, int layerNumber) const;
+	int const GetOnGrid(int x, int y, int layerNumber) const;
 	void LoadGrid(const std::string& path);
 	void SaveGrid(const std::string& path);
 

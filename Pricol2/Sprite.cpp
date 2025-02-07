@@ -1,8 +1,9 @@
 #include "Sprite.h"
 #include "Map.h"
 
-Sprite::Sprite(sf::Vector2f pos, float _size, int indText, float _angle, bool isDirect, float HP)
-	: position{ pos }, size{ _size }, texture{ indText }, angle{ _angle }, isDirectional{ isDirect }, healPoint{ HP } {}
+Sprite::Sprite(sf::Vector2f pos, float _size, int indText, float _angle, bool isDirect, float HP, SpriteType _type)
+	: position{ pos }, size{ _size }, texture{ indText }, angle{ _angle }, 
+	isDirectional{ isDirect }, healPoint{ HP }, type{ _type } {}
 
 Sprite::Sprite(SpriteDef spDef, MapSprite spMap) : Sprite(spMap.position, spDef.size ,spDef.indexTexture, spMap.angle, spDef.isDirectional, spDef.healPoint) {}
 
@@ -49,12 +50,6 @@ void Sprite::setupBlockmap(Map& map)
 	for (const auto& [x, y] : to_insert) { map.insertInBlockMap({ x, y }, this); }
 
 	blockmap_coords = coords;
-	/*if (blockmap_coords != (sf::Vector2i)position)
-	{
-		map.removeInBlockMap(blockmap_coords, this);
-		blockmap_coords = (sf::Vector2i)position;
-		map.insertInBlockMap(blockmap_coords, this);
-	}*/
 }
 
 bool Sprite::checkCollision(const Map& map, sf::Vector2f newPos, bool xAxis)
@@ -64,7 +59,7 @@ bool Sprite::checkCollision(const Map& map, sf::Vector2f newPos, bool xAxis)
 	sf::Vector2f thisEnd = newPos + thisSize;
 
 	if (xAxis) {
-		if (map.GetNewOnGrid(newPos.x, newPos.y, WALL_LAYER)) { return true; }
+		if (map.GetOnGrid(newPos.x, newPos.y, WALL_LAYER)) { return true; }
 
 		auto curSp = map.getBlockMap((sf::Vector2i)newPos);
 		for (auto sp : curSp) {
@@ -89,7 +84,7 @@ bool Sprite::checkCollision(const Map& map, sf::Vector2f newPos, bool xAxis)
 		}
 	}
 	else {
-		if (map.GetNewOnGrid(newPos.x, newPos.y, WALL_LAYER)) { return true; }
+		if (map.GetOnGrid(newPos.x, newPos.y, WALL_LAYER)) { return true; }
 
 		const auto& set = map.getBlockMap({ (int)newPos.x, (int)newPos.y});
 		for (const auto& thing : set) {

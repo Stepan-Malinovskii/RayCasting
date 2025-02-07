@@ -95,88 +95,36 @@ void Renderer::Draw3DView(sf::RenderTarget& target, sf::Vector2f position, float
 
 	//NewAlgoritmPart
 	sf::Vector2f rayDir;
-	sf::Vector2i rayStep;
-	sf::Vector2f deltaDist;
-	sf::Vector2i rayMapPos;
-	sf::Vector2f sideDist;
-	for (int i = 1; i <= SCREEN_W; i++)
+	for (int i = 0; i <= SCREEN_W; i++)
 	{
 		float cameraX = i * 2.0f / SCREEN_W - 1.0f;
 		rayDir = pDirection + cameraPlane * cameraX;
-		rayStep;
-		deltaDist.x = abs(1.0f / rayDir.x); deltaDist.y = abs(1.0f / rayDir.y);
-		rayMapPos.x = rayPos.x; rayMapPos.y = rayPos.y;
-		sideDist;
 
-		int isHit = 0;
-		bool isHitVer = false;
-		int rayDeth = 0;
+		RayHit hit = raycast(map, rayPos, rayDir);
 
-		if (rayDir.x < 0.0f)
+		if (hit.cell)
 		{
-			rayStep.x = -1;
-			sideDist.x = (rayPos.x - rayMapPos.x) * deltaDist.x;
-		}
-		else
-		{
-			rayStep.x = 1;
-			sideDist.x = (rayMapPos.x - rayPos.x + 1.0f) * deltaDist.x;
-		}
-
-		if (rayDir.y < 0.0f)
-		{
-			rayStep.y = -1;
-			sideDist.y = (rayPos.y - rayMapPos.y) * deltaDist.y;
-		}
-		else
-		{
-			rayStep.y = 1;
-			sideDist.y = (rayMapPos.y - rayPos.y + 1.0f) * deltaDist.y;
-		}
-
-		while (isHit == 0 && rayDeth < MAX_DETH)
-		{
-			if (sideDist.x < sideDist.y)
-			{
-				sideDist.x += deltaDist.x;
-				rayMapPos.x += rayStep.x;
-				isHitVer = false;
-			}
-			else
-			{
-				sideDist.y += deltaDist.y;
-				rayMapPos.y += rayStep.y;
-				isHitVer = true;
-			}
-
-			isHit = map.GetNewOnGrid(rayMapPos.x, rayMapPos.y, WALL_LAYER);
-			rayDeth++;
-		}
-		if (isHit != 0)
-		{
-			float perpWallDist = isHitVer ? sideDist.y - deltaDist.y :
-				sideDist.x - deltaDist.x;
-			float wallHeight = SCREEN_H / perpWallDist;
+			float wallHeight = SCREEN_H / hit.perpWallDist;
 			float wallStart = (SCREEN_H - wallHeight) / 2.0f;
 			float wallEnd = (SCREEN_H + wallHeight) / 2.0f;
 
-			float wallX = isHitVer ? rayPos.x + perpWallDist * rayDir.x :
-				rayPos.y + perpWallDist * rayDir.y;
+			float wallX = hit.isHitVert ? rayPos.x + hit.perpWallDist * rayDir.x :
+				rayPos.y + hit.perpWallDist * rayDir.y;
 
 			wallX -= floor(wallX);
 			float textureX = wallX * TEXTURE_SIZE;
 
-			float brightnes = 1.0f - (perpWallDist / brightnesDist);
-			if (isHitVer) brightnes -= 0.2f;
+			float brightnes = 1.0f - (hit.perpWallDist / brightnesDist);
+			if (hit.isHitVert) brightnes -= 0.2f;
 			if (brightnes < 0.0f) brightnes = 0.0f;
 			sf::Color colorShade(255 * brightnes, 255 * brightnes, 255 * brightnes);
 
 			walls.append(sf::Vertex(sf::Vector2f((float)i, wallStart), colorShade,
-				sf::Vector2f(textureX + (isHit - 1) * TEXTURE_SIZE, 0.0f)));
+				sf::Vector2f(textureX + (hit.cell - 1) * TEXTURE_SIZE, 0.0f)));
 			walls.append(sf::Vertex(sf::Vector2f((float)i, wallEnd), colorShade,
-				sf::Vector2f(textureX + (isHit - 1) * TEXTURE_SIZE, TEXTURE_SIZE)));
+				sf::Vector2f(textureX + (hit.cell - 1) * TEXTURE_SIZE, TEXTURE_SIZE)));
 
-			distanceBuffer[i] = perpWallDist;
+			distanceBuffer[i] = hit.perpWallDist;
 		}
 	}
 
@@ -262,7 +210,7 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, c
 				spriteColumns.append(sf::Vertex(vertStart, textStart));
 				spriteColumns.append(sf::Vertex(vertEnd, textEnd));
 
-				if (i == drawStart || i == drawEnd)
+				if (i == drawStart || i == drawEnd - 1)
 				{
 					debugColumns.append(sf::Vertex(vertStart, sf::Color::Green));
 					debugColumns.append(sf::Vertex(vertEnd, sf::Color::Green));
@@ -289,8 +237,8 @@ void Renderer::DrawFloor(sf::Vector2f& rayDirLeft, sf::Vector2f& rayDirRight, sf
 			textCoords.x &= (int)TEXTURE_SIZE - 1;
 			textCoords.y &= (int)TEXTURE_SIZE - 1;
 
-			int floorText = map.GetNewOnGrid(cell.x, cell.y, FLOOR_LAYER);
-			int cellingText = map.GetNewOnGrid(cell.x, cell.y, CELL_LAYER);
+			int floorText = map.GetOnGrid(cell.x, cell.y, FLOOR_LAYER);
+			int cellingText = map.GetOnGrid(cell.x, cell.y, CELL_LAYER);
 
 			sf::Color floorColor, cellingColor;
 

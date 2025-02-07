@@ -18,10 +18,10 @@ int main()
 
 	State state = State::Game;
 	
-	if (!Resources::playerGunTexture.loadFromFile("Texture/player_gun.png")) return 1;
+	if (!Resources::playerGunTexture.loadFromFile("Texture/weapon.png")) return 1;
 	if (!Resources::textureImage.loadFromFile("Texture/wall_texture.png")) return 1;
 	Resources::textures.loadFromImage(Resources::textureImage);
-	if (!Resources::spritesTexture.loadFromFile("Texture/enemys.png")) return 1;
+	if (!Resources::spritesTexture.loadFromFile("Texture/enemys1.png")) return 1;
 	if (!Resources::skyTextures.loadFromFile("Texture/sky_texture1.png")) return 1;
 	Resources::skyTextures.setRepeated(true);
 

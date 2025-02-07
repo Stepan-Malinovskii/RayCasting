@@ -3,14 +3,15 @@
 #define PLAYER
 
 #include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <vector>
 
 #include "Map.h"
 #include "Resources.h"
-#include "Sprite.h"
+#include "Animation.h"
+#include "Weapon.h"
 
 constexpr float MOVE_SPEED = 4.0f, ROTATION_SPEED = 80.0f, MOUSE_TURN_SPEED = 0.08f;
 
@@ -25,7 +26,12 @@ public:
 	Sprite* sprite;
 private:
 	sf::Vector2i lastMousePos;
-	sf::RectangleShape gunSprite;
+
+	sf::Texture weaponBaseTexture;
+	Animator<sf::Texture*> weaponAnimator;
+	std::array<sf::Texture, 4> weaponTexture;
+
+	float damage = 10.0f;
 };
 
 #endif // !PLAYER

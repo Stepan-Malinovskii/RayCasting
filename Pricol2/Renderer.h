@@ -10,8 +10,10 @@
 
 #include "Map.h"
 #include "Sprite.h"
+#include "Raycast.h"
+#include "Resources.h"
 
-constexpr float SCREEN_W = 1280.0f, SCREEN_H = 720.0f, PLAYER_FOV = 60.0f, CAMERA_Z = SCREEN_H / 2.0f, ASPECT = SCREEN_W / SCREEN_H * 0.5f;
+constexpr float PLAYER_FOV = 60.0f, CAMERA_Z = SCREEN_H / 2.0f, ASPECT = SCREEN_W / SCREEN_H * 0.5f;
 constexpr int THREAD_COUNT = 8, MAX_DETH = 64;
 
 class Renderer

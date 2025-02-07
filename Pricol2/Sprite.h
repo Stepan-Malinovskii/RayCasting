@@ -16,6 +16,11 @@ class Map;
 class MapSprite;
 class Sprite;
 
+enum SpriteType
+{
+	Enemy, Thing
+};
+
 class Thinker
 {
 public:
@@ -47,7 +52,7 @@ struct SpriteDef
 class Sprite
 {
 public:
-	Sprite(sf::Vector2f pos, float size, int indText, float angle = 0.0f, bool isDirect = false, float HP = 100.0f);
+	Sprite(sf::Vector2f pos, float size, int indText, float angle = 0.0f, bool isDirect = false, float HP = 100.0f, SpriteType type = Enemy);
 	Sprite(SpriteDef spDef, MapSprite spMap);
 	Sprite() = default;
 
@@ -55,6 +60,7 @@ public:
 	void setupBlockmap(Map& map);
 	sf::Vector2f position;
 	int texture;
+	SpriteType type;
 	bool isDirectional;
 	float angle, size, healPoint;
 
@@ -68,7 +74,7 @@ private:
 static std::vector<SpriteDef> spriteDef = {
 	{ "player", 0.3f, 100.0f, -1, false},
 	{ "shar", 1.0f, 100.f, 0, true },
-	{ "rog", 0.5f, 100.f, 1, true },
+	{ "rog", 1.0f, 100.f, 1, true },
 	{ "gorb", 1.0f, 100.f, 2, true },
 	{ "kozel", 1.0f, 100.f, 3, true },
 	{ "robot", 1.0f, 100.f, 4, true},

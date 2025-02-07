@@ -119,7 +119,7 @@ void Map::SetNewOnGrid(int x, int y, int layerNumber, int value)
 		grid[y][x][layerNumber] = value;
 }
 
-int const Map::GetNewOnGrid(int x, int y, int layerNumber) const
+int const Map::GetOnGrid(int x, int y, int layerNumber) const
 {
 	if (y >= 0 && y < grid.size() && x >= 0 && x < grid[y].size())
 		return grid[y][x][layerNumber];
@@ -139,6 +139,15 @@ void Map::removeInBlockMap(sf::Vector2i pos, Sprite* sprite)
 	if (pos.x >= 0 && pos.y >= 0 && pos.y < blockMap.size() && pos.x < blockMap[pos.y].size())
 	{
 		blockMap[pos.y][pos.x].erase(sprite);
+
+		for (int i = 0; i < sprites.size(); i++)
+		{
+			if ((sf::Vector2i)sprites[i].position == pos)
+			{
+				sprites.erase(sprites.begin() + i);
+				break;
+			}
+		}
 	}
 }
 
@@ -175,7 +184,8 @@ void Map::deleteSprite(sf::Vector2i mapPos)
 		{
 			if ((*sp)->texture != -1)
 			{
-				sp = blockMap[mapPos.y][mapPos.x].erase(sp);
+				blockMap[mapPos.y][mapPos.x].erase(sp);
+				break;
 			}
 			else
 			{

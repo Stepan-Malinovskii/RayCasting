@@ -62,6 +62,11 @@ void Game::resetMap()
 			sprites.push_back(sprite);
 		}
 	}
+	
+	for (auto sp : sprites)
+	{
+		sp->setupBlockmap(*nowMap);
+	}
 }
 
 void Game::update(float deltaTime)
@@ -72,6 +77,32 @@ void Game::update(float deltaTime)
 		if (sp->thinker)
 		{
 			sp->thinker->update(*sp, *nowMap, deltaTime);
+		}
+	}
+
+	bool t = false;
+	for (auto sp = sprites.begin(); sp != sprites.end();)
+	{
+		if ((*sp)->healPoint <= 0.0f)
+		{
+			nowMap->removeInBlockMap((sf::Vector2i)(*sp)->position, sp->get());
+			for (int i = 0; i < sprites.size();i++)
+			{
+				if (sprites[i] == (*sp))
+				{
+					sprites.erase(sprites.begin() + i);
+					t = true;
+					break;
+				}
+			}
+			if (t)
+			{
+				break;
+			}
+		}
+		else
+		{
+			sp++;
 		}
 	}
 }

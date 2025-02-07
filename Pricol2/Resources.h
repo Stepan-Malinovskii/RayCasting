@@ -5,7 +5,8 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Image.hpp>
 
-const float TEXTURE_SIZE = 64.0f, SPRITE_SIZE = 104.0f;
+const float TEXTURE_SIZE = 64.0f, SPRITE_SIZE = 104.0f, GUN_SIZE = 1.0f;
+constexpr float SCREEN_W = 1280.0f, SCREEN_H = 720.0f;
 
 class Resources
 {
