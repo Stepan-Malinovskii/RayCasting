@@ -6,23 +6,16 @@
 
 Player::Player(Sprite* _sprite) : sprite{ _sprite }
 {
-	if (!weaponBaseTexture.loadFromFile("Texture/weapon.png")) exit(2);
-	if (!weaponTexture[0].loadFromFile("Texture/weapon_fire10.png")) exit(2);
-	if (!weaponTexture[1].loadFromFile("Texture/weapon_fire11.png")) exit(2);
-	if (!weaponTexture[2].loadFromFile("Texture/weapon_fire12.png")) exit(2);
-	if (!weaponTexture[3].loadFromFile("Texture/weapon_fire13.png")) exit(2);
-
-	weaponAnimator = Animator{ &weaponBaseTexture, {Animation<sf::Texture*>({
-		{0.0f, &weaponTexture[0]},
-		{0.15f, &weaponTexture[1]},
-		{0.3f, &weaponTexture[2]},
-		{0.45f, &weaponTexture[3]},
-		{0.6f, &weaponTexture[2]},
-		{0.75f, &weaponTexture[1]},
-		{0.9f, &weaponTexture[0]},
-		{1.0f, &weaponTexture[0]},
-
-})}};
+	gun = Gun(10.0f, 1.0f, { &Resources::gun1BaseTexture, {Animation<sf::Texture*>({
+		{0.0f, &Resources::gun1FireAnimationTexture[0]},
+		{0.15f, &Resources::gun1FireAnimationTexture[1]},
+		{0.3f, &Resources::gun1FireAnimationTexture[2]},
+		{0.45f, &Resources::gun1FireAnimationTexture[3]},
+		{0.6f, &Resources::gun1FireAnimationTexture[2]},
+		{0.75f, &Resources::gun1FireAnimationTexture[1]},
+		{0.9f, &Resources::gun1FireAnimationTexture[0]},
+		{1.0f, &Resources::gun1FireAnimationTexture[0]},
+		})} },[=](Sprite* sp) {sp->healPoint -= 10.0f;});
 	lastMousePos = sf::Vector2i(640, 360);
 }
 
@@ -60,24 +53,21 @@ void Player::UpdatePlayer(float deltaTime, Map& map, sf::RenderWindow& window)
 	sf::Mouse::setPosition(lastMousePos, window);
 
 	static bool justFired = false;
-	static float fireTimer = 0.0f;
-	fireTimer -= deltaTime;
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && fireTimer <= 0.0f)
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && gun.isCanUsed())
 	{
 		if (!justFired)
 		{
 			RayHit hit = raycast(map, sprite->position, verticalMoveParametrs, true, sprite);
 			if (hit.sprite)
 			{
-				hit.sprite->healPoint -= damage;
+				gun.ussing(hit.sprite);
 			}
 			//else if (hit.cell)
 			//{
 			//	//map.SetNewOnGrid(hit.mapPos.x, hit.mapPos.y, WALL_LAYER, 1); 
 			//}
-			fireTimer = 1.0f;
 			justFired = true;
-			weaponAnimator.setAnimation(0);
+			gun.startAnimation(0);
 		}
 	}
 
@@ -87,18 +77,10 @@ void Player::UpdatePlayer(float deltaTime, Map& map, sf::RenderWindow& window)
 	}
 
 	//AnimatorPart
-	weaponAnimator.update(deltaTime);
+	gun.update(deltaTime);
 }
 
 void Player::DrawPlayerUI(sf::RenderWindow& window)
 {
-	sf::Texture* tex = weaponAnimator.get();
-	if (tex)
-	{
-		sf::Sprite weapon{ *tex };
-		weapon.setOrigin(tex->getSize().x / 2.0f, tex->getSize().y);
-		weapon.setPosition(window.getSize().x / 2.0f, window.getSize().y);
-		weapon.scale(2.5f, 2.5f);
-		window.draw(weapon);
-	}
+	gun.drawWeapon(window);
 }

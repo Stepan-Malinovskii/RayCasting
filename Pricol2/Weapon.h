@@ -16,7 +16,7 @@
 class Weapon
 {
 public:
-	Weapon(float _timeBetewen, sf::Texture& baseText, std::vector<Animation<sf::Texture*>> animation);
+	Weapon(float _timeBetewen, Animator<sf::Texture*> anim);
 	Weapon() = default;
 
 	virtual void update(float dt)
@@ -47,15 +47,13 @@ public:
 
 	virtual void startAnimation(int number)
 	{
+
+		nowTime = 0.0f;
 		weaponAnimator.setAnimation(number);
 	}
 
-	virtual void ussing(Sprite* sp)
-	{
-		nowTime = 0.0f;
-	}
+	virtual void ussing(Sprite* sp) = 0;
 private:
-	sf::Texture weaponTexture;
 	Animator<sf::Texture*> weaponAnimator;
 	float timeBetwen, nowTime;
 };
@@ -63,19 +61,17 @@ private:
 class Gun : public Weapon
 {
 public:
-	Gun(float _damage, float _timeBetewen, sf::Texture baseText, std::vector<Animation<sf::Texture*>> animation,
-		std::function<void(Sprite* sp)> _fn) : Weapon(_timeBetewen, baseText, animation)
+	Gun(float _damage, float _timeBetewen, Animator<sf::Texture*> anim,
+		std::function<void(Sprite* sp)> _fn) : Weapon(_timeBetewen, anim)
 	{
 		damage = _damage;
 		fn = _fn;
 	}
 	Gun() = default;
 
-	void ussing(Sprite* sp)
+	void ussing(Sprite* sp) override
 	{
-		Weapon::ussing(sp);
 		fn(sp);
-		startAnimation(0);
 	}
 private:
 	std::function<void(Sprite* sp)> fn;

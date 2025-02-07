@@ -24,6 +24,11 @@ int main()
 	if (!Resources::spritesTexture.loadFromFile("Texture/enemys1.png")) return 1;
 	if (!Resources::skyTextures.loadFromFile("Texture/sky_texture1.png")) return 1;
 	Resources::skyTextures.setRepeated(true);
+	if (!Resources::gun1BaseTexture.loadFromFile("Texture/weapon.png")) return 1;
+	if (!Resources::gun1FireAnimationTexture[0].loadFromFile("Texture/weapon_fire10.png")) return 1;
+	if (!Resources::gun1FireAnimationTexture[1].loadFromFile("Texture/weapon_fire11.png")) return 1;
+	if (!Resources::gun1FireAnimationTexture[2].loadFromFile("Texture/weapon_fire12.png")) return 1;
+	if (!Resources::gun1FireAnimationTexture[3].loadFromFile("Texture/weapon_fire13.png")) return 1;
 
 	std::unique_ptr<Map> map = std::make_unique<Map>();
 	map->LoadGrid("Texture/test.map");

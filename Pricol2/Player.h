@@ -26,12 +26,7 @@ public:
 	Sprite* sprite;
 private:
 	sf::Vector2i lastMousePos;
-
-	sf::Texture weaponBaseTexture;
-	Animator<sf::Texture*> weaponAnimator;
-	std::array<sf::Texture, 4> weaponTexture;
-
-	float damage = 10.0f;
+	Gun gun;
 };
 
 #endif // !PLAYER
