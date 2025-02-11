@@ -26,7 +26,8 @@ public:
 	Sprite* sprite;
 private:
 	sf::Vector2i lastMousePos;
-	Gun gun;
+	int nowGun;
+	std::vector<Gun> guns;
 };
 
 #endif // !PLAYER

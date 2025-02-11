@@ -6,6 +6,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Audio.hpp>
 #include <vector>
 #include <array>
 #include <functional>
@@ -47,7 +48,6 @@ public:
 
 	virtual void startAnimation(int number)
 	{
-
 		nowTime = 0.0f;
 		weaponAnimator.setAnimation(number);
 	}
@@ -61,21 +61,69 @@ private:
 class Gun : public Weapon
 {
 public:
-	Gun(float _damage, float _timeBetewen, Animator<sf::Texture*> anim,
-		std::function<void(Sprite* sp)> _fn) : Weapon(_timeBetewen, anim)
+	Gun(float _damage, int maxCnt, float _timeBetewen, float _timeBetewenReset, Animator<sf::Texture*>& anim,
+		std::function<void(Sprite* sp)> _fn, std::function<void(Gun* gun)> _resetFn) : Weapon(_timeBetewen, anim)
 	{
+		nowCount = maxCnt;
+		nowTimeBetwenReset = _timeBetewenReset;
+		timeBetwenReset = _timeBetewenReset;
+		maxCountPotron = maxCnt;
 		damage = _damage;
-		fn = _fn;
+		shutFn = _fn;
+		resetFn = _resetFn;
 	}
 	Gun() = default;
 
+	void setSound(sf::SoundBuffer& shut, sf::SoundBuffer& reset, sf::SoundBuffer& cantShut) 
+	{ 
+		shutSound.setBuffer(shut);
+		resetSound.setBuffer(reset);
+		cantShutSound.setBuffer(cantShut);
+	}
+
+	void update(float dt) override
+	{
+		Weapon::update(dt);
+		if (nowTimeBetwenReset >= timeBetwenReset) return;
+		nowTimeBetwenReset += dt;
+	}
+
+	void resetPatron()
+	{
+		if (nowTimeBetwenReset >= timeBetwenReset && nowCount < maxCountPotron && isCanUsed())
+		{
+			resetFn(this);
+			nowTimeBetwenReset = 0;
+			resetSound.play();
+		}
+	}
+
 	void ussing(Sprite* sp) override
 	{
-		fn(sp);
+		if (nowCount == 0)
+		{
+			cantShutSound.play();
+			return;
+		}
+		if (isCanUsed() && nowCount > 0 && nowTimeBetwenReset >= timeBetwenReset)
+		{
+			if (sp != nullptr) shutFn(sp);
+			nowCount--;
+			shutSound.play();
+			startAnimation(0);
+		}
 	}
+
+	int nowCount;
 private:
-	std::function<void(Sprite* sp)> fn;
+	float timeBetwenReset, nowTimeBetwenReset;
+	std::function<void(Sprite* sp)> shutFn;
+	std::function<void(Gun* gun)> resetFn;
 	float damage;
+	int maxCountPotron;
+	sf::Sound shutSound;
+	sf::Sound resetSound;
+	sf::Sound cantShutSound;
 };
 
 #endif // !WEAPON
