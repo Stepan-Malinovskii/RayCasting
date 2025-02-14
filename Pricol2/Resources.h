@@ -3,6 +3,7 @@
 #define RESOURCES
 
 #include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Audio.hpp>
 #include "array"
@@ -29,6 +30,8 @@ public:
 	static sf::SoundBuffer gun2ResetSound;
 	static sf::Texture gun2BaseTexture;
 	static std::array<sf::Texture, 4> gun2FireAnimationTexture;
+
+	static sf::Font UIFont;
 };
 
 #endif // !RESOURCES

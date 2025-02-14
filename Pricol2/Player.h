@@ -6,6 +6,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/Text.hpp>
 #include <vector>
 
 #include "Map.h"
@@ -13,7 +14,7 @@
 #include "Animation.h"
 #include "Weapon.h"
 
-constexpr float MOVE_SPEED = 4.0f, ROTATION_SPEED = 80.0f, MOUSE_TURN_SPEED = 0.08f;
+constexpr float ROTATION_SPEED = 80.0f, MOUSE_TURN_SPEED = 0.08f;
 
 class Player
 {
@@ -23,10 +24,14 @@ public:
 	void UpdatePlayer(float deltaTimeá, Map& map, sf::RenderWindow& window);
 	void DrawPlayerUI(sf::RenderWindow& window);
 
+	Gun* getWeapon();
+	float getMoveSpeed();
 	Sprite* sprite;
+	float timeBoost, timerBoost;
 private:
 	sf::Vector2i lastMousePos;
 	int nowGun;
+	float moveSpeed, nowSpeed, boostSpeed;
 	std::vector<Gun> guns;
 };
 

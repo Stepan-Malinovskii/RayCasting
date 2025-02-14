@@ -3,9 +3,9 @@
 
 Sprite::Sprite(sf::Vector2f pos, float _size, int indText, float _angle, bool isDirect, float HP, SpriteType _type)
 	: position{ pos }, size{ _size }, texture{ indText }, angle{ _angle }, 
-	isDirectional{ isDirect }, healPoint{ HP }, type{ _type } {}
+	isDirectional{ isDirect }, healPoint{ HP }, type{ _type }, maxHealpoint{ HP } {}
 
-Sprite::Sprite(SpriteDef spDef, MapSprite spMap) : Sprite(spMap.position, spDef.size ,spDef.indexTexture, spMap.angle, spDef.isDirectional, spDef.healPoint) {}
+Sprite::Sprite(SpriteDef spDef, MapSprite spMap) : Sprite(spMap.position, spDef.size ,spDef.indexTexture, spMap.angle, spDef.isDirectional, spDef.maxHealpoint) {}
 
 void Sprite::move(Map& map, sf::Vector2f move)
 {

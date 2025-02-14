@@ -27,3 +27,5 @@ sf::SoundBuffer Resources::gun2CantShoutSound{};
 sf::Texture Resources::gun2BaseTexture{};
 
 std::array<sf::Texture, 4> Resources::gun2FireAnimationTexture{};
+
+sf::Font Resources::UIFont{};

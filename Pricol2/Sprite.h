@@ -44,7 +44,7 @@ struct SpriteDef
 {
 	std::string name;
 	float size;
-	float healPoint;
+	float maxHealpoint;
 	int indexTexture;
 	bool isDirectional;
 };
@@ -62,7 +62,7 @@ public:
 	int texture;
 	SpriteType type;
 	bool isDirectional;
-	float angle, size, healPoint;
+	float angle, size, healPoint, maxHealpoint;
 
 	std::shared_ptr<Thinker> thinker;
 

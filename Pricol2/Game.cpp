@@ -114,6 +114,5 @@ void Game::render()
 	renderer.Draw3DView(*window, player->sprite->position,
 		player->sprite->angle, *nowMap, sprites);
 	player->DrawPlayerUI(*window);
-
 	window->display();
 }

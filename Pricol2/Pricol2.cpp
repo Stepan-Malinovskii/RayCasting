@@ -41,6 +41,7 @@ int main()
 	if (!Resources::gun2ShutSound.loadFromFile("Sound/gun2ShutSound.mp3")) return 1;
 	if (!Resources::gun2ResetSound.loadFromFile("Sound/gun2ResetSound.mp3")) return 1;
 	if (!Resources::gun2CantShoutSound.loadFromFile("Sound/gun1CantShutSound.mp3")) return 1;
+	if (!Resources::UIFont.loadFromFile("Texture/Pshek_KY2.ttf")) return 1;
 
 	std::unique_ptr<Map> map = std::make_unique<Map>();
 	map->LoadGrid("Texture/test.map");

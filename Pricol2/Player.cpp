@@ -6,6 +6,7 @@
 
 Player::Player(Sprite* _sprite) : sprite{ _sprite }, nowGun{ 1 }
 {
+	moveSpeed = 5.0f, boostSpeed = 8.0f, timeBoost = 2.0f, timerBoost = timeBoost, nowSpeed = moveSpeed;
 	Animator shutAnim1 = Animator<sf::Texture*>{ &Resources::gun1BaseTexture, {Animation<sf::Texture*>({
 		{0.0f, &Resources::gun1FireAnimationTexture[0]},
 		{0.15f, &Resources::gun1FireAnimationTexture[1]},
@@ -62,11 +63,46 @@ void Player::UpdatePlayer(float deltaTime, Map& map, sf::RenderWindow& window)
 		deltaPos -= verticalMoveParametrs;
 	}
 	
-	sprite->move(map, deltaPos * MOVE_SPEED * deltaTime);
+	sprite->move(map, deltaPos * nowSpeed * deltaTime);
 
 	if (GetAsyncKeyState('R'))
 	{
 		guns[nowGun].resetPatron();
+	}
+
+	static bool boostFlag = false, used = false;
+
+	if (GetAsyncKeyState(VK_LSHIFT))
+	{
+		if (timerBoost > 0 && !boostFlag)
+		{
+			used = true;
+			nowSpeed = boostSpeed;
+			timerBoost -= deltaTime * 1.2f;
+		}
+		else if (timerBoost < 0)
+		{
+			boostFlag = true;
+			used = false;
+			nowSpeed = moveSpeed;
+		}
+	}
+	else
+	{
+		nowSpeed = moveSpeed;
+		used = false;
+	}
+	if (!used)
+	{
+		if (timerBoost < timeBoost)
+		{
+			timerBoost += deltaTime;
+		}
+		else
+		{
+			timerBoost = timeBoost;
+			boostFlag = false;
+		}
 	}
 
 	//MousePart
@@ -110,5 +146,32 @@ void Player::UpdatePlayer(float deltaTime, Map& map, sf::RenderWindow& window)
 
 void Player::DrawPlayerUI(sf::RenderWindow& window)
 {
-	guns[nowGun].drawWeapon(window);
+	auto gun = guns[nowGun];
+	gun.drawWeapon(window);
+
+	sf::Text weaponInfo(std::to_string(gun.nowCount) + " / " + std::to_string(gun.maxCountPotron), Resources::UIFont, 50);
+	weaponInfo.setPosition({ SCREEN_W - 150, SCREEN_H - 60 });
+	weaponInfo.setFillColor({ 0, 0, 0 });
+	window.draw(weaponInfo);
+
+	float baseX = 300;
+	sf::RectangleShape hpShape({ baseX, 20 });
+	hpShape.setFillColor({ 128, 128, 128 });
+	hpShape.setPosition({ 20, SCREEN_H - 55 });
+	sf::RectangleShape boostShape{ hpShape };
+	boostShape.move({ 0, 30 });
+	window.draw(hpShape);
+	window.draw(boostShape);
+	hpShape.setFillColor({ 255, 23, 23 });
+	boostShape.setFillColor({ 44, 148, 15 });
+	float newXB = baseX * timerBoost / timeBoost;
+	float newXH = baseX * (sprite->healPoint <= 0 ? 0 : sprite->healPoint) / sprite->maxHealpoint;
+	hpShape.setSize({ newXH, 20 });
+	boostShape.setSize({ newXB, 20 });
+	window.draw(hpShape);
+	window.draw(boostShape);
 }
+
+Gun* Player::getWeapon() { return &guns[nowGun]; }
+
+float Player::getMoveSpeed() { return moveSpeed; }
