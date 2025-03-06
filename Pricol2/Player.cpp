@@ -127,17 +127,10 @@ void Player::UpdatePlayer(float deltaTime, Map& map, sf::RenderWindow& window)
 		justFired = false;
 	}
 
-	static bool justSwitch = false;
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Middle) && !justSwitch)
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Middle))
 	{
 		nowGun++;
 		nowGun = nowGun % guns.size();
-		justSwitch = true;
-	}
-
-	if (!sf::Mouse::isButtonPressed(sf::Mouse::Middle))
-	{
-		justSwitch = false;
 	}
 
 	//AnimatorPart
