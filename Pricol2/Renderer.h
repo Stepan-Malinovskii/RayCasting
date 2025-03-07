@@ -24,7 +24,7 @@ public:
 
 	void Init();
 
-	void Draw3DView(sf::RenderTarget& target, sf::Vector2f position, float angle,
+	void Draw3DView(sf::RenderTarget& target, sf::Vector2f position, float angle, float step,
 		const Map& map, std::vector<std::shared_ptr<Sprite>>& sprites);
 private:
 	sf::Texture floorTexture;
@@ -40,10 +40,10 @@ private:
 
 	std::vector<std::jthread>* threads;
 
-	void DrawFloor(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, sf::Vector2f& rayPos,
+	void DrawFloor(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, sf::Vector2f& rayPos, float step,
 		const Map& map, int startH, int endH);
 	void DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, const sf::Vector2f& playerPos,
-		std::vector<std::shared_ptr<Sprite>>& sprites, float invDet, float plAngle);
+		std::vector<std::shared_ptr<Sprite>>& sprites, float invDet, float plAngle, float step);
 };
 
 #endif // !RENDERER

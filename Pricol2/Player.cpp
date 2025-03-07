@@ -2,10 +2,10 @@
 #include "Raycast.h"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
-#include <Windows.h>
 
-Player::Player(Sprite* _sprite) : sprite{ _sprite }, nowGun{ 1 }
+Player::Player(Sprite* _sprite, Map* _nowMap) : sprite{ _sprite }, nowGun{ 1 }
 {
+	nowMap = _nowMap;
 	moveSpeed = 5.0f, boostSpeed = 8.0f, timeBoost = 2.0f, timerBoost = timeBoost, nowSpeed = moveSpeed;
 	Animator shutAnim1 = Animator<sf::Texture*>{ &Resources::gun1BaseTexture, {Animation<sf::Texture*>({
 		{0.0f, &Resources::gun1FireAnimationTexture[0]},
@@ -34,45 +34,26 @@ Player::Player(Sprite* _sprite) : sprite{ _sprite }, nowGun{ 1 }
 	Gun gun2 = Gun(10.0f, 20, 0.5f, 3.0f, shutAnim2, [&](Sprite* sp) {sp->healPoint -= 10.0f;}, [&](Gun* gun) {gun->nowCount = 20;});
 	gun2.setSound(Resources::gun2ShutSound, Resources::gun2ResetSound, Resources::gun2CantShoutSound);
 	guns.push_back(gun2);
-
-	lastMousePos = sf::Vector2i(640, 360);
 }
 
-void Player::UpdatePlayer(float deltaTime, Map& map, sf::RenderWindow& window)
+void Player::updateMouseData(sf::Vector2f mousePos, float deltaTime)
 {
-	//KeyBoardPart
-	float radiansAngle = sprite->angle * PI / 180.0f;
-	sf::Vector2f verticalMoveParametrs(cos(radiansAngle), sin(radiansAngle));
-	sf::Vector2f horizontalMoveParametrs(-verticalMoveParametrs.y, verticalMoveParametrs.x);
-	sf::Vector2f deltaPos(0, 0);
+	//MousePart
+	sprite->angle += MOUSE_TURN_SPEED * ROTATION_SPEED * mousePos.x * deltaTime;
 
-	if (GetAsyncKeyState('A'))
-	{
-		deltaPos -= horizontalMoveParametrs;
-	}
-	else if (GetAsyncKeyState('D'))
-	{
-		deltaPos += horizontalMoveParametrs;
-	}
-	if (GetAsyncKeyState('W'))
-	{
-		deltaPos += verticalMoveParametrs;
-	}
-	else if (GetAsyncKeyState('S'))
-	{
-		deltaPos -= verticalMoveParametrs;
-	}
-	
-	sprite->move(map, deltaPos * nowSpeed * deltaTime);
+	pitch -= mousePos.y * deltaTime * VERTICAL_MOUSE_SPEED;
+	if (pitch > 200) pitch = 200;
+	if (pitch < -200) pitch = -200;
 
-	if (GetAsyncKeyState('R'))
-	{
-		guns[nowGun].resetPatron();
-	}
+	//AnimatorPart
+	guns[nowGun].update(deltaTime);
+}
 
+void Player::checkBoost(bool isPressed, float deltaTime)
+{
 	static bool boostFlag = false, used = false;
 
-	if (GetAsyncKeyState(VK_LSHIFT))
+	if (isPressed)
 	{
 		if (timerBoost > 0 && !boostFlag)
 		{
@@ -104,37 +85,35 @@ void Player::UpdatePlayer(float deltaTime, Map& map, sf::RenderWindow& window)
 			boostFlag = false;
 		}
 	}
+}
 
-	//MousePart
-	sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-	float deltaX = (mousePos.x - lastMousePos.x)/2.0f;
-	sprite->angle += MOUSE_TURN_SPEED * ROTATION_SPEED * deltaX * deltaTime;
-	sf::Mouse::setPosition(lastMousePos, window);
+void Player::move(sf::Vector2f deltaPos)
+{
+	sprite->move(*nowMap, deltaPos * nowSpeed);
+}
 
-	static bool justFired = false;
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && guns[nowGun].isCanUsed())
+void Player::reloadingGun()
+{
+	guns[nowGun].resetPatron();
+}
+
+void Player::fire()
+{
+	float radiansAngle = sprite->angle * PI / 180.0f;
+	sf::Vector2f verticalMoveParametrs(cos(radiansAngle), sin(radiansAngle));
+
+	if (guns[nowGun].isCanUsed())
 	{
-		if (!justFired)
-		{
-			RayHit hit = raycast(map, sprite->position, verticalMoveParametrs, true, sprite);
-			guns[nowGun].ussing(hit.sprite);
-			justFired = true;
-		}
+		RayHit hit = raycast(*nowMap, sprite->position, verticalMoveParametrs, true, sprite);
+		guns[nowGun].ussing(hit.sprite);
 	}
+}
 
-	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
-	{
-		justFired = false;
-	}
-
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Middle))
-	{
-		nowGun++;
-		nowGun = nowGun % guns.size();
-	}
-
-	//AnimatorPart
-	guns[nowGun].update(deltaTime);
+void Player::swapGun(bool flag)
+{
+	int delta = flag ? 1 : -1;
+	nowGun++;
+	nowGun = nowGun % guns.size();
 }
 
 void Player::DrawPlayerUI(sf::RenderWindow& window)

@@ -15,10 +15,13 @@ class Game
 {
 public:
 	Game(sf::RenderWindow* window, Map* nowMap);
+	void getInput(sf::Event event, float deltaTime);
+	void getInput(float deltaTime);
 	void update(float deltaT);
 	void render();
 	void resetMap();
 private:
+	sf::Vector2i screenMidlePos;
 	std::vector<std::shared_ptr<Sprite>> sprites;
 	std::unique_ptr<Player> player;
 	Renderer renderer;

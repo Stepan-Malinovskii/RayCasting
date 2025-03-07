@@ -32,6 +32,8 @@ public:
 	static std::array<sf::Texture, 4> gun2FireAnimationTexture;
 
 	static sf::Font UIFont;
+
+	static void initResources();
 };
 
 #endif // !RESOURCES

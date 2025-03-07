@@ -1,15 +1,17 @@
 #include "Game.h"
+#include <Windows.h>
 
 Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
 	renderer(), window{ _window }, nowMap{ _nowMap }
 {
+	screenMidlePos = { (int)(SCREEN_W / 2), (int)(SCREEN_H / 2) };
 	for (auto sp : nowMap->getMapSprites())
 	{
 		auto def = spriteDef[sp.idx];
 		auto sprite = std::make_shared<Sprite>(def, sp);
 
 		if (sp.idx == 0) {
-			player = std::make_unique<Player>(sprite.get());
+			player = std::make_unique<Player>(Player(sprite.get(), _nowMap));
 		}
 		else
 		{
@@ -29,7 +31,7 @@ Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
 		auto def = spriteDef[0];
 		auto sprite = std::make_shared<Sprite>(sf::Vector2f{ 2,2 }, def.size, def.indexTexture, 0);
 		sprites.push_back(sprite);
-		player = std::make_unique<Player>(sprite.get());
+		player = std::make_unique<Player>(Player(sprite.get(), _nowMap));
 	}
 
 	for (auto sp : sprites)
@@ -37,6 +39,71 @@ Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
 		nowMap->insertInBlockMap((sf::Vector2i)sp->position, sp.get());
 		sp->setupBlockmap(*nowMap);
 	}
+}
+
+void Game::getInput(sf::Event event, float deltaTime)
+{
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	{			
+		player->fire();
+	}
+	if (event.type == sf::Event::MouseWheelMoved)
+	{
+		bool flag = event.mouseWheelScroll.delta > 0 ? true : false;
+		player->swapGun(flag);
+	}
+}
+
+void Game::getInput(float deltaTime)
+{
+
+	if (deltaTime > 0.01)
+	{
+		deltaTime = 0;
+	}
+
+	float radiansAngle = player->sprite->angle * PI / 180.0f;
+	sf::Vector2f verticalMoveParametrs(cos(radiansAngle), sin(radiansAngle));
+	sf::Vector2f horizontalMoveParametrs(-verticalMoveParametrs.y, verticalMoveParametrs.x);
+	sf::Vector2f deltaPos(0, 0);
+	bool lShiftPressed = false;
+	float deltaX = 0, deltaY = 0;
+	if (window->hasFocus())
+	{
+		if (GetAsyncKeyState('A'))
+		{
+			deltaPos -= horizontalMoveParametrs;
+		}
+		else if (GetAsyncKeyState('D'))
+		{
+			deltaPos += horizontalMoveParametrs;
+		}
+		if (GetAsyncKeyState('W'))
+		{
+			deltaPos += verticalMoveParametrs;
+		}
+		else if (GetAsyncKeyState('S'))
+		{
+			deltaPos -= verticalMoveParametrs;
+		}
+		if (GetAsyncKeyState('R'))
+		{
+			player->reloadingGun();
+		}
+		if (GetAsyncKeyState(SHIFT_PRESSED))
+		{
+			lShiftPressed = true;
+		}
+
+		sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+		deltaX = (mousePos.x - screenMidlePos.x) / 2.0f;
+		deltaY = (mousePos.y - screenMidlePos.y) / 2.0f;
+		sf::Mouse::setPosition(screenMidlePos, *window);
+	}
+
+	player->checkBoost(lShiftPressed, deltaTime);
+	player->move(deltaPos * deltaTime);
+	player->updateMouseData({deltaX, deltaY}, deltaTime);
 }
 
 void Game::resetMap()
@@ -71,7 +138,7 @@ void Game::resetMap()
 
 void Game::update(float deltaTime)
 {
-	player->UpdatePlayer(deltaTime, *nowMap, *window);
+	
 	for (auto sp : sprites)
 	{
 		if (sp->thinker)
@@ -112,7 +179,7 @@ void Game::render()
 	window->clear();
 
 	renderer.Draw3DView(*window, player->sprite->position,
-		player->sprite->angle, *nowMap, sprites);
+		player->sprite->angle, player->pitch, *nowMap, sprites);
 	player->DrawPlayerUI(*window);
 	window->display();
 }

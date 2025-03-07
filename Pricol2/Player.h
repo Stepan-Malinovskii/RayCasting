@@ -14,23 +14,29 @@
 #include "Animation.h"
 #include "Weapon.h"
 
-constexpr float ROTATION_SPEED = 80.0f, MOUSE_TURN_SPEED = 0.08f;
+constexpr float ROTATION_SPEED = 80.0f, MOUSE_TURN_SPEED = 0.08f, VERTICAL_MOUSE_SPEED = 25.0f;
 
 class Player
 {
 public:
-	Player(Sprite* sprite);
+	Player(Sprite* sprite, Map* _nowMap = nullptr);
 
-	void UpdatePlayer(float deltaTimeá, Map& map, sf::RenderWindow& window);
+
+	void updateMouseData(sf::Vector2f mousePos, float deltaTime);
+	void checkBoost(bool isPressed, float deltaTime);
+	void move(sf::Vector2f deltaPos);
+	void fire();
+	void swapGun(bool flag);
+	void reloadingGun();
 	void DrawPlayerUI(sf::RenderWindow& window);
 
 	Gun* getWeapon();
 	float getMoveSpeed();
 	Sprite* sprite;
-	float timeBoost, timerBoost;
+	float timeBoost, timerBoost, pitch;
 private:
-	sf::Vector2i lastMousePos;
 	int nowGun;
+	Map* nowMap;
 	float moveSpeed, nowSpeed, boostSpeed;
 	std::vector<Gun> guns;
 };

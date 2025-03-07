@@ -93,6 +93,10 @@ void Map::LoadGrid(const std::string& path)
 	int h = 0, w = 0;
 	in.read(reinterpret_cast<char*>(&w), sizeof(w));
 	in.read(reinterpret_cast<char*>(&h), sizeof(h));
+	if (h == 0 && w == 0)
+	{
+		return;
+	}
 
 	grid = std::vector(h, std::vector(w, std::array<int, LAYER_COUNT>()));
 	blockMap = std::vector(h, std::vector(w, std::set<Sprite*>()));
