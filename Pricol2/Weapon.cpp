@@ -1,7 +1,7 @@
 #include "Weapon.h"
 
-Weapon::Weapon(float _timeBetewen, Animator<sf::Texture*> anim)
-	: timeBetwen{ _timeBetewen }, weaponAnimator{ anim } {
+Weapon::Weapon(float _timeBetewen, float _maxDist, Animator<sf::Texture*> anim)
+	: timeBetwen{ _timeBetewen }, weaponAnimator{ anim }, maxDist{ _maxDist } {
 	nowTime = _timeBetewen;
 }
 
@@ -37,8 +37,8 @@ void Weapon::startAnimation(int number)
 	weaponAnimator.setAnimation(number);
 }
 
-Gun::Gun(float _damage, int maxCnt, float _timeBetewen, float _timeBetewenReset, Animator<sf::Texture*>& anim,
-	std::function<void(Sprite* sp)> _fn, std::function<void(Gun* gun)> _resetFn) : Weapon(_timeBetewen, anim)
+Gun::Gun(float _damage, int maxCnt, float _timeBetewen, float maxDist, float _timeBetewenReset, Animator<sf::Texture*>& anim,
+	std::function<void(Sprite* sp, float dist)> _fn, std::function<void(Gun* gun)> _resetFn) : Weapon(_timeBetewen, maxDist, anim)
 {
 	nowCount = maxCnt;
 	nowTimeBetwenReset = _timeBetewenReset;
@@ -73,7 +73,7 @@ void Gun::resetPatron()
 	}
 }
 
-void Gun::ussing(Sprite* sp) 
+void Gun::ussing(Sprite* sp, float dist) 
 {
 	if (nowCount == 0)
 	{
@@ -82,7 +82,7 @@ void Gun::ussing(Sprite* sp)
 	}
 	if (isCanUsed() && nowCount > 0 && nowTimeBetwenReset >= timeBetwenReset)
 	{
-		if (sp != nullptr) shutFn(sp);
+		if (sp != nullptr) shutFn(sp, dist);
 		nowCount--;
 		shutSound.play();
 		startAnimation(0);

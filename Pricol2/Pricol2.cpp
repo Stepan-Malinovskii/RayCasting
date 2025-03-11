@@ -9,7 +9,9 @@ enum class State{Editor, Game};
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H),"Game");
-	window.setFramerateLimit(144);
+	/*sf::View view({ {SCREEN_W / 2, SCREEN_H / 2}, {} });*/
+	/*window.setView(view);*/
+	window.setFramerateLimit(900);
 	window.setMouseCursorVisible(false);
 
 	sf::RenderWindow editorWindow(sf::VideoMode(450,500), "Editor");
@@ -45,7 +47,7 @@ int main()
 					if (state == State::Editor)
 					{
 						state = State::Game;
-						game.resetMap();
+						game.resetMap(map.get());
 						window.setMouseCursorVisible(false);
 						window.setView(window.getDefaultView());
 
@@ -85,9 +87,7 @@ int main()
 
 		if (state == State::Game)
 		{
-			game.getInput(deltaTime);
-			game.update(deltaTime);
-			game.render();
+			game.makeCycle(deltaTime);
 		}
 		else
 		{	

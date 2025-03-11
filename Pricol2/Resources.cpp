@@ -34,7 +34,7 @@ void Resources::initResources()
 {
 	if (!textureImage.loadFromFile("Texture/wall_texture.png")) throw "TextureLoadError!";
 	if (!textures.loadFromImage(Resources::textureImage)) throw "TextureLoadError!";
-	if (!spritesTexture.loadFromFile("Texture/enemys1.png")) throw "TextureLoadError!";
+	if (!spritesTexture.loadFromFile("Texture/enemys.png")) throw "TextureLoadError!";
 	if (!skyTextures.loadFromFile("Texture/sky_texture.png")) throw "TextureLoadError!";
 	skyTextures.setRepeated(true);
 

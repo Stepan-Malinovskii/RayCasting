@@ -8,13 +8,15 @@
 #include <SFML/Graphics/VertexArray.hpp>
 #include <thread>
 
+#include "Player.h"
 #include "Map.h"
 #include "Sprite.h"
 #include "Raycast.h"
 #include "Resources.h"
 
-constexpr float PLAYER_FOV = 60.0f, CAMERA_Z = SCREEN_H / 2.0f, ASPECT = SCREEN_W / SCREEN_H * 0.5f;
-constexpr int THREAD_COUNT = 8, MAX_DETH = 64;
+constexpr int THREAD_COUNT = 10, MAX_DETH = 64;
+constexpr float PLAYER_FOV = 60.0f, CAMERA_Z = SCREEN_H / 2.0f,
+ASPECT = SCREEN_W / SCREEN_H * 0.5f, BRIGHTNESTDIST = MAX_DETH / 7.0f;
 
 class Renderer
 {
@@ -24,13 +26,10 @@ public:
 
 	void Init();
 
-	void Draw3DView(sf::RenderTarget& target, sf::Vector2f position, float angle, float step,
-		const Map& map, std::vector<std::shared_ptr<Sprite>>& sprites);
+	void Draw3DView(sf::RenderTarget& target, Player* player, std::vector<std::shared_ptr<Sprite>>& sprites);
 private:
 	sf::Texture floorTexture;
 	sf::Sprite floorSprite;
-	sf::Texture cellingTexture;
-	sf::Sprite cellingSprite;
 	uint8_t* screenPixels;
 
 	sf::VertexArray walls{ sf::Lines };
@@ -38,12 +37,11 @@ private:
 	sf::VertexArray debugColumns{ sf::Lines };
 	float* distanceBuffer;
 
-	std::vector<std::jthread>* threads;
+	std::vector<std::jthread> threads;
 
-	void DrawFloor(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, sf::Vector2f& rayPos, float step,
-		const Map& map, int startH, int endH);
-	void DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, const sf::Vector2f& playerPos,
-		std::vector<std::shared_ptr<Sprite>>& sprites, float invDet, float plAngle, float step);
+	void DrawFloor(sf::Vector2f& rayDirLeft, sf::Vector2f& rayDirRight, sf::Vector2f& rayPos, Player* player, int startH, int endH);
+	void DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, Player* player,
+		std::vector<std::shared_ptr<Sprite>>& sprites, float invDet);
 };
 
 #endif // !RENDERER

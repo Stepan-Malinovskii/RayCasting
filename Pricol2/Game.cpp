@@ -56,12 +56,6 @@ void Game::getInput(sf::Event event, float deltaTime)
 
 void Game::getInput(float deltaTime)
 {
-
-	if (deltaTime > 0.01)
-	{
-		deltaTime = 0;
-	}
-
 	float radiansAngle = player->sprite->angle * PI / 180.0f;
 	sf::Vector2f verticalMoveParametrs(cos(radiansAngle), sin(radiansAngle));
 	sf::Vector2f horizontalMoveParametrs(-verticalMoveParametrs.y, verticalMoveParametrs.x);
@@ -90,9 +84,17 @@ void Game::getInput(float deltaTime)
 		{
 			player->reloadingGun();
 		}
-		if (GetAsyncKeyState(SHIFT_PRESSED))
+		if (GetAsyncKeyState(VK_LSHIFT))
 		{
 			lShiftPressed = true;
+		}
+		if (GetAsyncKeyState(VK_SPACE))
+		{
+			player->jump();
+		}
+		if (GetAsyncKeyState('E'))
+		{
+			player->use();
 		}
 
 		sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
@@ -106,7 +108,7 @@ void Game::getInput(float deltaTime)
 	player->updateMouseData({deltaX, deltaY}, deltaTime);
 }
 
-void Game::resetMap()
+void Game::resetMap(Map* newMap)
 {
 	for (auto sp = sprites.begin(); sp != sprites.end();)
 	{
@@ -129,7 +131,7 @@ void Game::resetMap()
 			sprites.push_back(sprite);
 		}
 	}
-	
+
 	for (auto sp : sprites)
 	{
 		sp->setupBlockmap(*nowMap);
@@ -138,7 +140,6 @@ void Game::resetMap()
 
 void Game::update(float deltaTime)
 {
-	
 	for (auto sp : sprites)
 	{
 		if (sp->thinker)
@@ -174,12 +175,41 @@ void Game::update(float deltaTime)
 	}
 }
 
+void Game::makeCycle(float deltaTime)
+{
+//#if !DEBUG
+//	if (deltaTime > 0.01)
+//	{
+//		deltaTime = 0;
+//	}
+//#endif //DEBUG
+
+	getInput(deltaTime);
+	update(deltaTime);
+	render();
+}
+
+void Game::drawAim()
+{
+	sf::CircleShape aim{};
+	aim.setRadius(1.0f);
+	aim.setFillColor(sf::Color::Black);
+	aim.setPointCount(16);
+	aim.setPosition((sf::Vector2f)screenMidlePos);
+
+}
+
 void Game::render()
 {
 	window->clear();
-
-	renderer.Draw3DView(*window, player->sprite->position,
-		player->sprite->angle, player->pitch, *nowMap, sprites);
+	renderer.Draw3DView(*window, player.get(), sprites);
 	player->DrawPlayerUI(*window);
+	sf::CircleShape aim{};
+	aim.setRadius(2.5f);
+	aim.setOrigin({ aim.getRadius(),aim.getRadius() });
+	aim.setFillColor(sf::Color::Black);
+	aim.setPointCount(16);
+	aim.setPosition((sf::Vector2f)screenMidlePos);
+	window->draw(aim);
 	window->display();
 }

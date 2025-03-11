@@ -2,10 +2,11 @@
 #include "Map.h"
 
 Sprite::Sprite(sf::Vector2f pos, float _size, int indText, float _angle, bool isDirect, float HP, SpriteType _type)
-	: position{ pos }, size{ _size }, texture{ indText }, angle{ _angle }, 
-	isDirectional{ isDirect }, healPoint{ HP }, type{ _type }, maxHealpoint{ HP } {}
+	: position{ pos }, size{ _size }, texture{ indText }, angle{ _angle },
+	isDirectional{ isDirect }, healPoint{ HP }, type{ _type }, maxHealpoint{ HP } {
+}
 
-Sprite::Sprite(SpriteDef spDef, MapSprite spMap) : Sprite(spMap.position, spDef.size ,spDef.indexTexture, spMap.angle, spDef.isDirectional, spDef.maxHealpoint) {}
+Sprite::Sprite(SpriteDef spDef, MapSprite spMap) : Sprite(spMap.position, spDef.size, spDef.indexTexture, spMap.angle, spDef.isDirectional, spDef.maxHealpoint) {}
 
 void Sprite::move(Map& map, sf::Vector2f move)
 {
@@ -86,7 +87,7 @@ bool Sprite::checkCollision(const Map& map, sf::Vector2f newPos, bool xAxis)
 	else {
 		if (map.GetOnGrid(newPos.x, newPos.y, WALL_LAYER)) { return true; }
 
-		const auto& set = map.getBlockMap({ (int)newPos.x, (int)newPos.y});
+		const auto& set = map.getBlockMap({ (int)newPos.x, (int)newPos.y });
 		for (const auto& thing : set) {
 			if (thing->size == 0.f || thing == this) { continue; }
 
@@ -107,7 +108,7 @@ bool Sprite::checkCollision(const Map& map, sf::Vector2f newPos, bool xAxis)
 				return true;
 			}
 		}
-		
+
 	}
 
 	return false;

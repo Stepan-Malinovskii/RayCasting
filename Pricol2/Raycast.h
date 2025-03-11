@@ -2,6 +2,10 @@
 #ifndef RAYCAST
 #define RAYCAST
 
+#define SQUARE(a) ((a) * (a))
+#define GETDIST(a,b) (SQUARE(a.x - b.x) + SQUARE(a.y - b.y))
+#define COMPARER(a, b, c) GETDIST(a, c) > GETDIST(b, c) ? true : false
+
 #include "Map.h"
 
 struct RayHit

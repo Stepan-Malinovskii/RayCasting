@@ -54,4 +54,3 @@ private:
 };
 
 #endif // !MAP_H
-

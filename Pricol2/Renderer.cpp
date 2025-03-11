@@ -1,17 +1,21 @@
 #include "Renderer.h"
 #include <SFML/Graphics/RectangleShape.hpp>
+
+#define SQUARE(a) ((a) * (a))
+#define GETDIST(a,b) (SQUARE(a.x - b.x) + SQUARE(a.y - b.y))
+#define COMPARER(a, b, c) GETDIST(a, c) > GETDIST(b, c) ? true : false
+
 Renderer::Renderer()
 {
 	Init();
 	screenPixels = new uint8_t[(int)SCREEN_H * (int)SCREEN_W * 4]();
 	distanceBuffer = new float[(int)SCREEN_W]();
-	threads = new std::vector<std::jthread>(THREAD_COUNT);
+	threads = std::vector<std::jthread>(THREAD_COUNT);
 }
 
 Renderer::~Renderer()
 {
-	delete threads;
-	//delete distanceBuffer;
+	//delete[] distanceBuffer;
 	delete[] screenPixels;
 }
 
@@ -19,20 +23,15 @@ void Renderer::Init()
 {
 	floorTexture.create(SCREEN_W, SCREEN_H);
 	floorSprite.setTexture(floorTexture);
-
-	cellingTexture.create(SCREEN_W, SCREEN_H);
-	cellingSprite.setTexture(cellingTexture);
-	cellingSprite.setPosition(0, -SCREEN_H / 2.0f);
 }
 
-void Renderer::Draw3DView(sf::RenderTarget& target, sf::Vector2f position, float angle, float step,
-	const Map& map, std::vector<std::shared_ptr<Sprite>>& sprites)
+void Renderer::Draw3DView(sf::RenderTarget& target, Player* player, std::vector<std::shared_ptr<Sprite>>& sprites)
 {
 	//StaticCalculations
-	float pRadians = angle * PI / 180.0f;
+	float pRadians = player->sprite->angle * PI / 180.0f;
 	sf::Vector2f pDirection{ cosf(pRadians), sinf(pRadians) };
 	sf::Vector2f cameraPlane = sf::Vector2f(- pDirection.y, pDirection.x) * ASPECT;
-	sf::Vector2f rayPos = position;
+	sf::Vector2f rayPos = player->sprite->position;
 
 	//FloorPart
 	sf::Vector2f rayDirLeft{ pDirection - cameraPlane },
@@ -41,51 +40,47 @@ void Renderer::Draw3DView(sf::RenderTarget& target, sf::Vector2f position, float
 		{
 			int start = (int)((SCREEN_H / (THREAD_COUNT - 1) * thread_id));
 			int end = (int)((SCREEN_H / (THREAD_COUNT - 1) * (thread_id + 1)));
-			DrawFloor(rayDirLeft, rayDirRight, rayPos, step, map, start, end );
+			DrawFloor(rayDirLeft, rayDirRight, rayPos, player, start, end );
 		};
 	//SpritePart
-	auto getDist = [position](const std::shared_ptr<Sprite> sp)
+	auto getDist = [player](const std::shared_ptr<Sprite> sp)
 		{
-			return pow(position.x - sp->position.x, 2) +
-				pow(position.y - sp->position.y, 2);
+			return SQUARE(player->sprite->position.x - sp->position.x) +
+				SQUARE(player->sprite->position.y - sp->position.y);
 		};
-	auto comperer = [getDist](const std::shared_ptr<Sprite> a, const std::shared_ptr<Sprite> b)
+	auto comperer = [player](const std::shared_ptr<Sprite> a, const std::shared_ptr<Sprite> b)
 		{
-			return getDist(a) > getDist(b);
+			return COMPARER(a.get()->position, b.get()->position, player->sprite->position);
 		};
 	std::sort(sprites.begin(), sprites.end(), comperer);
 
 	float invDet = 1.0f / (cameraPlane.x * pDirection.y - cameraPlane.y * pDirection.x);
 
 	auto sprite_func = [&]() {
-		DrawSprite(pDirection, cameraPlane, position, sprites,
-			invDet, angle, step);
+		DrawSprite(pDirection, cameraPlane, player, sprites, invDet);
 		};
 
 	for (int cnt = 0; cnt < THREAD_COUNT - 1; cnt++)
 	{
-		(*threads)[cnt] = std::jthread(floor_func, cnt);
+		threads[cnt] = std::jthread(floor_func, cnt);
 	}
 
-	(*threads)[THREAD_COUNT - 1] = std::jthread(sprite_func);
-
-	//MiniShaderPart
-	float brightnesDist = MAX_DETH / 2.0f;
+	threads[THREAD_COUNT - 1] = std::jthread(sprite_func);
 
 	//SkyPart
 	sf::Vector2u skyTextureSize = Resources::skyTextures.getSize();
-	int textureOffsetX = (int)(angle / 90.0f * skyTextureSize.x);
+	int textureOffsetX = (int)(player->sprite->angle / 90.0f * skyTextureSize.x);
 	while (textureOffsetX < 0)
 	{
 		textureOffsetX += skyTextureSize.x;
 	}
 
 	sf::Vertex sky[] = {
-		sf::Vertex(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(textureOffsetX, - step)),
-		sf::Vertex(sf::Vector2f(0.0f, SCREEN_H), sf::Vector2f(textureOffsetX, skyTextureSize.y - step)),
+		sf::Vertex(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(textureOffsetX, -player->pitch)),
+		sf::Vertex(sf::Vector2f(0.0f, SCREEN_H), sf::Vector2f(textureOffsetX, skyTextureSize.y - player->pitch)),
 		sf::Vertex(sf::Vector2f(SCREEN_W, SCREEN_H),
-		sf::Vector2f(textureOffsetX + skyTextureSize.x, skyTextureSize.y - step)),
-		sf::Vertex(sf::Vector2f(SCREEN_W, 0), sf::Vector2f(textureOffsetX + skyTextureSize.x, - step))
+		sf::Vector2f(textureOffsetX + skyTextureSize.x, skyTextureSize.y - player->pitch)),
+		sf::Vertex(sf::Vector2f(SCREEN_W, 0), sf::Vector2f(textureOffsetX + skyTextureSize.x, -player->pitch))
 	};
 
 	target.draw(sky, 4, sf::Quads, sf::RenderStates(&Resources::skyTextures));
@@ -97,13 +92,14 @@ void Renderer::Draw3DView(sf::RenderTarget& target, sf::Vector2f position, float
 		float cameraX = i * 2.0f / SCREEN_W - 1.0f;
 		rayDir = pDirection + cameraPlane * cameraX;
 
-		RayHit hit = raycast(map, rayPos, rayDir);
-
+		RayHit hit = raycast(*player->nowMap, rayPos, rayDir);
+		
 		if (hit.cell)
 		{
 			float wallHeight = SCREEN_H / hit.perpWallDist;
-			float wallStart = (SCREEN_H - wallHeight) / 2.0f + step;
-			float wallEnd = (SCREEN_H + wallHeight) / 2.0f + step;
+			float wallStart = (SCREEN_H - wallHeight) / 2.0f + player->pitch + player->posZ / hit.perpWallDist;
+			float wallEnd = (SCREEN_H + wallHeight) / 2.0f + player->pitch + player->posZ / hit.perpWallDist;
+			
 
 			float wallX = hit.isHitVert ? rayPos.x + hit.perpWallDist * rayDir.x :
 				rayPos.y + hit.perpWallDist * rayDir.y;
@@ -111,14 +107,14 @@ void Renderer::Draw3DView(sf::RenderTarget& target, sf::Vector2f position, float
 			wallX -= floor(wallX);
 			float textureX = wallX * TEXTURE_SIZE;
 
-			float brightnes = 1.0f - (hit.perpWallDist / brightnesDist);
-			if (hit.isHitVert) brightnes -= 0.2f;
-			if (brightnes < 0.0f) brightnes = 0.0f;
+			float brightnes = 1.0f - (hit.perpWallDist / BRIGHTNESTDIST);
+			if (brightnes < 0.11f) brightnes = 0.11f;
+			if (hit.isHitVert) brightnes -= 0.09f;
 			sf::Color colorShade(255 * brightnes, 255 * brightnes, 255 * brightnes);
 
 			walls.append(sf::Vertex(sf::Vector2f((float)i, wallStart), colorShade,
 				sf::Vector2f(textureX + (hit.cell - 1) * TEXTURE_SIZE, 0.0f)));
-			walls.append(sf::Vertex(sf::Vector2f((float)i, wallEnd), colorShade,
+			walls.append(sf::Vertex(sf::Vector2f((float)i, wallEnd + 1), colorShade,
 				sf::Vector2f(textureX + (hit.cell - 1) * TEXTURE_SIZE, TEXTURE_SIZE)));
 
 			distanceBuffer[i] = hit.perpWallDist;
@@ -128,13 +124,12 @@ void Renderer::Draw3DView(sf::RenderTarget& target, sf::Vector2f position, float
 	//ThreadPart
 	for (int cnt = 0; cnt < THREAD_COUNT; cnt++)
 	{
-		(*threads)[cnt].join();
+		threads[cnt].join();
 	}
 
 	//DrawPart
 	floorTexture.update(screenPixels);
 	target.draw(floorSprite);
-	target.draw(cellingSprite);
 	sf::RenderStates states{ &Resources::textures };
 	target.draw(walls, states);
 	
@@ -147,14 +142,17 @@ void Renderer::Draw3DView(sf::RenderTarget& target, sf::Vector2f position, float
 	walls.clear();
 }
 
-void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, const sf::Vector2f& playerPos,
-	std::vector<std::shared_ptr<Sprite>>& sprites, float invDet, float plAngle, float step)
+void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, Player* player,
+	std::vector<std::shared_ptr<Sprite>>& sprites, float invDet)
 {
-
 	for (auto sp : sprites)
 	{
 		if (sp->texture < 0) continue;
-		sf::Vector2f spritePos = sp->position - playerPos;
+		sf::Vector2f spritePos = sp->position - player->sprite->position;
+		float spDist = sqrt(SQUARE(spritePos.x) + SQUARE(spritePos.y));
+		float brightnes = 1 - spDist / BRIGHTNESTDIST;
+		if (brightnes < 0.1f) brightnes = 0.1f;
+		sf::Color colorShade(255 * brightnes, 255 * brightnes, 255 * brightnes);
 
 		//transform sprite with the inverse camera matrix
 		// [ planeX   dirX ] -1    [x]                                     [ dirY      -dirX ]   [x]
@@ -203,11 +201,11 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, c
 				sf::Vector2f textStart(textX + deltaRotateText, startYtext + 0.1f);
 				sf::Vector2f textEnd(textX + deltaRotateText, endYtext);
 
-				sf::Vector2f vertStart(i, -spriteSize / 2.0f + SCREEN_H / 2.0f + step);
-				sf::Vector2f vertEnd(i, spriteSize / 2.0f + SCREEN_H / 2.0f + step);
+				sf::Vector2f vertStart(i, -spriteSize / 2.0f + SCREEN_H / 2.0f + player->pitch + player->posZ / transforme.y);
+				sf::Vector2f vertEnd(i, spriteSize / 2.0f + SCREEN_H / 2.0f + player->pitch + player->posZ / transforme.y);
 
-				spriteColumns.append(sf::Vertex(vertStart, textStart));
-				spriteColumns.append(sf::Vertex(vertEnd, textEnd));
+				spriteColumns.append(sf::Vertex(vertStart, colorShade,textStart));
+				spriteColumns.append(sf::Vertex(vertEnd, colorShade, textEnd));
 
 				if (i == spriteStart || i == spriteEnd - 1)
 				{
@@ -220,17 +218,18 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, c
 	}
 }
 
-void Renderer::DrawFloor(sf::Vector2f& rayDirLeft, sf::Vector2f& rayDirRight, sf::Vector2f& rayPos, float step,
-	const Map& map, int startH, int endH)
+void Renderer::DrawFloor(sf::Vector2f& rayDirLeft, sf::Vector2f& rayDirRight, sf::Vector2f& rayPos, Player* player, int startH, int endH)
 {
 	for (int y = startH; y < endH; y++)
 	{
-		bool is_floor = y > SCREEN_H / 2 + step;
-		int p = is_floor ? (y - SCREEN_H / 2 - step) : (SCREEN_H / 2 - y + step);
-		float rowDist = CAMERA_Z / p;
+		bool is_floor = y > SCREEN_H / 2 + player->pitch;
+		int p = is_floor ? (y - SCREEN_H / 2 - player->pitch) : (SCREEN_H / 2 - y + player->pitch);
+		float rowDist = is_floor ? ( CAMERA_Z + player->posZ ) / p : ( CAMERA_Z - player->posZ )/ p ;
 		sf::Vector2f floorStep = rowDist * (rayDirRight - rayDirLeft) / SCREEN_W;
 		sf::Vector2f floor = rayPos + rowDist * rayDirLeft;
-
+		float brightnes = 1 - rowDist / BRIGHTNESTDIST;
+		if (brightnes < 0.08f) brightnes = 0.08f;
+		
 		for (int x = 0; x < SCREEN_W; x++)
 		{
 			sf::Vector2i cell{ floor };
@@ -238,8 +237,8 @@ void Renderer::DrawFloor(sf::Vector2f& rayDirLeft, sf::Vector2f& rayDirRight, sf
 			textCoords.x &= (int)TEXTURE_SIZE - 1;
 			textCoords.y &= (int)TEXTURE_SIZE - 1;
 
-			int floorText = map.GetOnGrid(cell.x, cell.y, FLOOR_LAYER);
-			int cellingText = map.GetOnGrid(cell.x, cell.y, CELL_LAYER);
+			int floorText = player->nowMap->GetOnGrid(cell.x, cell.y, FLOOR_LAYER);
+			int cellingText = player->nowMap->GetOnGrid(cell.x, cell.y, CELL_LAYER);
 
 			sf::Color color;
 			if (is_floor)
@@ -252,10 +251,9 @@ void Renderer::DrawFloor(sf::Vector2f& rayDirLeft, sf::Vector2f& rayDirRight, sf
 				color = cellingText == 0 ? sf::Color(0, 0, 0, 0) :
 				Resources::textureImage.getPixel((cellingText - 1) * TEXTURE_SIZE + textCoords.x, textCoords.y);
 			}
-
-			screenPixels[(x + y * (int)SCREEN_W) * 4 + 0] = color.r;
-			screenPixels[(x + y * (int)SCREEN_W) * 4 + 1] = color.g;
-			screenPixels[(x + y * (int)SCREEN_W) * 4 + 2] = color.b;
+			screenPixels[(x + y * (int)SCREEN_W) * 4 + 0] = color.r * brightnes;
+			screenPixels[(x + y * (int)SCREEN_W) * 4 + 1] = color.g * brightnes;
+			screenPixels[(x + y * (int)SCREEN_W) * 4 + 2] = color.b * brightnes;
 			screenPixels[(x + y * (int)SCREEN_W) * 4 + 3] = color.a;
 
 			floor += floorStep;

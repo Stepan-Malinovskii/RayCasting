@@ -25,7 +25,9 @@ public:
 	void updateMouseData(sf::Vector2f mousePos, float deltaTime);
 	void checkBoost(bool isPressed, float deltaTime);
 	void move(sf::Vector2f deltaPos);
+	void jump();
 	void fire();
+	void use();
 	void swapGun(bool flag);
 	void reloadingGun();
 	void DrawPlayerUI(sf::RenderWindow& window);
@@ -33,10 +35,12 @@ public:
 	Gun* getWeapon();
 	float getMoveSpeed();
 	Sprite* sprite;
-	float timeBoost, timerBoost, pitch;
-private:
-	int nowGun;
 	Map* nowMap;
+	float timeBoost, timerBoost, pitch, posZ;
+private:
+	bool isJump, jumpFlag;
+	void gravity(float deltaTime);
+	int nowGun;
 	float moveSpeed, nowSpeed, boostSpeed;
 	std::vector<Gun> guns;
 };

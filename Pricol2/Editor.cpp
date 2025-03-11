@@ -20,24 +20,24 @@ void Editor::initButton()
 	EdingButton b;
 	int x = 0, y = 0;
 	for (; x < Resources::textures.getSize().x / TEXTURE_SIZE; x++, y++)
-	{ 
+	{
 		b = EdingButton(TEXTURE_SIZE * (sf::Vector2f(x % COUNT_ROW_TEXT, y / COUNT_ROW_TEXT) + sf::Vector2f(0.025f, 0.025f)),
 			{ TEXTURE_SIZE * 0.95, TEXTURE_SIZE * 0.95, }, Resources::textures, { {(int)(x * TEXTURE_SIZE), 0}, {(int)TEXTURE_SIZE, (int)TEXTURE_SIZE} });
-		b.setFunc([=]() { 
+		b.setFunc([=]() {
 			nowValue = x + 1;
 			});
-		
+
 		buttons.push_back(std::make_shared<EdingButton>(b));
 	}
 
 	y /= COUNT_ROW_TEXT + 1;
 	y = y * (COUNT_ROW_TEXT - 3);
-	
+
 	for (x = 0; x < Resources::spritesTexture.getSize().y / SPRITE_SIZE; x++, y++)
 	{
 		b = EdingButton(SPRITE_SIZE * (sf::Vector2f(x % (COUNT_ROW_TEXT - 3), y / (COUNT_ROW_TEXT - 3)) + sf::Vector2f(0.025f, 0.025f)),
-			{ SPRITE_SIZE, SPRITE_SIZE }, Resources::spritesTexture, { { 0, (int)(SPRITE_SIZE * x)}, {(int)SPRITE_SIZE, (int)SPRITE_SIZE}});
-		b.setFunc([=]() { 
+			{ SPRITE_SIZE, SPRITE_SIZE }, Resources::spritesTexture, { { 0, (int)(SPRITE_SIZE * x)}, {(int)SPRITE_SIZE, (int)SPRITE_SIZE} });
+		b.setFunc([=]() {
 			nowSpriteDef = spriteDef[x + 1];
 			});
 		buttons.push_back(std::make_shared<EdingButton>(b));
@@ -154,7 +154,7 @@ void Editor::editorWindowStateLeftClick(sf::RenderWindow& editorWindow)
 }
 
 void Editor::drawEditor(sf::RenderWindow& editorWindow)
-{		
+{
 	for (auto b : buttons)
 	{
 		b->drawButton(editorWindow);
@@ -184,7 +184,7 @@ void Editor::editorEvent(const sf::Event& event)
 	if (event.type == sf::Event::MouseWheelScrolled)
 	{
 		float deltaScrol = -5 * event.mouseWheelScroll.delta;
-		editorView.move({0, deltaScrol});
+		editorView.move({ 0, deltaScrol });
 	}
 }
 

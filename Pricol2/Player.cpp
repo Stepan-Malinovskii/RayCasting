@@ -6,6 +6,10 @@
 Player::Player(Sprite* _sprite, Map* _nowMap) : sprite{ _sprite }, nowGun{ 1 }
 {
 	nowMap = _nowMap;
+	pitch = 0;
+	posZ = 0.0f;
+	isJump = false;
+	jumpFlag = false;
 	moveSpeed = 5.0f, boostSpeed = 8.0f, timeBoost = 2.0f, timerBoost = timeBoost, nowSpeed = moveSpeed;
 	Animator shutAnim1 = Animator<sf::Texture*>{ &Resources::gun1BaseTexture, {Animation<sf::Texture*>({
 		{0.0f, &Resources::gun1FireAnimationTexture[0]},
@@ -27,11 +31,11 @@ Player::Player(Sprite* _sprite, Map* _nowMap) : sprite{ _sprite }, nowGun{ 1 }
 		{0.428f, &Resources::gun2FireAnimationTexture[0]},
 		{0.5f, &Resources::gun2FireAnimationTexture[0]}})} };
 
-	Gun gun1 = Gun(50.0f, 5, 1.0f, 0.5f, shutAnim1, [&](Sprite* sp) {sp->healPoint -= 50.0f;}, [&](Gun* gun) {gun->nowCount++;});
+	Gun gun1 = Gun(50.0f, 5, 1.0f, 5.0f, 0.5f, shutAnim1, [&](Sprite* sp, float dist) {sp->healPoint -= 50.0f * (dist < 5.0f ? 1:0);}, [&](Gun* gun) {gun->nowCount++;});
 	gun1.setSound(Resources::gun1ShutSound, Resources::gun1ResetSound, Resources::gun1CantShoutSound);
 	guns.push_back(gun1);
 
-	Gun gun2 = Gun(10.0f, 20, 0.5f, 3.0f, shutAnim2, [&](Sprite* sp) {sp->healPoint -= 10.0f;}, [&](Gun* gun) {gun->nowCount = 20;});
+	Gun gun2 = Gun(10.0f, 20, 0.5f, 10.0f, 3.0f, shutAnim2, [&](Sprite* sp, float dist) {sp->healPoint -= 10.0f * (dist < 10 ? 1 : 0);}, [&](Gun* gun) {gun->nowCount = 20;});
 	gun2.setSound(Resources::gun2ShutSound, Resources::gun2ResetSound, Resources::gun2CantShoutSound);
 	guns.push_back(gun2);
 }
@@ -47,6 +51,9 @@ void Player::updateMouseData(sf::Vector2f mousePos, float deltaTime)
 
 	//AnimatorPart
 	guns[nowGun].update(deltaTime);
+
+	//GravityPart
+	gravity(deltaTime);
 }
 
 void Player::checkBoost(bool isPressed, float deltaTime)
@@ -92,6 +99,56 @@ void Player::move(sf::Vector2f deltaPos)
 	sprite->move(*nowMap, deltaPos * nowSpeed);
 }
 
+void Player::gravity(float deltaTime)
+{
+	if (isJump)
+	{
+		if (posZ < 0)
+		{
+			isJump = false;
+			jumpFlag = false;
+			posZ = 0;
+		}
+		else
+		{
+			if (posZ > 150)
+			{
+				jumpFlag = true;
+			}
+			if (!jumpFlag)
+			{
+				posZ += 750 * deltaTime;
+			}
+			else
+			{
+				posZ -= 750 * deltaTime;
+			}
+			
+			
+		}
+	}
+	
+}
+
+void Player::jump()
+{
+	if (posZ == 0)
+	{
+		isJump = true;
+	}
+}
+
+void Player::use()
+{
+	float radiansAngle = sprite->angle * PI / 180.0f;
+	sf::Vector2f verticalMoveParametrs(cos(radiansAngle), sin(radiansAngle));
+	RayHit hit = raycast(*nowMap, sprite->position, verticalMoveParametrs, true, sprite, 1);
+	if (hit.sprite != nullptr)
+	{
+		hit.sprite->healPoint -= hit.sprite->healPoint;
+	}
+}
+
 void Player::reloadingGun()
 {
 	guns[nowGun].resetPatron();
@@ -104,8 +161,10 @@ void Player::fire()
 
 	if (guns[nowGun].isCanUsed())
 	{
-		RayHit hit = raycast(*nowMap, sprite->position, verticalMoveParametrs, true, sprite);
-		guns[nowGun].ussing(hit.sprite);
+		RayHit hit = raycast(*nowMap, sprite->position, verticalMoveParametrs, true, sprite, guns[nowGun].maxDist);
+		float dist = 0;
+		if (hit.sprite != nullptr) { dist = sqrt(GETDIST(hit.sprite->position, sprite->position)); }
+		guns[nowGun].ussing(hit.sprite, dist);
 	}
 }
 

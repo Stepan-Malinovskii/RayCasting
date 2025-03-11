@@ -1,3 +1,4 @@
+
 #pragma once
 #ifndef SPRITE
 #define SPRITE
@@ -30,7 +31,7 @@ public:
 class ThinkerLogic : public Thinker
 {
 public:
-	template<typename Fn> ThinkerLogic(const Fn& _fn): fn{ _fn } {}
+	template<typename Fn> ThinkerLogic(const Fn& _fn) : fn{ _fn } {}
 
 	void update(Sprite& sprite, Map& map, float deltaT) override
 	{
@@ -68,7 +69,7 @@ public:
 
 private:
 	bool checkCollision(const Map& map, sf::Vector2f newPos, bool xAxis);
-	std::set<std::tuple<int,int>> blockmap_coords;
+	std::set<std::tuple<int, int>> blockmap_coords;
 };
 
 static std::vector<SpriteDef> spriteDef = {

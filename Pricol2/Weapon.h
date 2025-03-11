@@ -17,7 +17,7 @@
 class Weapon
 {
 public:
-	Weapon(float _timeBetewen, Animator<sf::Texture*> anim);
+	Weapon(float _timeBetewen, float maxDist,Animator<sf::Texture*> anim);
 	Weapon() = default;
 
 	virtual void update(float dt);
@@ -28,7 +28,8 @@ public:
 
 	virtual void startAnimation(int number);
 
-	virtual void ussing(Sprite* sp) = 0;
+	virtual void ussing(Sprite* sp, float dist) = 0;
+	float maxDist;
 private:
 	Animator<sf::Texture*> weaponAnimator;
 	float timeBetwen, nowTime;
@@ -37,8 +38,8 @@ private:
 class Gun : public Weapon
 {
 public:
-	Gun(float _damage, int maxCnt, float _timeBetewen, float _timeBetewenReset, Animator<sf::Texture*>& anim,
-		std::function<void(Sprite* sp)> _fn, std::function<void(Gun* gun)> _resetFn);
+	Gun(float _damage, int maxCnt, float _timeBetewen, float maxDist, float _timeBetewenReset, Animator<sf::Texture*>& anim,
+		std::function<void(Sprite* sp, float dist)> _fn, std::function<void(Gun* gun)> _resetFn);
 	Gun() = default;
 
 	void setSound(sf::SoundBuffer& shut, sf::SoundBuffer& reset, sf::SoundBuffer& cantShut);
@@ -47,13 +48,13 @@ public:
 
 	void resetPatron();
 
-	void ussing(Sprite* sp) override;
+	void ussing(Sprite* sp, float dist) override;
 
 	int nowCount;
 	int maxCountPotron;
 private:
 	float timeBetwenReset, nowTimeBetwenReset;
-	std::function<void(Sprite* sp)> shutFn;
+	std::function<void(Sprite* sp, float dist)> shutFn;
 	std::function<void(Gun* gun)> resetFn;
 	float damage;
 	sf::Sound shutSound;

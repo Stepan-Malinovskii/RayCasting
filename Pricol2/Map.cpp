@@ -3,7 +3,7 @@
 void Map::Draw(sf::RenderTarget& target, int layerNumber)
 {
 	if (grid.empty()) return;
-	
+
 	sf::RectangleShape cell(sf::Vector2f(TEXTURE_SIZE * 0.95, TEXTURE_SIZE * 0.95));
 	cell.setTexture(&Resources::textures);
 
@@ -74,7 +74,7 @@ void Map::SaveGrid(const std::string& path)
 	{
 		for (int x = 0; x < w; x++)
 		{
-			out.write(reinterpret_cast<const char*>(grid[y][x].data()), 
+			out.write(reinterpret_cast<const char*>(grid[y][x].data()),
 				sizeof(grid[y][x][0]) * LAYER_COUNT);
 		}
 	}
@@ -84,7 +84,7 @@ void Map::SaveGrid(const std::string& path)
 	for (int i = 0; i < sprites.size(); i++)
 		out.write(reinterpret_cast<const char*>(&sprites[i]), sizeof(sprites[i]));
 }
- 
+
 void Map::LoadGrid(const std::string& path)
 {
 	std::ifstream in{ path, std::ios::in | std::ios::binary };
@@ -104,7 +104,7 @@ void Map::LoadGrid(const std::string& path)
 	{
 		for (int x = 0; x < w; x++)
 		{
-			in.read(reinterpret_cast<char*>(grid[y][x].data()), 
+			in.read(reinterpret_cast<char*>(grid[y][x].data()),
 				sizeof(grid[y][x][0]) * LAYER_COUNT);
 		}
 	}
