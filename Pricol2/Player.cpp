@@ -96,7 +96,7 @@ void Player::checkBoost(bool isPressed, float deltaTime)
 
 void Player::move(sf::Vector2f deltaPos)
 {
-	sprite->move(*nowMap, deltaPos * nowSpeed);
+	sprite->move(nowMap, deltaPos * nowSpeed);
 }
 
 void Player::gravity(float deltaTime)

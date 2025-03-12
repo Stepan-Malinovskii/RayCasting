@@ -1,6 +1,7 @@
 #include "Editor.h"
 #include <SFML/Window/Mouse.hpp>
 #include <SFML/Window/Event.hpp>
+#include "SpriteManager.h"
 
 void Editor::init(sf::RenderWindow& window, sf::RenderWindow& editorWindow, Map* map)
 {
@@ -9,8 +10,6 @@ void Editor::init(sf::RenderWindow& window, sf::RenderWindow& editorWindow, Map*
 	nowLayer = WALL_LAYER;
 	windowView = window.getView();
 	editorView = editorWindow.getView();
-	cellShape.setSize(sf::Vector2f(TEXTURE_SIZE, TEXTURE_SIZE));
-	cellShape.setFillColor(sf::Color::Cyan);
 
 	initButton();
 }
@@ -44,10 +43,27 @@ void Editor::initButton()
 	}
 }
 
-void Editor::takeInput(sf::RenderWindow& window, sf::RenderWindow& editorWindow)
+void Editor::takeEditInput(sf::RenderWindow& editorWindow, sf::Event event)
+{
+	editorMousePos = sf::Mouse::getPosition(editorWindow);
+
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	{
+		editorWindowStateLeftClick(editorWindow);
+	}
+
+	if (event.type == sf::Event::MouseWheelScrolled)
+	{
+		float deltaScrol = -5 * event.mouseWheelScroll.delta;
+		editorView.move({ 0, deltaScrol });
+	}
+
+	editorWindow.setView(editorView);
+}
+
+void Editor::takeWindowInput(sf::RenderWindow& window, sf::Event event)
 {
 	windowMousePos = sf::Mouse::getPosition(window);
-	editorMousePos = sf::Mouse::getPosition(editorWindow);
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
 	{
@@ -57,15 +73,35 @@ void Editor::takeInput(sf::RenderWindow& window, sf::RenderWindow& editorWindow)
 	{
 		windowStateNoRightClick(window);
 	}
+	
 
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	static bool da = false;
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !da)
 	{
+		da = true;
 		windowStateLeftClick(window);
-		editorWindowStateLeftClick(editorWindow);
+	}
+	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	{
+		da = false;
+	}
+
+	if (event.type == sf::Event::MouseWheelScrolled)
+	{
+		float zoom = 1.0f - 0.1f * event.mouseWheelScroll.delta;
+		windowView.zoom(zoom);
+	}
+
+	if (event.type == sf::Event::KeyPressed)
+	{
+		if (event.key.code == sf::Keyboard::Tab)
+		{
+			nowLayer++;
+			nowLayer = nowLayer % ALL_LAYER;
+	}
 	}
 
 	window.setView(windowView);
-	editorWindow.setView(editorView);
 }
 
 void Editor::windowStateRightClick(sf::RenderWindow& window)
@@ -105,8 +141,6 @@ void Editor::windowStateLeftClick(sf::RenderWindow& window)
 		sf::Vector2f worldPos = window.mapPixelToCoords(windowMousePos);
 		sf::Vector2i mapPos = sf::Vector2i((int)floor(worldPos.x - 0.1f) / TEXTURE_SIZE,
 			(int)floor(worldPos.y - 0.1f) / TEXTURE_SIZE);
-		cellShape.setPosition((sf::Vector2f)mapPos * TEXTURE_SIZE);
-		window.draw(cellShape);
 		if (nowLayer != SPRITE_LAYER)
 		{
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
@@ -122,12 +156,17 @@ void Editor::windowStateLeftClick(sf::RenderWindow& window)
 		{
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
 			{
-				nowMap->deleteSprite(mapPos);
+				nowMap->deleteMapSprite(mapPos);
 			}
 			else
 			{
-				Sprite sp(nowSpriteDef, { nowSpriteDef.indexTexture, { mapPos.x + 0.5f, mapPos.y + 0.5f }, -90.0f });
-				nowMap->setSprites(sp);
+				if (nowSpriteDef.indexTexture != -1)
+				{
+					if (nowMap->isCellEmpty(mapPos))
+					{
+						nowMap->setMapSprite({ nowSpriteDef.indexTexture + 1, { mapPos.x + 0.5f, mapPos.y + 0.5f }, -90.0f });
+					}
+				}
 			}
 		}
 	}
@@ -140,8 +179,6 @@ void Editor::editorWindowStateLeftClick(sf::RenderWindow& editorWindow)
 		sf::Vector2i worldPos = (sf::Vector2i)editorWindow.mapPixelToCoords(editorMousePos);
 		sf::Vector2i mapPos = sf::Vector2i((int)floor(worldPos.x - 0.1f) / TEXTURE_SIZE,
 			(int)floor(worldPos.y - 0.1f) / TEXTURE_SIZE);
-		cellShape.setPosition((sf::Vector2f)mapPos * TEXTURE_SIZE);
-		editorWindow.draw(cellShape);
 
 		for (auto b : buttons)
 		{
@@ -158,33 +195,6 @@ void Editor::drawEditor(sf::RenderWindow& editorWindow)
 	for (auto b : buttons)
 	{
 		b->drawButton(editorWindow);
-	}
-}
-
-void Editor::windowEvent(const sf::Event& event)
-{
-	if (event.type == sf::Event::MouseWheelScrolled)
-	{
-		float zoom = 1.0f - 0.1f * event.mouseWheelScroll.delta;
-		windowView.zoom(zoom);
-	}
-
-	if (event.type == sf::Event::KeyPressed)
-	{
-		if (event.key.code == sf::Keyboard::Tab)
-		{
-			nowLayer++;
-			nowLayer = nowLayer % ALL_LAYER;
-		}
-	}
-}
-
-void Editor::editorEvent(const sf::Event& event)
-{
-	if (event.type == sf::Event::MouseWheelScrolled)
-	{
-		float deltaScrol = -5 * event.mouseWheelScroll.delta;
-		editorView.move({ 0, deltaScrol });
 	}
 }
 

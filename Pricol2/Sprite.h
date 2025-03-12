@@ -53,14 +53,15 @@ struct SpriteDef
 class Sprite
 {
 public:
-	Sprite(sf::Vector2f pos, float size, int indText, float angle = 0.0f, bool isDirect = false, float HP = 100.0f, SpriteType type = Enemy);
-	Sprite(SpriteDef spDef, MapSprite spMap);
+	Sprite(sf::Vector2f pos, float size, int indText, int id, float angle = 0.0f, bool isDirect = false, float HP = 100.0f, SpriteType type = Enemy);
+	Sprite(SpriteDef spDef, MapSprite spMap, int _id);
 	Sprite() = default;
 
-	void move(Map& map, sf::Vector2f move);
-	void setupBlockmap(Map& map);
+	void move(Map* map, sf::Vector2f move);
+	void setupBlockmap(Map* map);
 	sf::Vector2f position;
 	int texture;
+	int id;
 	SpriteType type;
 	bool isDirectional;
 	float angle, size, healPoint, maxHealpoint;

@@ -34,9 +34,8 @@ class Editor
 {
 public:
 	void init(sf::RenderWindow& window, sf::RenderWindow& editorWindow, Map* map);
-	void takeInput(sf::RenderWindow& window, sf::RenderWindow& editorWindow);
-	void windowEvent(const sf::Event& event);
-	void editorEvent(const sf::Event& event);
+	void takeWindowInput(sf::RenderWindow& window, sf::Event event);
+	void takeEditInput(sf::RenderWindow& editorWindow, sf::Event event);
 	void drawEditor(sf::RenderWindow& editorWindow);
 
 	int drawerLayer() const;
@@ -45,7 +44,6 @@ private:
 	int nowValue;
 	int nowLayer;
 	SpriteDef nowSpriteDef;
-	sf::RectangleShape cellShape;
 	sf::Vector2i lastMousePos;
 	sf::Vector2i windowMousePos, editorMousePos;
 	sf::View windowView, editorView;

@@ -35,16 +35,24 @@ class Map
 {
 public:
 	void Draw(sf::RenderTarget& window, int layerNumber);
+
 	void SetNewOnGrid(int x, int y, int layerNumber, int value);
 	int const GetOnGrid(int x, int y, int layerNumber) const;
+
 	void LoadGrid(const std::string& path);
 	void SaveGrid(const std::string& path);
 
-	void insertInBlockMap(sf::Vector2i pos, Sprite* sprite);
+	bool insertInBlockMap(sf::Vector2i pos, Sprite* sprite);
 	void removeInBlockMap(sf::Vector2i pos, Sprite* sprite);
+	bool isCellEmpty(sf::Vector2i pos);
 	std::set<Sprite*> getBlockMap(sf::Vector2i pos) const;
+
+	void setMapSprite(MapSprite sp);
+	void deleteMapSprite(sf::Vector2i pos);
+	void writeMapSprite(std::vector<std::shared_ptr<Sprite>> sprs);
 	std::vector<MapSprite>& getMapSprites();
-	void setSprites(Sprite& sprite);
+
+
 	void deleteSprite(sf::Vector2i mapPos);
 private:
 	std::vector<std::vector<std::array<int, LAYER_COUNT>>> grid;

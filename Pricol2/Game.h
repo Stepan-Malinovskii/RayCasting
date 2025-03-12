@@ -21,6 +21,7 @@ public:
 	void getInput(sf::Event event, float deltaTime);
 	void resetMap(Map* newMap);
 	void makeCycle(float deltaTime);
+	void save();
 private:
 	void drawAim();
 	void getInput(float deltaTime);
@@ -28,8 +29,8 @@ private:
 	void render();
 	
 	sf::Vector2i screenMidlePos;
-	std::vector<std::shared_ptr<Sprite>> sprites;
-	std::unique_ptr<Player> player;
+	SpriteManager* spManager;
+	Player* player;
 	Renderer renderer;
 	Map* nowMap;
 	sf::RenderWindow* window;

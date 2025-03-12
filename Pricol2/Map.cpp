@@ -130,12 +130,14 @@ int const Map::GetOnGrid(int x, int y, int layerNumber) const
 	return 0;
 }
 
-void Map::insertInBlockMap(sf::Vector2i pos, Sprite* sprite)
+bool Map::insertInBlockMap(sf::Vector2i pos, Sprite* sprite)
 {
 	if (pos.x >= 0 && pos.y >= 0 && pos.y < blockMap.size() && pos.x < blockMap[pos.y].size())
 	{
 		blockMap[pos.y][pos.x].insert(sprite);
+		return true;
 	}
+	return false;
 }
 
 void Map::removeInBlockMap(sf::Vector2i pos, Sprite* sprite)
@@ -143,16 +145,16 @@ void Map::removeInBlockMap(sf::Vector2i pos, Sprite* sprite)
 	if (pos.x >= 0 && pos.y >= 0 && pos.y < blockMap.size() && pos.x < blockMap[pos.y].size())
 	{
 		blockMap[pos.y][pos.x].erase(sprite);
-
-		for (int i = 0; i < sprites.size(); i++)
-		{
-			if ((sf::Vector2i)sprites[i].position == pos)
-			{
-				sprites.erase(sprites.begin() + i);
-				break;
-			}
-		}
 	}
+}
+
+bool Map::isCellEmpty(sf::Vector2i pos)
+{
+	if (pos.x >= 0 && pos.y >= 0 && pos.y < blockMap.size() && pos.x < blockMap[pos.y].size())
+	{
+		return blockMap[pos.y][pos.x].empty();
+	}
+	return false;
 }
 
 std::set<Sprite*> Map::getBlockMap(sf::Vector2i pos) const
@@ -169,14 +171,30 @@ std::vector<MapSprite>& Map::getMapSprites()
 	return sprites;
 }
 
-void Map::setSprites(Sprite& sprite)
+void Map::setMapSprite(MapSprite sp)
 {
-	sf::Vector2i pos = (sf::Vector2i)sprite.position;
-	int l = blockMap[pos.y][pos.x].size();
-	insertInBlockMap((sf::Vector2i)sprite.position, &sprite);
-	if (l != blockMap[pos.y][pos.x].size())
+	sprites.push_back(sp);
+}
+
+void Map::writeMapSprite(std::vector<std::shared_ptr<Sprite>> sprs)
+{
+	sprites.clear();
+	MapSprite mapSp;
+	for (auto sp : sprs)
 	{
-		sprites.push_back({ sprite.texture + 1, sprite.position, sprite.angle });
+		sprites.push_back({ sp->texture + 1, sp->position, sp->angle });
+	}
+}
+
+void Map::deleteMapSprite(sf::Vector2i pos)
+{
+	for (int i = 0; i < sprites.size(); i++)
+	{
+		if ((sf::Vector2i)sprites[i].position == pos)
+		{
+			sprites.erase(sprites.begin() + i);
+			break;
+		}
 	}
 }
 

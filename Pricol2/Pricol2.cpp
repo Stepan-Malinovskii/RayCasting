@@ -3,6 +3,7 @@
 #include "Renderer.h"
 #include "Resources.h"
 #include "Game.h"
+#include "SpriteManager.h"
 
 enum class State{Editor, Game};
 
@@ -33,9 +34,14 @@ int main()
 	float deltaTime = 0;
 	while (window.isOpen())
 	{
+
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
+			if (state == State::Editor)
+			{
+				editor.takeWindowInput(window, event);
+			}
 			if (event.type == sf::Event::Closed)
 			{
 				window.close();
@@ -63,10 +69,7 @@ int main()
 					}
 				}
 			}
-			if (state == State::Editor)
-			{
-				editor.windowEvent(event);
-			}
+
 			if (state == State::Game)
 			{
 				game.getInput(event, deltaTime);
@@ -81,7 +84,7 @@ int main()
 				{
 					editorWindow.close();
 				}
-				editor.editorEvent(event);
+				editor.takeEditInput(editorWindow, event);
 			}
 		}
 
@@ -93,8 +96,6 @@ int main()
 		{	
 			editorWindow.clear();
 			window.clear();
-
-			editor.takeInput(window, editorWindow);
 			map->Draw(window, editor.drawerLayer());
 			editor.drawEditor(editorWindow);
 			
@@ -106,6 +107,6 @@ int main()
 		deltaTime = gameClock.getElapsedTime().asSeconds();
 		gameClock.restart();
 	}
-
+	game.save();
 	map->SaveGrid("Texture/test.map");
 }
