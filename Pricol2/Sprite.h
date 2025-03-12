@@ -58,7 +58,6 @@ public:
 	Sprite() = default;
 
 	void move(Map* map, sf::Vector2f move);
-	void setupBlockmap(Map* map);
 	sf::Vector2f position;
 	int texture;
 	int id;
@@ -67,10 +66,10 @@ public:
 	float angle, size, healPoint, maxHealpoint;
 
 	std::shared_ptr<Thinker> thinker;
+	std::set<std::tuple<int, int>> blockmap_coords;
 
 private:
 	bool checkCollision(const Map& map, sf::Vector2f newPos, bool xAxis);
-	std::set<std::tuple<int, int>> blockmap_coords;
 };
 
 static std::vector<SpriteDef> spriteDef = {

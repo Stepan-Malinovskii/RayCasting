@@ -157,6 +157,42 @@ bool Map::isCellEmpty(sf::Vector2i pos)
 	return false;
 }
 
+void Map::setupBlockmap(Sprite* sp)
+{
+	sf::Vector2f halfSize = { sp->size / 2.f, sp->size / 2.f };
+	sf::Vector2i start = static_cast<sf::Vector2i>(sp->position - halfSize);
+	sf::Vector2i end = static_cast<sf::Vector2i>(sp->position + halfSize);
+
+	std::set<std::tuple<int, int>> coords;
+	for (int y = start.y; y <= end.y; y++) {
+		for (int x = start.x; x <= end.x; x++) { coords.insert({ x, y }); }
+	}
+
+	std::set<std::tuple<int, int>> to_remove;
+	auto blockmap_coords = sp->blockmap_coords;
+	std::set_difference(blockmap_coords.begin(), blockmap_coords.end(),
+		coords.begin(), coords.end(),
+		std::inserter(to_remove, to_remove.end()));
+
+	std::set<std::tuple<int, int>> to_insert;
+	std::set_difference(coords.begin(), coords.end(), blockmap_coords.begin(),
+		blockmap_coords.end(),
+		std::inserter(to_insert, to_insert.end()));
+
+	for (const auto& [x, y] : to_remove) { removeInBlockMap({ x, y }, sp); }
+	for (const auto& [x, y] : to_insert) { insertInBlockMap({ x, y }, sp); }
+
+	sp->blockmap_coords = coords;
+}
+
+void Map::deleteInBlockMap(Sprite* sp)
+{
+	for (const auto& [x, y] : sp->blockmap_coords)
+	{
+		blockMap[y][x].erase(sp);
+	}
+}
+
 std::set<Sprite*> Map::getBlockMap(sf::Vector2i pos) const
 {
 	if (pos.x >= 0 && pos.y >= 0 && pos.y < blockMap.size() && pos.x < blockMap[pos.y].size())

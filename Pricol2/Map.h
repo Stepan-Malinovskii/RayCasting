@@ -42,9 +42,9 @@ public:
 	void LoadGrid(const std::string& path);
 	void SaveGrid(const std::string& path);
 
-	bool insertInBlockMap(sf::Vector2i pos, Sprite* sprite);
-	void removeInBlockMap(sf::Vector2i pos, Sprite* sprite);
 	bool isCellEmpty(sf::Vector2i pos);
+	void setupBlockmap(Sprite* sp);
+	void deleteInBlockMap(Sprite* sp);
 	std::set<Sprite*> getBlockMap(sf::Vector2i pos) const;
 
 	void setMapSprite(MapSprite sp);
@@ -52,9 +52,11 @@ public:
 	void writeMapSprite(std::vector<std::shared_ptr<Sprite>> sprs);
 	std::vector<MapSprite>& getMapSprites();
 
-
 	void deleteSprite(sf::Vector2i mapPos);
 private:
+	bool insertInBlockMap(sf::Vector2i pos, Sprite* sprite);
+	void removeInBlockMap(sf::Vector2i pos, Sprite* sprite);
+
 	std::vector<std::vector<std::array<int, LAYER_COUNT>>> grid;
 	std::vector<std::vector<std::set<Sprite*>>> blockMap;
 

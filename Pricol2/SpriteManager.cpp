@@ -44,7 +44,7 @@ void SpriteManager::init()
 
 	for (auto sp : sprites)
 	{
-		sp->setupBlockmap(nowMap);
+		nowMap->setupBlockmap(sp.get());
 	}
 }
 
@@ -82,7 +82,7 @@ void SpriteManager::update(float deltaTime)
 
 void SpriteManager::deleteSprite(std::shared_ptr<Sprite> sp)
 {
-	nowMap->removeInBlockMap((sf::Vector2i)sp->position, sp.get());
+	nowMap->deleteInBlockMap(sp.get());
 	for (int i = 0; i < sprites.size();i++)
 	{
 		if (sprites[i]->id == sp->id)
