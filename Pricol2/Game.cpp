@@ -77,7 +77,7 @@ void Game::getInput(float deltaTime)
 	}
 
 	player->checkBoost(lShiftPressed, deltaTime);
-	player->move(deltaPos * deltaTime);
+	player->move(deltaPos, deltaTime);
 	player->updateMouseData({deltaX, deltaY}, deltaTime);
 }
 
@@ -95,12 +95,12 @@ void Game::update(float deltaTime)
 
 void Game::makeCycle(float deltaTime)
 {
-//#if !DEBUG
-//	if (deltaTime > 0.01)
-//	{
-//		deltaTime = 0;
-//	}
-//#endif //DEBUG
+#if !_DEBUG
+	if (deltaTime > 1/144.0f)
+	{
+		deltaTime = 0;
+	}
+#endif //_DEBUG
 
 	getInput(deltaTime);
 	update(deltaTime);
@@ -121,13 +121,14 @@ void Game::render()
 {
 	window->clear();
 	renderer.Draw3DView(*window, player, spManager->getSprites());
-	player->DrawPlayerUI(*window);
+	player->DrawPlayerUI(window);
+
 	sf::CircleShape aim{};
 	aim.setRadius(2.5f);
 	aim.setOrigin({ aim.getRadius(),aim.getRadius() });
-	aim.setFillColor(sf::Color::Black);
+	aim.setFillColor(sf::Color::Blue);
 	aim.setPointCount(16);
 	aim.setPosition((sf::Vector2f)screenMidlePos);
+
 	window->draw(aim);
-	window->display();
 }

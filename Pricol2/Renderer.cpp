@@ -1,21 +1,17 @@
 #include "Renderer.h"
 #include <SFML/Graphics/RectangleShape.hpp>
 
-#define SQUARE(a) ((a) * (a))
-#define GETDIST(a,b) (SQUARE(a.x - b.x) + SQUARE(a.y - b.y))
-#define COMPARER(a, b, c) GETDIST(a, c) > GETDIST(b, c) ? true : false
-
 Renderer::Renderer()
 {
 	Init();
 	screenPixels = new uint8_t[(int)SCREEN_H * (int)SCREEN_W * 4]();
-	distanceBuffer = new float[(int)SCREEN_W]();
+	distanceBuffer = new float[(int)SCREEN_W + 1] {};
 	threads = std::vector<std::jthread>(THREAD_COUNT);
 }
 
 Renderer::~Renderer()
 {
-	//delete[] distanceBuffer;
+	delete[] distanceBuffer;
 	delete[] screenPixels;
 }
 

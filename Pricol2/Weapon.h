@@ -10,7 +10,7 @@
 #include <vector>
 #include <array>
 #include <functional>
-
+#include "Resources.h"
 #include "Sprite.h"
 #include "Animation.h"
 
@@ -22,7 +22,7 @@ public:
 
 	virtual void update(float dt);
 
-	virtual void drawWeapon(sf::RenderWindow& window);
+	virtual void drawWeapon(sf::RenderTarget* window, sf::Vector2f delta);
 
 	virtual bool isCanUsed();
 

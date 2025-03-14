@@ -24,21 +24,24 @@ public:
 
 	void updateMouseData(sf::Vector2f mousePos, float deltaTime);
 	void checkBoost(bool isPressed, float deltaTime);
-	void move(sf::Vector2f deltaPos);
+	void move(sf::Vector2f deltaPos, float deltaTime);
 	void jump();
 	void fire();
 	void use();
 	void swapGun(bool flag);
 	void reloadingGun();
-	void DrawPlayerUI(sf::RenderWindow& window);
+	void DrawPlayerUI(sf::RenderWindow* window);
 
 	Gun* getWeapon();
 	float getMoveSpeed();
 	Sprite* sprite;
 	Map* nowMap;
-	float timeBoost, timerBoost, pitch, posZ;
+	sf::Vector2f shakeDelta;
+	float pitch, posZ;
 private:
+	float timeBoost, timerBoost, shakeTime;
 	bool isJump, jumpFlag;
+	void shakeCamera(float deltaTime, bool isRun);
 	void gravity(float deltaTime);
 	int nowGun;
 	float moveSpeed, nowSpeed, boostSpeed;

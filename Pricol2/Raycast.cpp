@@ -1,7 +1,7 @@
 #include "Raycast.h"
 
 RayHit raycast(const Map& map, sf::Vector2f pos, sf::Vector2f dir,
-	bool checkSprite, Sprite* ignore, int maxDist)
+	bool checkSprite, Sprite* ignore, int maxDist, float pitch)
 {
 	float origin[2] = { pos.x, pos.y };
 	float dir_inv[2] = { 1.0f / dir.x, 1.0f / dir.y };
@@ -77,7 +77,13 @@ RayHit raycast(const Map& map, sf::Vector2f pos, sf::Vector2f dir,
 				tmax = fmin(tmax, fmax(tmin, fmax(t1, t2)));
 			}
 
-			if (tmin < tmax) { hitSprite = sprite; }
+			if (tmin < tmax) 
+			{
+				if (pitch * sqrt(pow(pos.x - sprite->position.x, 2) + pow(pos.y - sprite->position.y, 2)) / 3 - 20 < SPRITE_SIZE)
+				{
+					hitSprite = sprite; 
+				}
+			}
 		}
 	}
 	

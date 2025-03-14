@@ -12,16 +12,16 @@ void Weapon::update(float dt)
 	weaponAnimator.update(dt);
 }
 
-void Weapon::drawWeapon(sf::RenderWindow& window)
+void Weapon::drawWeapon(sf::RenderTarget* window, sf::Vector2f delta)
 {
 	sf::Texture* tex = weaponAnimator.get();
 	if (tex)
 	{
 		sf::Sprite weapon{ *tex };
 		weapon.setOrigin(tex->getSize().x / 2.0f, tex->getSize().y);
-		weapon.setPosition(window.getSize().x / 2.0f, window.getSize().y);
 		weapon.scale(2.5f, 2.5f);
-		window.draw(weapon);
+		weapon.setPosition(SCREEN_W / 2.0f - 20 + delta.x, SCREEN_H + delta.y + 10);
+		window->draw(weapon);
 	}
 }
 

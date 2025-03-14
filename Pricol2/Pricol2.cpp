@@ -10,8 +10,6 @@ enum class State{Editor, Game};
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H),"Game");
-	/*sf::View view({ {SCREEN_W / 2, SCREEN_H / 2}, {} });*/
-	/*window.setView(view);*/
 	window.setFramerateLimit(900);
 	window.setMouseCursorVisible(false);
 
@@ -91,6 +89,7 @@ int main()
 		if (state == State::Game)
 		{
 			game.makeCycle(deltaTime);
+			window.display();
 		}
 		else
 		{	
