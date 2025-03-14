@@ -21,7 +21,6 @@ class Player
 public:
 	Player(Sprite* sprite, Map* _nowMap = nullptr);
 
-
 	void updateMouseData(sf::Vector2f mousePos, float deltaTime);
 	void checkBoost(bool isPressed, float deltaTime);
 	void move(sf::Vector2f deltaPos, float deltaTime);
@@ -30,22 +29,24 @@ public:
 	void use();
 	void swapGun(bool flag);
 	void reloadingGun();
+	void swapMap(Map* newMap);
 	void DrawPlayerUI(sf::RenderWindow* window);
 
 	Gun* getWeapon();
 	float getMoveSpeed();
 	Sprite* sprite;
-	Map* nowMap;
-	sf::Vector2f shakeDelta;
 	float pitch, posZ;
 private:
-	float timeBoost, timerBoost, shakeTime;
 	bool isJump, jumpFlag;
+	Map* nowMap;
+	sf::Vector2f shakeDelta;
+	int nowGun;
+	std::vector<Gun> guns;
+	float moveSpeed, nowSpeed, boostSpeed,
+		timeBoost, timerBoost, shakeTime;
+
 	void shakeCamera(float deltaTime, bool isRun);
 	void gravity(float deltaTime);
-	int nowGun;
-	float moveSpeed, nowSpeed, boostSpeed;
-	std::vector<Gun> guns;
 };
 
 #endif // !PLAYER

@@ -6,11 +6,10 @@
 Player::Player(Sprite* _sprite, Map* _nowMap) : sprite{ _sprite }, nowGun{ 1 }
 {
 	nowMap = _nowMap;
-	pitch = 0;
-	posZ = 0.0f;
-	isJump = false;
-	jumpFlag = false;
+	pitch = 0, shakeTime = 0, posZ = 0.0f;
+	isJump = false, jumpFlag = false;
 	moveSpeed = 5.0f, boostSpeed = 8.0f, timeBoost = 2.0f, timerBoost = timeBoost, nowSpeed = moveSpeed;
+	
 	Animator shutAnim1 = Animator<sf::Texture*>{ &Resources::gun1BaseTexture, {Animation<sf::Texture*>({
 		{0.0f, &Resources::gun1FireAnimationTexture[0]},
 		{0.15f, &Resources::gun1FireAnimationTexture[1]},
@@ -20,6 +19,12 @@ Player::Player(Sprite* _sprite, Map* _nowMap) : sprite{ _sprite }, nowGun{ 1 }
 		{0.75f, &Resources::gun1FireAnimationTexture[1]},
 		{0.9f, &Resources::gun1FireAnimationTexture[0]},
 		{1.0f, &Resources::gun1FireAnimationTexture[0]}})} };
+	Gun gun1 = Gun(50.0f, 5, 1.0f, 5.0f, 0.5f);
+	gun1.setAnimator(shutAnim1);
+	gun1.setResetFunc([&](Gun* gun) {gun->nowCount++;});
+	gun1.setShutFunc([&](Sprite* sp, float dist) {sp->healPoint -= 50.0f * (dist < 5.0f ? 1:0);});
+	gun1.setSound(Resources::gun1ShutSound, Resources::gun1ResetSound, Resources::gun1CantShoutSound);
+	guns.push_back(gun1);
 
 	Animator shutAnim2 = Animator<sf::Texture*>{ &Resources::gun2BaseTexture, {Animation<sf::Texture*>({
 		{0.0f, &Resources::gun2FireAnimationTexture[0]},
@@ -30,12 +35,10 @@ Player::Player(Sprite* _sprite, Map* _nowMap) : sprite{ _sprite }, nowGun{ 1 }
 		{0.357f, &Resources::gun2FireAnimationTexture[1]},
 		{0.428f, &Resources::gun2FireAnimationTexture[0]},
 		{0.5f, &Resources::gun2FireAnimationTexture[0]}})} };
-
-	Gun gun1 = Gun(50.0f, 5, 1.0f, 5.0f, 0.5f, shutAnim1, [&](Sprite* sp, float dist) {sp->healPoint -= 50.0f * (dist < 5.0f ? 1:0);}, [&](Gun* gun) {gun->nowCount++;});
-	gun1.setSound(Resources::gun1ShutSound, Resources::gun1ResetSound, Resources::gun1CantShoutSound);
-	guns.push_back(gun1);
-
-	Gun gun2 = Gun(10.0f, 20, 0.5f, 20.0f, 3.0f, shutAnim2, [&](Sprite* sp, float dist) {sp->healPoint -= 10.0f * (dist < 20 ? 1 : 0);}, [&](Gun* gun) {gun->nowCount = 20;});
+	Gun gun2 = Gun(10.0f, 20, 0.5f, 20.0f, 3.0f);
+	gun2.setAnimator(shutAnim2);
+	gun2.setResetFunc([&](Gun* gun) {gun->nowCount = 20;});
+	gun2.setShutFunc([&](Sprite* sp, float dist) {sp->healPoint -= 10.0f * (dist < 20 ? 1 : 0);});
 	gun2.setSound(Resources::gun2ShutSound, Resources::gun2ResetSound, Resources::gun2CantShoutSound);
 	guns.push_back(gun2);
 }
@@ -164,7 +167,7 @@ void Player::use()
 {
 	float radiansAngle = sprite->angle * PI / 180.0f;
 	sf::Vector2f verticalMoveParametrs(cos(radiansAngle), sin(radiansAngle));
-	RayHit hit = raycast(*nowMap, sprite->position, verticalMoveParametrs, true, sprite, 1);
+	RayHit hit = raycast(nowMap, sprite->position, verticalMoveParametrs, true, sprite, 1);
 	if (hit.sprite != nullptr)
 	{
 		hit.sprite->healPoint -= hit.sprite->healPoint;
@@ -183,7 +186,7 @@ void Player::fire()
 
 	if (guns[nowGun].isCanUsed())
 	{
-		RayHit hit = raycast(*nowMap, sprite->position, verticalMoveParametrs, true, sprite, guns[nowGun].maxDist, pitch);
+		RayHit hit = raycast(nowMap, sprite->position, verticalMoveParametrs, true, sprite, guns[nowGun].maxDist, pitch);
 		float dist = 0;
 		if (hit.sprite != nullptr) { dist = sqrt(GETDIST(hit.sprite->position, sprite->position)); }
 		guns[nowGun].ussing(hit.sprite, dist);
@@ -202,7 +205,7 @@ void Player::DrawPlayerUI(sf::RenderWindow* window)
 	auto gun = guns[nowGun];
 	gun.drawWeapon(window, shakeDelta);
 
-	sf::Text weaponInfo(std::to_string(gun.nowCount) + " / " + std::to_string(gun.maxCountPotron), Resources::UIFont, 50);
+	sf::Text weaponInfo(std::to_string(guns[nowGun].nowCount) + " / " + std::to_string(guns[nowGun].maxCountPotron), Resources::UIFont, 50);
 	weaponInfo.setPosition({ SCREEN_W - 150, SCREEN_H - 60 });
 	weaponInfo.setFillColor({ 0, 0, 0 });
 	window->draw(weaponInfo);
@@ -211,19 +214,29 @@ void Player::DrawPlayerUI(sf::RenderWindow* window)
 	sf::RectangleShape hpShape({ baseX, 20 });
 	hpShape.setFillColor({ 128, 128, 128 });
 	hpShape.setPosition({ 20, SCREEN_H - 55 });
+	window->draw(hpShape);
+
 	sf::RectangleShape boostShape{ hpShape };
 	boostShape.move({ 0, 30 });
-	window->draw(hpShape);
 	window->draw(boostShape);
+
 	hpShape.setFillColor({ 255, 23, 23 });
-	boostShape.setFillColor({ 44, 148, 15 });
-	float newXB = baseX * timerBoost / timeBoost;
 	float newXH = baseX * (sprite->healPoint <= 0 ? 0 : sprite->healPoint) / sprite->maxHealpoint;
 	hpShape.setSize({ newXH, 20 });
-	boostShape.setSize({ newXB, 20 });
 	window->draw(hpShape);
+
+	boostShape.setFillColor({ 44, 148, 15 });
+	float newXB = baseX * timerBoost / timeBoost;
+	boostShape.setSize({ newXB, 20 });
 	window->draw(boostShape);
+
+	sf::CircleShape aim(1.0f, 16);
+	aim.setFillColor(sf::Color::Black);
+	aim.setPosition({SCREEN_W / 2, SCREEN_H / 2});
+	window->draw(aim);
 }
+
+void Player::swapMap(Map* newMap) { nowMap = newMap; }
 
 Gun* Player::getWeapon() { return &guns[nowGun]; }
 

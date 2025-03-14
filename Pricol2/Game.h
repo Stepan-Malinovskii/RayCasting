@@ -23,7 +23,6 @@ public:
 	void makeCycle(float deltaTime);
 	void save();
 private:
-	void drawAim();
 	void getInput(float deltaTime);
 	void update(float deltaT);
 	void render();

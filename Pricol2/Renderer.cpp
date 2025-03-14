@@ -21,7 +21,7 @@ void Renderer::Init()
 	floorSprite.setTexture(floorTexture);
 }
 
-void Renderer::Draw3DView(sf::RenderTarget& target, Player* player, std::vector<std::shared_ptr<Sprite>>& sprites)
+void Renderer::Draw3DView(sf::RenderTarget& target, Player* player, Map* map, std::vector<std::shared_ptr<Sprite>>& sprites)
 {
 	//StaticCalculations
 	float pRadians = player->sprite->angle * PI / 180.0f;
@@ -36,7 +36,7 @@ void Renderer::Draw3DView(sf::RenderTarget& target, Player* player, std::vector<
 		{
 			int start = (int)((SCREEN_H / (THREAD_COUNT - 1) * thread_id));
 			int end = (int)((SCREEN_H / (THREAD_COUNT - 1) * (thread_id + 1)));
-			DrawFloor(rayDirLeft, rayDirRight, rayPos, player, start, end );
+			DrawFloor(rayDirLeft, rayDirRight, rayPos, player, map, start, end );
 		};
 	//SpritePart
 	auto getDist = [player](const std::shared_ptr<Sprite> sp)
@@ -88,7 +88,7 @@ void Renderer::Draw3DView(sf::RenderTarget& target, Player* player, std::vector<
 		float cameraX = i * 2.0f / SCREEN_W - 1.0f;
 		rayDir = pDirection + cameraPlane * cameraX;
 
-		RayHit hit = raycast(*player->nowMap, rayPos, rayDir);
+		RayHit hit = raycast(map, rayPos, rayDir);
 		
 		if (hit.cell)
 		{
@@ -214,7 +214,7 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, P
 	}
 }
 
-void Renderer::DrawFloor(sf::Vector2f& rayDirLeft, sf::Vector2f& rayDirRight, sf::Vector2f& rayPos, Player* player, int startH, int endH)
+void Renderer::DrawFloor(sf::Vector2f& rayDirLeft, sf::Vector2f& rayDirRight, sf::Vector2f& rayPos, Player* player, Map* map, int startH, int endH)
 {
 	for (int y = startH; y < endH; y++)
 	{
@@ -233,8 +233,8 @@ void Renderer::DrawFloor(sf::Vector2f& rayDirLeft, sf::Vector2f& rayDirRight, sf
 			textCoords.x &= (int)TEXTURE_SIZE - 1;
 			textCoords.y &= (int)TEXTURE_SIZE - 1;
 
-			int floorText = player->nowMap->GetOnGrid(cell.x, cell.y, FLOOR_LAYER);
-			int cellingText = player->nowMap->GetOnGrid(cell.x, cell.y, CELL_LAYER);
+			int floorText = map->GetOnGrid(cell.x, cell.y, FLOOR_LAYER);
+			int cellingText = map->GetOnGrid(cell.x, cell.y, CELL_LAYER);
 
 			sf::Color color;
 			if (is_floor)

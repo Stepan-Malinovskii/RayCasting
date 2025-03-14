@@ -1,7 +1,7 @@
 #include "Weapon.h"
 
-Weapon::Weapon(float _timeBetewen, float _maxDist, Animator<sf::Texture*> anim)
-	: timeBetwen{ _timeBetewen }, weaponAnimator{ anim }, maxDist{ _maxDist } {
+Weapon::Weapon(float _timeBetewen, float _maxDist)
+	: timeBetwen{ _timeBetewen }, maxDist{ _maxDist } {
 	nowTime = _timeBetewen;
 }
 
@@ -11,6 +11,8 @@ void Weapon::update(float dt)
 	nowTime += dt;
 	weaponAnimator.update(dt);
 }
+
+void Weapon::setAnimator(Animator<sf::Texture*>& anim) { weaponAnimator = anim; }
 
 void Weapon::drawWeapon(sf::RenderTarget* window, sf::Vector2f delta)
 {
@@ -37,17 +39,18 @@ void Weapon::startAnimation(int number)
 	weaponAnimator.setAnimation(number);
 }
 
-Gun::Gun(float _damage, int maxCnt, float _timeBetewen, float maxDist, float _timeBetewenReset, Animator<sf::Texture*>& anim,
-	std::function<void(Sprite* sp, float dist)> _fn, std::function<void(Gun* gun)> _resetFn) : Weapon(_timeBetewen, maxDist, anim)
+Gun::Gun(float _damage, int maxCnt, float _timeBetewen, float maxDist, float _timeBetewenReset) : Weapon(_timeBetewen, maxDist)
 {
 	nowCount = maxCnt;
 	nowTimeBetwenReset = _timeBetewenReset;
 	timeBetwenReset = _timeBetewenReset;
 	maxCountPotron = maxCnt;
 	damage = _damage;
-	shutFn = _fn;
-	resetFn = _resetFn;
 }
+
+void Gun::setResetFunc(std::function<void(Gun* gun)> _resetFn) { resetFn = _resetFn; }
+
+void Gun::setShutFunc(std::function<void(Sprite* sp, float dist)> _shutfn) { shutFn = _shutfn; }
 
 void Gun::setSound(sf::SoundBuffer& shut, sf::SoundBuffer& reset, sf::SoundBuffer& cantShut)
 {

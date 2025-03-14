@@ -17,7 +17,7 @@
 class Weapon
 {
 public:
-	Weapon(float _timeBetewen, float maxDist,Animator<sf::Texture*> anim);
+	Weapon(float _timeBetewen, float maxDist);
 	Weapon() = default;
 
 	virtual void update(float dt);
@@ -25,6 +25,8 @@ public:
 	virtual void drawWeapon(sf::RenderTarget* window, sf::Vector2f delta);
 
 	virtual bool isCanUsed();
+
+	virtual void setAnimator(Animator<sf::Texture*>& anim);
 
 	virtual void startAnimation(int number);
 
@@ -38,11 +40,14 @@ private:
 class Gun : public Weapon
 {
 public:
-	Gun(float _damage, int maxCnt, float _timeBetewen, float maxDist, float _timeBetewenReset, Animator<sf::Texture*>& anim,
-		std::function<void(Sprite* sp, float dist)> _fn, std::function<void(Gun* gun)> _resetFn);
+	Gun(float _damage, int maxCnt, float _timeBetewen, float maxDist, float _timeBetewenReset);
 	Gun() = default;
 
 	void setSound(sf::SoundBuffer& shut, sf::SoundBuffer& reset, sf::SoundBuffer& cantShut);
+
+	void setResetFunc(std::function<void(Gun* gun)> _resetFn);
+
+	void setShutFunc(std::function<void(Sprite* sp, float dist)> _shutfn);
 
 	void update(float dt) override;
 

@@ -1,6 +1,6 @@
 #include "Raycast.h"
 
-RayHit raycast(const Map& map, sf::Vector2f pos, sf::Vector2f dir,
+RayHit raycast(const Map* map, sf::Vector2f pos, sf::Vector2f dir,
 	bool checkSprite, Sprite* ignore, int maxDist, float pitch)
 {
 	float origin[2] = { pos.x, pos.y };
@@ -50,11 +50,11 @@ RayHit raycast(const Map& map, sf::Vector2f pos, sf::Vector2f dir,
 			isVertHit = true;
 		}
 
-		hit = map.GetOnGrid(mapPos.x, mapPos.y, WALL_LAYER);
+		hit = map->GetOnGrid(mapPos.x, mapPos.y, WALL_LAYER);
 
 		if (hit || !checkSprite) continue;
 
-		auto block = map.getBlockMap(mapPos);
+		auto block = map->getBlockMap(mapPos);
 		for (auto sprite : block)
 		{
 			if (sprite == ignore) continue;

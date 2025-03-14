@@ -85,7 +85,7 @@ void Game::resetMap(Map* newMap)
 {
 	nowMap = newMap;
 	player = spManager->resetMap(newMap);
-	player->nowMap = newMap;
+	player->swapMap(newMap);
 }
 
 void Game::update(float deltaTime)
@@ -107,20 +107,10 @@ void Game::makeCycle(float deltaTime)
 	render();
 }
 
-void Game::drawAim()
-{
-	sf::CircleShape aim{};
-	aim.setRadius(1.0f);
-	aim.setFillColor(sf::Color::Black);
-	aim.setPointCount(16);
-	aim.setPosition((sf::Vector2f)screenMidlePos);
-
-}
-
 void Game::render()
 {
 	window->clear();
-	renderer.Draw3DView(*window, player, spManager->getSprites());
+	renderer.Draw3DView(*window, player, nowMap, spManager->getSprites());
 	player->DrawPlayerUI(window);
 
 	sf::CircleShape aim{};
