@@ -7,9 +7,9 @@ Weapon::Weapon(float _timeBetewen, float _maxDist)
 
 void Weapon::update(float dt)
 {
+	weaponAnimator.update(dt);
 	if (nowTime >= timeBetwen) return;
 	nowTime += dt;
-	weaponAnimator.update(dt);
 }
 
 void Weapon::setAnimator(Animator<sf::Texture*>& anim) { weaponAnimator = anim; }
@@ -73,6 +73,7 @@ void Gun::resetPatron()
 		resetFn(this);
 		nowTimeBetwenReset = 0;
 		resetSound.play();
+		startAnimation(1);
 	}
 }
 
@@ -83,7 +84,7 @@ void Gun::ussing(Sprite* sp, float dist)
 		cantShutSound.play();
 		return;
 	}
-	if (isCanUsed() && nowCount > 0 && nowTimeBetwenReset >= timeBetwenReset)
+	else if (isCanUsed() && nowTimeBetwenReset >= timeBetwenReset)
 	{
 		if (sp != nullptr) shutFn(sp, dist);
 		nowCount--;

@@ -20,7 +20,7 @@ void Game::getInput(sf::Event event, float deltaTime)
 	{			
 		player->fire();
 	}
-	if (event.type == sf::Event::MouseWheelMoved)
+	if (event.type == sf::Event::MouseWheelScrolled)
 	{
 		bool flag = event.mouseWheelScroll.delta > 0 ? true : false;
 		player->swapGun(flag);
