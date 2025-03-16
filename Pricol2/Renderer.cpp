@@ -143,7 +143,7 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, P
 {
 	for (auto sp : sprites)
 	{
-		if (sp->texture < 0) continue;
+		if (sp->spDef.texture < 0) continue;
 		sf::Vector2f spritePos = sp->position - player->sprite->position;
 		float spDist = sqrt(SQUARE(spritePos.x) + SQUARE(spritePos.y));
 		float brightnes = 1 - spDist / BRIGHTNESTDIST;
@@ -166,9 +166,9 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, P
 		int drawStartX = -spriteSize / 2 + screenX;
 		int drawEndX = spriteSize / 2 + screenX;
 
-		float startYtext= sp->texture * SPRITE_SIZE, endYtext = SPRITE_SIZE * (sp->texture + 1);
+		float startYtext= sp->spDef.texture * SPRITE_SIZE, endYtext = SPRITE_SIZE * (sp->spDef.texture + 1);
 		float deltaRotateText = 0.0f;
-		if (sp->isDirectional)
+		if (sp->spDef.isDirectional)
 		{
 			sf::Vector2f dir = spritePos;
 			float len = sqrt(dir.x * dir.x + dir.y * dir.y);
@@ -186,8 +186,8 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, P
 			deltaRotateText = SPRITE_SIZE * (angle / 45.0f);
 		}
 
-		int spriteStart = -spriteSize * sp->size / 2 + screenX,
-			spriteEnd = spriteSize * sp->size / 2 + screenX;
+		int spriteStart = -spriteSize * sp->spDef.size / 2 + screenX,
+			spriteEnd = spriteSize * sp->spDef.size / 2 + screenX;
 
 		for (int i = std::max(drawStartX, 0); i < std::min(drawEndX, (int)SCREEN_W - 1); i++)
 		{

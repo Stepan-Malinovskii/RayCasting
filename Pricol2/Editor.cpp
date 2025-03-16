@@ -160,11 +160,11 @@ void Editor::windowStateLeftClick(sf::RenderWindow& window)
 			}
 			else
 			{
-				if (nowSpriteDef.indexTexture != -1)
+				if (nowSpriteDef.texture != -1)
 				{
 					if (nowMap->isCellEmpty(mapPos))
 					{
-						nowMap->setMapSprite({ nowSpriteDef.indexTexture + 1, { mapPos.x + 0.5f, mapPos.y + 0.5f }, -90.0f });
+						nowMap->setMapSprite({ nowSpriteDef.texture + 1, { mapPos.x + 0.5f, mapPos.y + 0.5f }, -90.0f, nowSpriteDef.maxHealpoint });
 					}
 				}
 			}

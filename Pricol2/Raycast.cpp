@@ -59,7 +59,7 @@ RayHit raycast(const Map* map, sf::Vector2f pos, sf::Vector2f dir,
 		{
 			if (sprite == ignore) continue;
 
-			sf::Vector2f halfSize = { sprite->size / 2.0f, sprite->size / 2.0f };
+			sf::Vector2f halfSize = { sprite->spDef.size / 2.0f, sprite->spDef.size / 2.0f };
 			sf::Vector2f start = sprite->position - halfSize;
 			sf::Vector2f end = sprite->position + halfSize;
 

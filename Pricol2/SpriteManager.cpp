@@ -36,7 +36,7 @@ void SpriteManager::init()
 
 	if (!player) {
 		auto def = spriteDef[0];
-		auto sprite = std::make_shared<Sprite>(sf::Vector2f{ 2,2 }, def.size, def.indexTexture, id);
+		auto sprite = std::make_shared<Sprite>(sf::Vector2f{ 2,2 }, def.size, def.texture, id, 100);
 		id++;
 		sprites.push_back(sprite);
 		player = std::make_unique<Player>(Player(sprite.get(), nowMap));

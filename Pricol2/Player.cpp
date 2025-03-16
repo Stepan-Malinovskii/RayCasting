@@ -97,12 +97,12 @@ Player::Player(Sprite* _sprite, Map* _nowMap) : sprite{ _sprite }, nowGun{ 0 }
 	guns.push_back(gun3);
 
 	Animation<sf::Texture*> shutAnim4({
-		{0.005f, &Resources::gun4FireAnimationTexture[0]},
-		{0.010f, &Resources::gun4FireAnimationTexture[1]},
-		{0.015f, &Resources::gun4FireAnimationTexture[2]},
-		{0.020f, &Resources::gun4FireAnimationTexture[2]},
-		{0.025f, &Resources::gun4FireAnimationTexture[1]},
-		{0.030f, &Resources::gun4FireAnimationTexture[0]},
+		{0.05f, &Resources::gun4FireAnimationTexture[0]},
+		{0.10f, &Resources::gun4FireAnimationTexture[1]},
+		{0.15f, &Resources::gun4FireAnimationTexture[2]},
+		{0.20f, &Resources::gun4FireAnimationTexture[2]},
+		{0.25f, &Resources::gun4FireAnimationTexture[1]},
+		{0.30f, &Resources::gun4FireAnimationTexture[0]},
 		});
 	Animation<sf::Texture*> resetAnim4({
 		{0.25f, &Resources::gun4ResetAnimationTexture[0]},
@@ -155,6 +155,35 @@ Player::Player(Sprite* _sprite, Map* _nowMap) : sprite{ _sprite }, nowGun{ 0 }
 	gun5.setShutFunc([&](Sprite* sp, float dist) {sp->healPoint -= 200.0f * (dist < 10 ? 1 : 0);});
 	gun5.setSound(Resources::gun5ShutSound, Resources::gun5ResetSound, Resources::gun1CantShoutSound);
 	guns.push_back(gun5);
+
+	Animation<sf::Texture*> shutAnim6({
+		{0.02f, &Resources::gun6FireAnimationTexture[0]},
+		{0.04f, &Resources::gun6FireAnimationTexture[1]},
+		{0.06f, &Resources::gun6FireAnimationTexture[2]},
+		{0.08f, &Resources::gun6FireAnimationTexture[3]},
+		{0.1f, &Resources::gun6FireAnimationTexture[3]}});
+	Animation<sf::Texture*> resetAnim6({
+		{0.21f, &Resources::gun6ResetAnimationTexture[0]},
+		{0.42f, &Resources::gun6ResetAnimationTexture[1]},
+		{0.63f, &Resources::gun6ResetAnimationTexture[2]},
+		{0.84f, &Resources::gun6ResetAnimationTexture[3]},
+		{1.05f, &Resources::gun6ResetAnimationTexture[4]},
+		{1.26f, &Resources::gun6ResetAnimationTexture[5]},
+		{1.47f, &Resources::gun6ResetAnimationTexture[6]},
+		{2.74f, &Resources::gun6ResetAnimationTexture[5]},
+		{2.95f, &Resources::gun6ResetAnimationTexture[4]},
+		{3.16f, &Resources::gun6ResetAnimationTexture[3]},
+		{3.37f, &Resources::gun6ResetAnimationTexture[2]},
+		{3.58f, &Resources::gun6ResetAnimationTexture[1]},
+		{3.79f, &Resources::gun6ResetAnimationTexture[0]},
+		{4.00f, &Resources::gun6ResetAnimationTexture[0]} });
+	Animator animr6 = Animator<sf::Texture*>{ &Resources::gun6BaseTexture, {shutAnim6, resetAnim6 }};
+	Gun gun6 = Gun(15.0f, 100, 0.1f, 10.0f, 4.0f);
+	gun6.setAnimator(animr6);
+	gun6.setResetFunc([&](Gun* gun) {gun->nowCount = 100;});
+	gun6.setShutFunc([&](Sprite* sp, float dist) {sp->healPoint -= 10.0f * (dist < 10 ? 1 : 0);});
+	gun6.setSound(Resources::gun6ShutSound, Resources::gun6ResetSound, Resources::gun1CantShoutSound);
+	guns.push_back(gun6);
 }
 
 void Player::updateMouseData(sf::Vector2f mousePos, float deltaTime)
@@ -284,7 +313,10 @@ void Player::use()
 	RayHit hit = raycast(nowMap, sprite->position, verticalMoveParametrs, true, sprite, 1);
 	if (hit.sprite != nullptr)
 	{
-		hit.sprite->healPoint -= hit.sprite->healPoint;
+		if (hit.sprite->id == 12)
+		{
+			hit.sprite->healPoint -= hit.sprite->healPoint;
+		}
 	}
 }
 
@@ -335,7 +367,7 @@ void Player::DrawPlayerUI(sf::RenderWindow* window)
 	window->draw(boostShape);
 
 	hpShape.setFillColor({ 255, 23, 23 });
-	float newXH = baseX * (sprite->healPoint <= 0 ? 0 : sprite->healPoint) / sprite->maxHealpoint;
+	float newXH = baseX * (sprite->healPoint <= 0 ? 0 : sprite->healPoint) / sprite->spDef.maxHealpoint;
 	hpShape.setSize({ newXH, 20 });
 	window->draw(hpShape);
 

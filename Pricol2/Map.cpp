@@ -108,7 +108,7 @@ void Map::LoadGrid(const std::string& path)
 				sizeof(grid[y][x][0]) * LAYER_COUNT);
 		}
 	}
-
+	
 	int numSp;
 	in.read(reinterpret_cast<char*>(&numSp), sizeof(numSp));
 
@@ -159,7 +159,7 @@ bool Map::isCellEmpty(sf::Vector2i pos)
 
 void Map::setupBlockmap(Sprite* sp)
 {
-	sf::Vector2f halfSize = { sp->size / 2.f, sp->size / 2.f };
+	sf::Vector2f halfSize = { sp->spDef.size / 2.f, sp->spDef.size / 2.f };
 	sf::Vector2i start = static_cast<sf::Vector2i>(sp->position - halfSize);
 	sf::Vector2i end = static_cast<sf::Vector2i>(sp->position + halfSize);
 
@@ -218,7 +218,7 @@ void Map::writeMapSprite(std::vector<std::shared_ptr<Sprite>> sprs)
 	MapSprite mapSp;
 	for (auto sp : sprs)
 	{
-		sprites.push_back({ sp->texture + 1, sp->position, sp->angle });
+		sprites.push_back({ sp->spDef.texture + 1, sp->position, sp->angle, sp->healPoint });
 	}
 }
 
@@ -240,7 +240,7 @@ void Map::deleteSprite(sf::Vector2i mapPos)
 	{
 		for (auto sp = blockMap[mapPos.y][mapPos.x].begin(); sp != blockMap[mapPos.y][mapPos.x].end();)
 		{
-			if ((*sp)->texture != -1)
+			if ((*sp)->spDef.texture != -1)
 			{
 				blockMap[mapPos.y][mapPos.x].erase(sp);
 				break;

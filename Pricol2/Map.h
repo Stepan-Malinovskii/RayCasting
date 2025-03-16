@@ -29,6 +29,7 @@ struct MapSprite
 	int idx;
 	sf::Vector2f position;
 	float angle;
+	float nowHealPoint;
 };
 
 class Map
