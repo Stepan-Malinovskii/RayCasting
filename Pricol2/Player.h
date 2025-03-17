@@ -25,23 +25,23 @@ public:
 	void checkBoost(bool isPressed, float deltaTime);
 	void move(sf::Vector2f deltaPos, float deltaTime);
 	void jump();
-	void fire();
-	void use();
+	void fire(int gun = -1);
 	void swapGun(bool flag);
 	void reloadingGun();
 	void swapMap(Map* newMap);
 	void DrawPlayerUI(sf::RenderWindow* window);
-
-	Gun* getWeapon();
+	void setGun(Gun* gun);
 	float getMoveSpeed();
+
 	Sprite* sprite;
 	float pitch, posZ;
+	Gun* kick;
 private:
 	bool isJump, jumpFlag;
 	Map* nowMap;
 	sf::Vector2f shakeDelta;
 	int nowGun;
-	std::vector<Gun> guns;
+	std::vector<Gun*> guns;
 	float moveSpeed, nowSpeed, boostSpeed,
 		timeBoost, timerBoost, shakeTime;
 

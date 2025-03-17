@@ -22,9 +22,10 @@ void SpriteManager::init()
 		}
 		else
 		{
-			sprite->thinker = std::make_shared<ThinkerLogic>([](Sprite& sprite1, Map& map, float deltaT) {
+			
+			/*sprite->thinker = std::make_shared<ThinkerLogic>([](Sprite& sprite1, Map& map, float deltaT) {
 				sprite1.angle += 100 * deltaT;
-				});
+				});*/
 		}
 
 		sprites.push_back(sprite);

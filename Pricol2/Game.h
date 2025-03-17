@@ -12,12 +12,14 @@
 #include "Player.h"
 #include "Renderer.h"
 #include "SpriteManager.h"
+#include "GunManager.h"
 
 class Game
 {
 public:
 public:
 	Game(sf::RenderWindow* window, Map* nowMap);
+	~Game();
 	void getInput(sf::Event event, float deltaTime);
 	void resetMap(Map* newMap);
 	void makeCycle(float deltaTime);
@@ -29,6 +31,7 @@ private:
 	
 	sf::Vector2i screenMidlePos;
 	SpriteManager* spManager;
+	GunManager* gunManager;
 	Player* player;
 	Renderer renderer;
 	Map* nowMap;

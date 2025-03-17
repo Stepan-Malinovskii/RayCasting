@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GunManager.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Pricol2.cpp" />
@@ -158,6 +159,7 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GunManager.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Raycast.h" />

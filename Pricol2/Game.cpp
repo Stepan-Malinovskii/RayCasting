@@ -6,7 +6,19 @@ Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
 {
 	screenMidlePos = { (int)(SCREEN_W / 2), (int)(SCREEN_H / 2) };
 	spManager = new SpriteManager( nowMap );
+	gunManager = new GunManager();
 	player = spManager->getPlayer();
+	player->kick = gunManager->getGun(0);
+	for (int i = 1; i < 7; i++)
+	{
+		player->setGun(gunManager->getGun(i));
+	}
+}
+
+Game::~Game()
+{
+	delete spManager;
+	delete gunManager;
 }
 
 void Game::save()
@@ -18,7 +30,7 @@ void Game::getInput(sf::Event event, float deltaTime)
 {
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{			
-		player->fire();
+		player->fire(0);
 	}
 	if (event.type == sf::Event::MouseWheelScrolled)
 	{
@@ -65,9 +77,9 @@ void Game::getInput(float deltaTime)
 		{
 			player->jump();
 		}
-		if (GetAsyncKeyState('E'))
+		if (GetAsyncKeyState('F'))
 		{
-			player->use();
+			player->fire();
 		}
 
 		sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
@@ -86,6 +98,11 @@ void Game::resetMap(Map* newMap)
 	nowMap = newMap;
 	player = spManager->resetMap(newMap);
 	player->swapMap(newMap);
+	player->kick = gunManager->getGun(0);
+	for (int i = 1; i < 7; i++)
+	{
+		player->setGun(gunManager->getGun(i));
+	}
 }
 
 void Game::update(float deltaTime)

@@ -43,7 +43,7 @@ public:
 	Gun(float _damage, int maxCnt, float _timeBetewen, float maxDist, float _timeBetewenReset);
 	Gun() = default;
 
-	void setSound(sf::SoundBuffer& shut, sf::SoundBuffer& reset, sf::SoundBuffer& cantShut);
+	void setSound(sf::SoundBuffer* shut = nullptr, sf::SoundBuffer* reset = nullptr, sf::SoundBuffer* cantShut = nullptr);
 
 	void setResetFunc(std::function<void(Gun* gun)> _resetFn);
 
@@ -57,10 +57,10 @@ public:
 
 	int nowCount;
 	int maxCountPotron;
+	std::function<void(Gun* gun)> resetFn;
 private:
 	float timeBetwenReset, nowTimeBetwenReset;
 	std::function<void(Sprite* sp, float dist)> shutFn;
-	std::function<void(Gun* gun)> resetFn;
 	float damage;
 	sf::Sound shutSound;
 	sf::Sound resetSound;

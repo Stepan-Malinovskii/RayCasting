@@ -52,39 +52,45 @@ void Gun::setResetFunc(std::function<void(Gun* gun)> _resetFn) { resetFn = _rese
 
 void Gun::setShutFunc(std::function<void(Sprite* sp, float dist)> _shutfn) { shutFn = _shutfn; }
 
-void Gun::setSound(sf::SoundBuffer& shut, sf::SoundBuffer& reset, sf::SoundBuffer& cantShut)
+void Gun::setSound(sf::SoundBuffer* shut, sf::SoundBuffer* reset, sf::SoundBuffer* cantShut)
 {
-	shutSound.setBuffer(shut);
-	resetSound.setBuffer(reset);
-	cantShutSound.setBuffer(cantShut);
+	if (shut != nullptr) shutSound.setBuffer(*shut);
+	if (reset != nullptr) resetSound.setBuffer(*reset);
+	if (cantShut != nullptr) cantShutSound.setBuffer(*cantShut);
 }
 
 void Gun::update(float dt)
 {
 	Weapon::update(dt);
-	if (nowTimeBetwenReset >= timeBetwenReset) return;
-	nowTimeBetwenReset += dt;
+	if (resetFn != nullptr)
+	{
+		if (nowTimeBetwenReset >= timeBetwenReset) return;
+		nowTimeBetwenReset += dt;
+	}
 }
 
 void Gun::resetPatron()
 {
-	if (nowTimeBetwenReset >= timeBetwenReset && nowCount < maxCountPotron && isCanUsed())
+	if (resetFn != nullptr)
 	{
-		resetFn(this);
-		nowTimeBetwenReset = 0;
-		resetSound.play();
-		startAnimation(1);
+		if (nowTimeBetwenReset >= timeBetwenReset && nowCount < maxCountPotron && isCanUsed())
+		{
+			resetFn(this);
+			nowTimeBetwenReset = 0;
+			resetSound.play();
+			startAnimation(1);
+		}
 	}
 }
 
 void Gun::ussing(Sprite* sp, float dist) 
 {
-	if (nowCount == 0)
+	if (nowCount == 0 && resetFn != nullptr)
 	{
 		cantShutSound.play();
 		return;
 	}
-	else if (isCanUsed() && nowTimeBetwenReset >= timeBetwenReset)
+	else if (isCanUsed() && (nowTimeBetwenReset >= timeBetwenReset || resetFn == nullptr))
 	{
 		if (sp != nullptr) shutFn(sp, dist);
 		nowCount--;

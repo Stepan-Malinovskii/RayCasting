@@ -19,6 +19,13 @@ public:
 	static sf::Image textureImage;
 	static sf::Texture spritesTexture;
 
+	static sf::SoundBuffer gun01ShutSound;
+	static std::vector<sf::Texture> gun01FireAnimationTexture;
+
+	static sf::SoundBuffer gun0ShutSound;
+	static sf::Texture gun0BaseTexture;
+	static std::vector<sf::Texture> gun0FireAnimationTexture;
+
 	static sf::SoundBuffer gun1ShutSound;
 	static sf::SoundBuffer gun1CantShoutSound;
 	static sf::SoundBuffer gun1ResetSound;

@@ -5,6 +5,13 @@ sf::Image Resources::textureImage{};
 sf::Texture Resources::spritesTexture{};
 sf::Texture Resources::skyTextures{};
 
+sf::SoundBuffer Resources::gun01ShutSound{};
+std::vector<sf::Texture> Resources::gun01FireAnimationTexture{};
+
+sf::SoundBuffer Resources::gun0ShutSound{};
+sf::Texture Resources::gun0BaseTexture{};
+std::vector<sf::Texture> Resources::gun0FireAnimationTexture{};
+
 sf::SoundBuffer Resources::gun1ShutSound{};
 sf::SoundBuffer Resources::gun1ResetSound{};
 sf::SoundBuffer Resources::gun1CantShoutSound{};
@@ -70,6 +77,13 @@ void Resources::initResources()
 	if (!spritesTexture.loadFromFile("Texture/enemys.png")) throw "TextureLoadError!";
 	if (!skyTextures.loadFromFile("Texture/sky_texture.png")) throw "TextureLoadError!";
 	skyTextures.setRepeated(true);
+
+	loadFor("Texture/gun01FireTexture", &gun01FireAnimationTexture);
+	if (!gun01ShutSound.loadFromFile("Sound/gun01ShutSound.mp3")) throw "TextureLoadError!";
+
+	if (!gun0BaseTexture.loadFromFile("Texture/gun0BaseTexture.png")) throw "TextureLoadError!";
+	loadFor("Texture/gun0FireTexture", &gun0FireAnimationTexture);
+	if (!gun0ShutSound.loadFromFile("Sound/gun0ShutSound.mp3")) throw "TextureLoadError!";
 
 	if (!gun1BaseTexture.loadFromFile("Texture/gun1BaseTexture.png")) throw "TextureLoadError!";
 	if (!gun1IconTexture.loadFromFile("Texture/gun1IconTexture.png")) throw "TextureLoadError!";
