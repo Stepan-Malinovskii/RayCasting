@@ -47,9 +47,9 @@ void Map::Draw(sf::RenderTarget& target, int layerNumber)
 
 		for (auto sp : sprites)
 		{
-			if (sp.idx != 0)
+			if (sp.spriteDefId != 0)
 			{
-				spShape.setTextureRect(sf::IntRect(sf::Vector2i(0.0f, SPRITE_SIZE * (sp.idx - 1)),
+				spShape.setTextureRect(sf::IntRect(sf::Vector2i(0.0f, SPRITE_SIZE * (sp.spriteDefId - 1)),
 					sf::Vector2i(SPRITE_SIZE, SPRITE_SIZE)));
 				spShape.setPosition((sf::Vector2f)((int)TEXTURE_SIZE * (sf::Vector2i)sp.position));
 				target.draw(spShape);
@@ -160,8 +160,8 @@ bool Map::isCellEmpty(sf::Vector2i pos)
 void Map::setupBlockmap(Sprite* sp)
 {
 	sf::Vector2f halfSize = { sp->spDef.size / 2.f, sp->spDef.size / 2.f };
-	sf::Vector2i start = static_cast<sf::Vector2i>(sp->position - halfSize);
-	sf::Vector2i end = static_cast<sf::Vector2i>(sp->position + halfSize);
+	sf::Vector2i start = static_cast<sf::Vector2i>(sp->spMap.position - halfSize);
+	sf::Vector2i end = static_cast<sf::Vector2i>(sp->spMap.position + halfSize);
 
 	std::set<std::tuple<int, int>> coords;
 	for (int y = start.y; y <= end.y; y++) {
@@ -218,7 +218,7 @@ void Map::writeMapSprite(std::vector<std::shared_ptr<Sprite>> sprs)
 	MapSprite mapSp;
 	for (auto sp : sprs)
 	{
-		sprites.push_back({ sp->spDef.texture + 1, sp->position, sp->angle, sp->healPoint });
+		sprites.push_back(sp->spMap);
 	}
 }
 

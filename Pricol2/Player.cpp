@@ -16,7 +16,7 @@ void Player::setGun(Gun* gun) { guns.push_back(gun); }
 void Player::updateMouseData(sf::Vector2f mousePos, float deltaTime)
 {
 	//MousePart
-	sprite->angle += MOUSE_TURN_SPEED * ROTATION_SPEED * mousePos.x * deltaTime;
+	sprite->spMap.angle += MOUSE_TURN_SPEED * ROTATION_SPEED * mousePos.x * deltaTime;
 
 	pitch -= mousePos.y * deltaTime * VERTICAL_MOUSE_SPEED;
 	if (pitch > 200) pitch = 200;
@@ -141,14 +141,14 @@ void Player::reloadingGun()
 
 void Player::fire(int gun)
 {
-	float radiansAngle = sprite->angle * PI / 180.0f;
+	float radiansAngle = sprite->spMap.angle * PI / 180.0f;
 	sf::Vector2f verticalMoveParametrs(cos(radiansAngle), sin(radiansAngle));
 
 	if (gun == -1)
 	{
 		if (kick->isCanUsed() && guns[nowGun]->isCanUsed())
 		{
-			RayHit hit = raycast(nowMap, sprite->position, verticalMoveParametrs, false, sprite, 1);
+			RayHit hit = raycast(nowMap, sprite->spMap.position, verticalMoveParametrs, false, sprite, 1);
 			if (hit.cell == 1) nowMap->SetNewOnGrid(hit.mapPos.x, hit.mapPos.y, WALL_LAYER, 0);
 			kick->ussing(nullptr, 0);
 		}
@@ -157,9 +157,9 @@ void Player::fire(int gun)
 	{
 		if (guns[nowGun]->isCanUsed() && kick->isCanUsed())
 		{
-			RayHit hit = raycast(nowMap, sprite->position, verticalMoveParametrs, true, sprite, guns[nowGun]->maxDist, pitch);
+			RayHit hit = raycast(nowMap, sprite->spMap.position, verticalMoveParametrs, true, sprite, guns[nowGun]->maxDist, pitch);
 			float dist = 0;
-			if (hit.sprite != nullptr) { dist = sqrt(GETDIST(hit.sprite->position, sprite->position)); }
+			if (hit.sprite != nullptr) { dist = sqrt(GETDIST(hit.sprite->spMap.position, sprite->spMap.position)); }
 			guns[nowGun]->ussing(hit.sprite, dist);
 		}
 	}
@@ -203,7 +203,7 @@ void Player::DrawPlayerUI(sf::RenderWindow* window)
 	window->draw(boostShape);
 
 	hpShape.setFillColor({ 255, 23, 23 });
-	float newXH = baseX * (sprite->healPoint <= 0 ? 0 : sprite->healPoint) / sprite->spDef.maxHealpoint;
+	float newXH = baseX * (sprite->spMap.nowHealPoint <= 0 ? 0 : sprite->spMap.nowHealPoint) / sprite->spDef.maxHealpoint;
 	hpShape.setSize({ newXH, 20 });
 	window->draw(hpShape);
 

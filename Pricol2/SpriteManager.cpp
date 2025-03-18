@@ -13,11 +13,11 @@ void SpriteManager::init()
 	player = nullptr;
 	for (auto sp : nowMap->getMapSprites())
 	{
-		auto def = spriteDef[sp.idx];
+		auto def = spriteDef[sp.spriteDefId];
 		auto sprite = std::make_shared<Sprite>(def, sp, id);
 		id++;
 
-		if (sp.idx == 0) {
+		if (sp.spriteDefId == 0) {
 			player = std::make_unique<Player>(Player(sprite.get(), nowMap));
 		}
 		else
@@ -36,7 +36,7 @@ void SpriteManager::init()
 		});*/
 
 	if (!player) {
-		auto def = spriteDef[0];
+		auto def = spriteDef[15];
 		auto sprite = std::make_shared<Sprite>(sf::Vector2f{ 2,2 }, def.size, def.texture, id, 100);
 		id++;
 		sprites.push_back(sprite);
@@ -73,7 +73,7 @@ void SpriteManager::update(float deltaTime)
 	{
 		if (sp.get() != nullptr)
 		{
-			if (sp->healPoint <= 0.0f)
+			if (sp->spMap.nowHealPoint <= 0.0f)
 			{
 				deleteSprite(sp);
 			}

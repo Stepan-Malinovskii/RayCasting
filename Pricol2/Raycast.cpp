@@ -60,8 +60,8 @@ RayHit raycast(const Map* map, sf::Vector2f pos, sf::Vector2f dir,
 			if (sprite == ignore) continue;
 
 			sf::Vector2f halfSize = { sprite->spDef.size / 2.0f, sprite->spDef.size / 2.0f };
-			sf::Vector2f start = sprite->position - halfSize;
-			sf::Vector2f end = sprite->position + halfSize;
+			sf::Vector2f start = sprite->spMap.position - halfSize;
+			sf::Vector2f end = sprite->spMap.position + halfSize;
 
 			float min[2] = { start.x, start.y };
 			float max[2] = { end.x, end.y };
@@ -79,7 +79,7 @@ RayHit raycast(const Map* map, sf::Vector2f pos, sf::Vector2f dir,
 
 			if (tmin < tmax) 
 			{
-				if (pitch * sqrt(pow(pos.x - sprite->position.x, 2) + pow(pos.y - sprite->position.y, 2)) / 3 - 20 < SPRITE_SIZE)
+				if (pitch * sqrt(SQUARE(pos.x - sprite->spMap.position.x) + SQUARE(pos.y - sprite->spMap.position.y)) / 3 - 20 < SPRITE_SIZE)
 				{
 					hitSprite = sprite; 
 				}

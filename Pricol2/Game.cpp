@@ -9,7 +9,7 @@ Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
 	gunManager = new GunManager();
 	player = spManager->getPlayer();
 	player->kick = gunManager->getGun(0);
-	for (int i = 1; i < 7; i++)
+	for (int i = 1; i < 8; i++)
 	{
 		player->setGun(gunManager->getGun(i));
 	}
@@ -41,7 +41,7 @@ void Game::getInput(sf::Event event, float deltaTime)
 
 void Game::getInput(float deltaTime)
 {
-	float radiansAngle = player->sprite->angle * PI / 180.0f;
+	float radiansAngle = player->sprite->spMap.angle * PI / 180.0f;
 	sf::Vector2f verticalMoveParametrs(cos(radiansAngle), sin(radiansAngle));
 	sf::Vector2f horizontalMoveParametrs(-verticalMoveParametrs.y, verticalMoveParametrs.x);
 	sf::Vector2f deltaPos(0, 0);
@@ -99,7 +99,7 @@ void Game::resetMap(Map* newMap)
 	player = spManager->resetMap(newMap);
 	player->swapMap(newMap);
 	player->kick = gunManager->getGun(0);
-	for (int i = 1; i < 7; i++)
+	for (int i = 1; i < 8; i++)
 	{
 		player->setGun(gunManager->getGun(i));
 	}

@@ -39,7 +39,7 @@ void GunManager::init()
 	Animator animr0 = Animator<sf::Texture*>{ &Resources::gun0BaseTexture, {shutAnim0} };
 	Gun* gun0 = new Gun(10.0f, 0, 0.3f, 1.0f, 0);
 	gun0->setAnimator(animr0);
-	gun0->setShutFunc([&](Sprite* sp, float dist) {sp->healPoint -= 10.0f * (dist < 1.0f ? 1 : 0);});
+	gun0->setShutFunc([&](Sprite* sp, float dist) {sp->spMap.nowHealPoint -= 10.0f * (dist < 1.0f ? 1 : 0);});
 	gun0->setSound(&Resources::gun0ShutSound);
 	guns.push_back(gun0);
 
@@ -67,7 +67,7 @@ void GunManager::init()
 	Gun* gun1 = new Gun(50.0f, 5, 1.0f, 5.0f, 1.5f);
 	gun1->setAnimator(animr1);
 	gun1->setResetFunc([&](Gun* gun) {gun->nowCount++;});
-	gun1->setShutFunc([&](Sprite* sp, float dist) {sp->healPoint -= 50.0f * (dist < 5.0f ? 1 : 0);});
+	gun1->setShutFunc([&](Sprite* sp, float dist) {sp->spMap.nowHealPoint -= 50.0f * (dist < 5.0f ? 1 : 0);});
 	gun1->setSound(&Resources::gun1ShutSound, &Resources::gun1ResetSound, &Resources::gun1CantShoutSound);
 	guns.push_back(gun1);
 
@@ -91,7 +91,7 @@ void GunManager::init()
 	Gun* gun2 = new Gun(10.0f, 20, 0.4f, 20.0f, 1.5f);
 	gun2->setAnimator(animr2);
 	gun2->setResetFunc([&](Gun* gun) {gun->nowCount = 20;});
-	gun2->setShutFunc([&](Sprite* sp, float dist) {sp->healPoint -= 10.0f * (dist < 20 ? 1 : 0);});
+	gun2->setShutFunc([&](Sprite* sp, float dist) {sp->spMap.nowHealPoint -= 10.0f * (dist < 20 ? 1 : 0);});
 	gun2->setSound(&Resources::gun2ShutSound, &Resources::gun2ResetSound, &Resources::gun1CantShoutSound);
 	guns.push_back(gun2);
 
@@ -125,7 +125,7 @@ void GunManager::init()
 	Gun* gun3 = new Gun(100.0f, 2, 0.6f, 5.0f, 3.0f);
 	gun3->setAnimator(animr3);
 	gun3->setResetFunc([&](Gun* gun) {gun->nowCount = 2;});
-	gun3->setShutFunc([&](Sprite* sp, float dist) {sp->healPoint -= 100.0f * (dist < 5 ? 1 : 0);});
+	gun3->setShutFunc([&](Sprite* sp, float dist) {sp->spMap.nowHealPoint -= 100.0f * (dist < 5 ? 1 : 0);});
 	gun3->setSound(&Resources::gun3ShutSound, &Resources::gun3ResetSound, &Resources::gun1CantShoutSound);
 	guns.push_back(gun3);
 
@@ -155,7 +155,7 @@ void GunManager::init()
 	Gun* gun4 = new Gun(15.0f, 30, 0.3f, 15.0f, 3.0f);
 	gun4->setAnimator(animr4);
 	gun4->setResetFunc([&](Gun* gun) {gun->nowCount = 30;});
-	gun4->setShutFunc([&](Sprite* sp, float dist) {sp->healPoint -= 15.0f * (dist < 15 ? 1 : 0);});
+	gun4->setShutFunc([&](Sprite* sp, float dist) {sp->spMap.nowHealPoint -= 15.0f * (dist < 15 ? 1 : 0);});
 	gun4->setSound(&Resources::gun4ShutSound, &Resources::gun4ResetSound, &Resources::gun1CantShoutSound);
 	guns.push_back(gun4);
 
@@ -185,7 +185,7 @@ void GunManager::init()
 	Gun* gun5 = new Gun(200.0f, 1, 1.0f, 10.0f, 3.0f);
 	gun5->setAnimator(animr5);
 	gun5->setResetFunc([&](Gun* gun) {gun->nowCount = 1;});
-	gun5->setShutFunc([&](Sprite* sp, float dist) {sp->healPoint -= 200.0f * (dist < 10 ? 1 : 0);});
+	gun5->setShutFunc([&](Sprite* sp, float dist) {sp->spMap.nowHealPoint -= 200.0f * (dist < 10 ? 1 : 0);});
 	gun5->setSound(&Resources::gun5ShutSound, &Resources::gun5ResetSound, &Resources::gun1CantShoutSound);
 	guns.push_back(gun5);
 
@@ -214,7 +214,7 @@ void GunManager::init()
 	Gun* gun6 = new Gun(15.0f, 100, 0.1f, 10.0f, 4.0f);
 	gun6->setAnimator(animr6);
 	gun6->setResetFunc([&](Gun* gun) {gun->nowCount = 100;});
-	gun6->setShutFunc([&](Sprite* sp, float dist) {sp->healPoint -= 10.0f * (dist < 10 ? 1 : 0);});
+	gun6->setShutFunc([&](Sprite* sp, float dist) {sp->spMap.nowHealPoint -= 10.0f * (dist < 10 ? 1 : 0);});
 	gun6->setSound(&Resources::gun6ShutSound, &Resources::gun6ResetSound, &Resources::gun1CantShoutSound);
 	guns.push_back(gun6);
 }

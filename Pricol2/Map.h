@@ -24,14 +24,6 @@ constexpr int WALL_LAYER = 1;
 constexpr int CELL_LAYER = 2;
 constexpr int SPRITE_LAYER = 3;
 
-struct MapSprite
-{
-	int idx;
-	sf::Vector2f position;
-	float angle;
-	float nowHealPoint;
-};
-
 class Map
 {
 public:
@@ -42,6 +34,7 @@ public:
 
 	void LoadGrid(const std::string& path);
 	void SaveGrid(const std::string& path);
+	void writeMapSprite(std::vector<std::shared_ptr<Sprite>> sprs);
 
 	bool isCellEmpty(sf::Vector2i pos);
 	void setupBlockmap(Sprite* sp);
@@ -50,7 +43,6 @@ public:
 
 	void setMapSprite(MapSprite sp);
 	void deleteMapSprite(sf::Vector2i pos);
-	void writeMapSprite(std::vector<std::shared_ptr<Sprite>> sprs);
 	std::vector<MapSprite>& getMapSprites();
 
 	void deleteSprite(sf::Vector2i mapPos);

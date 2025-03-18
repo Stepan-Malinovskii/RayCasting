@@ -24,10 +24,10 @@ void Renderer::Init()
 void Renderer::Draw3DView(sf::RenderTarget& target, Player* player, Map* map, std::vector<std::shared_ptr<Sprite>>& sprites)
 {
 	//StaticCalculations
-	float pRadians = player->sprite->angle * PI / 180.0f;
+	float pRadians = player->sprite->spMap.angle * PI / 180.0f;
 	sf::Vector2f pDirection{ cosf(pRadians), sinf(pRadians) };
 	sf::Vector2f cameraPlane = sf::Vector2f(- pDirection.y, pDirection.x) * ASPECT;
-	sf::Vector2f rayPos = player->sprite->position;
+	sf::Vector2f rayPos = player->sprite->spMap.position;
 
 	//FloorPart
 	sf::Vector2f rayDirLeft{ pDirection - cameraPlane },
@@ -41,12 +41,12 @@ void Renderer::Draw3DView(sf::RenderTarget& target, Player* player, Map* map, st
 	//SpritePart
 	auto getDist = [player](const std::shared_ptr<Sprite> sp)
 		{
-			return SQUARE(player->sprite->position.x - sp->position.x) +
-				SQUARE(player->sprite->position.y - sp->position.y);
+			return SQUARE(player->sprite->spMap.position.x - sp->spMap.position.x) +
+				SQUARE(player->sprite->spMap.position.y - sp->spMap.position.y);
 		};
 	auto comperer = [player](const std::shared_ptr<Sprite> a, const std::shared_ptr<Sprite> b)
 		{
-			return COMPARER(a.get()->position, b.get()->position, player->sprite->position);
+			return COMPARER(a.get()->spMap.position, b.get()->spMap.position, player->sprite->spMap.position);
 		};
 	std::sort(sprites.begin(), sprites.end(), comperer);
 
@@ -65,7 +65,7 @@ void Renderer::Draw3DView(sf::RenderTarget& target, Player* player, Map* map, st
 
 	//SkyPart
 	sf::Vector2u skyTextureSize = Resources::skyTextures.getSize();
-	int textureOffsetX = (int)(player->sprite->angle / 90.0f * skyTextureSize.x);
+	int textureOffsetX = (int)(player->sprite->spMap.angle / 90.0f * skyTextureSize.x);
 	while (textureOffsetX < 0)
 	{
 		textureOffsetX += skyTextureSize.x;
@@ -144,7 +144,7 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, P
 	for (auto sp : sprites)
 	{
 		if (sp->spDef.texture < 0) continue;
-		sf::Vector2f spritePos = sp->position - player->sprite->position;
+		sf::Vector2f spritePos = sp->spMap.position - player->sprite->spMap.position;
 		float spDist = sqrt(SQUARE(spritePos.x) + SQUARE(spritePos.y));
 		float brightnes = 1 - spDist / BRIGHTNESTDIST;
 		if (brightnes < 0.1f) brightnes = 0.1f;
@@ -174,7 +174,7 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, P
 			float len = sqrt(dir.x * dir.x + dir.y * dir.y);
 			dir /= len;
 
-			float spAngle = sp->angle * PI / 180.0f;
+			float spAngle = sp->spMap.angle * PI / 180.0f;
 			float angle = spAngle - atan2(dir.y, dir.x);
 			angle = angle * 180.0f / PI;
 			angle = round(angle / 45.0f) * 45.0f;
