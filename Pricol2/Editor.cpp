@@ -184,6 +184,7 @@ void Editor::editorWindowStateLeftClick(sf::RenderWindow& editorWindow)
 		{
 			if (b->isClicked(worldPos))
 			{
+				int a;
 				b->update();
 			}
 		}
