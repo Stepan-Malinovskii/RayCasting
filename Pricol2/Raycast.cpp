@@ -79,7 +79,7 @@ RayHit raycast(const Map* map, sf::Vector2f pos, sf::Vector2f dir,
 
 			if (tmin < tmax) 
 			{
-				if (pitch * sqrt(SQUARE(pos.x - sprite->spMap.position.x) + SQUARE(pos.y - sprite->spMap.position.y)) / 3 - 20 < SPRITE_SIZE)
+				if (pitch * sqrt(SQUARE(pos.x - sprite->spMap.position.x) + SQUARE(pos.y - sprite->spMap.position.y)) / 3 - 20 < 106)
 				{
 					hitSprite = sprite; 
 				}

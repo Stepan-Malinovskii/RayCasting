@@ -4,6 +4,7 @@
 #define SPRITE
 
 #include "SFML/System/Vector2.hpp"
+#include "SFML/Graphics/Texture.hpp"
 
 #include <functional>
 #include <algorithm>
@@ -71,6 +72,7 @@ public:
 	MapSprite spMap;
 
 	sf::Texture* texture;
+	int textSize;
 
 	std::shared_ptr<Thinker> thinker;
 	std::set<std::tuple<int, int>> blockmap_coords;

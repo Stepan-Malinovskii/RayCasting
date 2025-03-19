@@ -29,13 +29,11 @@ void Editor::initButton()
 		buttons.push_back(std::make_shared<EdingButton>(b));
 	}
 
-	y /= COUNT_ROW_TEXT + 1;
-	y = y * (COUNT_ROW_TEXT - 3);
-
-	for (x = 0; x < Resources::spritesTexture.getSize().y / SPRITE_SIZE; x++, y++)
+	y += (y / COUNT_ROW_TEXT + 1) * COUNT_ROW_TEXT - y;
+	for (x = 0; x < spriteDef.size() - 1; x++, y++)
 	{
-		b = EdingButton(SPRITE_SIZE * (sf::Vector2f(x % (COUNT_ROW_TEXT - 3), y / (COUNT_ROW_TEXT - 3)) + sf::Vector2f(0.025f, 0.025f)),
-			{ SPRITE_SIZE, SPRITE_SIZE }, Resources::spritesTexture, { { 0, (int)(SPRITE_SIZE * x)}, {(int)SPRITE_SIZE, (int)SPRITE_SIZE} });
+		b = EdingButton(TEXTURE_SIZE * (sf::Vector2f(x % COUNT_ROW_TEXT, y / COUNT_ROW_TEXT) + sf::Vector2f(0.025f, 0.025f)),
+			{ TEXTURE_SIZE, TEXTURE_SIZE }, Resources::spriteIcon, { { (int)(TEXTURE_SIZE * x), 0}, {(int)TEXTURE_SIZE, (int)TEXTURE_SIZE} });
 		b.setFunc([=]() {
 			nowSpriteDef = spriteDef[x + 1];
 			});

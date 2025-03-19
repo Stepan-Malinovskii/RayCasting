@@ -3,10 +3,24 @@
 
 Sprite::Sprite(sf::Vector2f pos, float _size, int indText, int _id, float HP, float _angle, bool isDirect, SpriteType _type)
 	: spMap{indText + 1, pos, _angle, HP}, 
-	spDef{ "", _type, _size, HP, indText, isDirect }, id{ _id } {}
+	spDef{ "", _type, _size, HP, indText, isDirect }, id{ _id } 
+{
+	if (spDef.texture != -1)
+	{
+		texture = &Resources::spritesTextures[spDef.texture];
+		textSize = texture->getSize().y;
+	}
+}
 
 Sprite::Sprite(SpriteDef _spDef, MapSprite _spMap, int _id) : 
-	spDef{ _spDef }, spMap{ _spMap }, id { _id } {}
+	spDef{ _spDef }, spMap{ _spMap }, id { _id } 
+{
+	if (spDef.texture != -1)
+	{
+		texture = &Resources::spritesTextures[spDef.texture];
+		textSize = texture->getSize().y;
+	}
+}
 
 void Sprite::move(Map* map, sf::Vector2f move)
 {

@@ -8,7 +8,7 @@
 #include <SFML/Audio.hpp>
 #include "array"
 
-const float TEXTURE_SIZE = 64.0f, SPRITE_SIZE = 104.0f, GUN_SIZE = 1.0f;
+const float TEXTURE_SIZE = 64.0f, GUN_SIZE = 1.0f;
 constexpr float SCREEN_W = 1280.0f, SCREEN_H = 720.0f;
 
 class Resources
@@ -17,7 +17,8 @@ public:
 	static sf::Texture textures;
 	static sf::Texture skyTextures;
 	static sf::Image textureImage;
-	static sf::Texture spritesTexture;
+	static sf::Texture spriteIcon;
+	static std::vector<sf::Texture> spritesTextures;
 
 	static sf::SoundBuffer gun01ShutSound;
 	static std::vector<sf::Texture> gun01FireAnimationTexture;

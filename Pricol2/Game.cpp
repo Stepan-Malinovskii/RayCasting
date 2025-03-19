@@ -2,7 +2,7 @@
 #include <Windows.h>
 
 Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
-	renderer(), window{ _window }, nowMap{ _nowMap }
+	renderer(_window), window{ _window }, nowMap{ _nowMap }
 {
 	screenMidlePos = { (int)(SCREEN_W / 2), (int)(SCREEN_H / 2) };
 	spManager = new SpriteManager( nowMap );
@@ -127,7 +127,7 @@ void Game::makeCycle(float deltaTime)
 void Game::render()
 {
 	window->clear();
-	renderer.Draw3DView(*window, player, nowMap, spManager->getSprites());
+	renderer.Draw3DView(player, nowMap, spManager->getSprites());
 	player->DrawPlayerUI(window);
 
 	sf::CircleShape aim{};

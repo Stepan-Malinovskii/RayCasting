@@ -1,8 +1,9 @@
 #include "Renderer.h"
 #include <SFML/Graphics/RectangleShape.hpp>
 
-Renderer::Renderer()
+Renderer::Renderer(sf::RenderWindow* _window)
 {
+	window = _window;
 	Init();
 	screenPixels = new uint8_t[(int)SCREEN_H * (int)SCREEN_W * 4]();
 	distanceBuffer = new float[(int)SCREEN_W + 1] {};
@@ -21,7 +22,7 @@ void Renderer::Init()
 	floorSprite.setTexture(floorTexture);
 }
 
-void Renderer::Draw3DView(sf::RenderTarget& target, Player* player, Map* map, std::vector<std::shared_ptr<Sprite>>& sprites)
+void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<Sprite>>& sprites)
 {
 	//StaticCalculations
 	float pRadians = player->sprite->spMap.angle * PI / 180.0f;
@@ -48,12 +49,11 @@ void Renderer::Draw3DView(sf::RenderTarget& target, Player* player, Map* map, st
 		{
 			return COMPARER(a.get()->spMap.position, b.get()->spMap.position, player->sprite->spMap.position);
 		};
-	std::sort(sprites.begin(), sprites.end(), comperer);
 
 	float invDet = 1.0f / (cameraPlane.x * pDirection.y - cameraPlane.y * pDirection.x);
 
 	auto sprite_func = [&]() {
-		DrawSprite(pDirection, cameraPlane, player, sprites, invDet);
+		std::sort(sprites.begin(), sprites.end(), comperer);
 		};
 
 	for (int cnt = 0; cnt < THREAD_COUNT - 1; cnt++)
@@ -79,10 +79,9 @@ void Renderer::Draw3DView(sf::RenderTarget& target, Player* player, Map* map, st
 		sf::Vertex(sf::Vector2f(SCREEN_W, 0), sf::Vector2f(textureOffsetX + skyTextureSize.x, -player->pitch))
 	};
 
-	target.draw(sky, 4, sf::Quads, sf::RenderStates(&Resources::skyTextures));
-
+	window->draw(sky, 4, sf::Quads, sf::RenderStates(&Resources::skyTextures));
 	//NewAlgoritmPart
-	sf::Vector2f rayDir;
+	sf::Vector2f rayDir{};
 	for (int i = 0; i <= SCREEN_W; i++)
 	{
 		float cameraX = i * 2.0f / SCREEN_W - 1.0f;
@@ -125,16 +124,14 @@ void Renderer::Draw3DView(sf::RenderTarget& target, Player* player, Map* map, st
 
 	//DrawPart
 	floorTexture.update(screenPixels);
-	target.draw(floorSprite);
+	window->draw(floorSprite);
+
 	sf::RenderStates states{ &Resources::textures };
-	target.draw(walls, states);
+	window->draw(walls, states);
 	
-	states.texture = &Resources::spritesTexture;
-	target.draw(spriteColumns, states);
-	target.draw(debugColumns);
+	DrawSprite(pDirection, cameraPlane, player, sprites, invDet);
 
 	spriteColumns.clear();
-	debugColumns.clear();
 	walls.clear();
 }
 
@@ -166,7 +163,6 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, P
 		int drawStartX = -spriteSize / 2 + screenX;
 		int drawEndX = spriteSize / 2 + screenX;
 
-		float startYtext= sp->spDef.texture * SPRITE_SIZE, endYtext = SPRITE_SIZE * (sp->spDef.texture + 1);
 		float deltaRotateText = 0.0f;
 		if (sp->spDef.isDirectional)
 		{
@@ -183,7 +179,7 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, P
 			{
 				angle += 360.0f;
 			}
-			deltaRotateText = SPRITE_SIZE * (angle / 45.0f);
+			deltaRotateText = sp->textSize * (angle / 45.0f);
 		}
 
 		int spriteStart = -spriteSize * sp->spDef.size / 2 + screenX,
@@ -193,24 +189,20 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, P
 		{
 			if (transforme.y > 0 && transforme.y < distanceBuffer[i])
 			{
-				float textX = (i - drawStartX) * SPRITE_SIZE / spriteSize;
-				sf::Vector2f textStart(textX + deltaRotateText, startYtext + 0.1f);
-				sf::Vector2f textEnd(textX + deltaRotateText, endYtext);
+				float textX = (i - drawStartX) * sp->textSize / spriteSize;
+				sf::Vector2f textStart(textX + deltaRotateText, 0);
+				sf::Vector2f textEnd(textX + deltaRotateText, sp->textSize);
 
 				sf::Vector2f vertStart(i, -spriteSize / 2.0f + SCREEN_H / 2.0f + player->pitch + player->posZ / transforme.y);
 				sf::Vector2f vertEnd(i, spriteSize / 2.0f + SCREEN_H / 2.0f + player->pitch + player->posZ / transforme.y);
 
-				spriteColumns.append(sf::Vertex(vertStart, colorShade,textStart));
+				spriteColumns.append(sf::Vertex(vertStart, colorShade, textStart));
 				spriteColumns.append(sf::Vertex(vertEnd, colorShade, textEnd));
-
-				if (i == spriteStart || i == spriteEnd - 1)
-				{
-					debugColumns.append(sf::Vertex(vertStart, sf::Color::Green));
-					debugColumns.append(sf::Vertex(vertEnd, sf::Color::Green));
-				}
 			}
 		}
-
+		sf::RenderStates state(sp->texture);
+		window->draw(spriteColumns, state);
+		spriteColumns.clear();
 	}
 }
 

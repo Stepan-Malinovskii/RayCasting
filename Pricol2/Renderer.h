@@ -21,20 +21,20 @@ ASPECT = SCREEN_W / SCREEN_H * 0.5f, BRIGHTNESTDIST = MAX_DETH / 7.0f;
 class Renderer
 {
 public:
-	Renderer();
+	Renderer(sf::RenderWindow* window);
 	~Renderer();
 
 	void Init();
 
-	void Draw3DView(sf::RenderTarget& target, Player* player, Map* map, std::vector<std::shared_ptr<Sprite>>& sprites);
+	void Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<Sprite>>& sprites);
 private:
+	sf::RenderWindow* window;
 	sf::Texture floorTexture;
 	sf::Sprite floorSprite;
 	uint8_t* screenPixels;
 
 	sf::VertexArray walls{ sf::Lines };
 	sf::VertexArray spriteColumns{ sf::Lines };
-	sf::VertexArray debugColumns{ sf::Lines };
 	float* distanceBuffer;
 
 	std::vector<std::jthread> threads;

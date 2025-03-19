@@ -2,7 +2,8 @@
 
 sf::Texture Resources::textures{};
 sf::Image Resources::textureImage{};
-sf::Texture Resources::spritesTexture{};
+sf::Texture Resources::spriteIcon{};
+std::vector<sf::Texture> Resources::spritesTextures{};
 sf::Texture Resources::skyTextures{};
 
 sf::SoundBuffer Resources::gun01ShutSound{};
@@ -74,8 +75,9 @@ void Resources::initResources()
 {
 	if (!textureImage.loadFromFile("Texture/wall_texture.png")) throw "TextureLoadError!";
 	if (!textures.loadFromImage(Resources::textureImage)) throw "TextureLoadError!";
-	if (!spritesTexture.loadFromFile("Texture/enemys.png")) throw "TextureLoadError!";
 	if (!skyTextures.loadFromFile("Texture/sky_texture.png")) throw "TextureLoadError!";
+	if (!spriteIcon.loadFromFile("Texture/enemysIcon.png")) throw "TextureLoadError!";
+	loadFor("Texture/enemy", &spritesTextures);
 	skyTextures.setRepeated(true);
 
 	loadFor("Texture/gun01FireTexture", &gun01FireAnimationTexture);

@@ -43,14 +43,14 @@ void Map::Draw(sf::RenderTarget& target, int layerNumber)
 		}
 
 		sf::RectangleShape spShape(sf::Vector2f(TEXTURE_SIZE * 0.95, TEXTURE_SIZE * 0.95));
-		spShape.setTexture(&Resources::spritesTexture);
+		spShape.setTexture(&Resources::spriteIcon);
 
 		for (auto sp : sprites)
 		{
 			if (sp.spriteDefId != 0)
 			{
-				spShape.setTextureRect(sf::IntRect(sf::Vector2i(0.0f, SPRITE_SIZE * (sp.spriteDefId - 1)),
-					sf::Vector2i(SPRITE_SIZE, SPRITE_SIZE)));
+				spShape.setTextureRect(sf::IntRect(sf::Vector2i(TEXTURE_SIZE * (sp.spriteDefId - 1), 0),
+					sf::Vector2i(TEXTURE_SIZE, TEXTURE_SIZE)));
 				spShape.setPosition((sf::Vector2f)((int)TEXTURE_SIZE * (sf::Vector2i)sp.position));
 				target.draw(spShape);
 			}
@@ -115,6 +115,7 @@ void Map::LoadGrid(const std::string& path)
 	sprites.resize(numSp);
 	for (int i = 0; i < sprites.size(); i++)
 		in.read(reinterpret_cast<char*>(&sprites[i]), sizeof(sprites[i]));
+	sprites.clear();
 }
 
 void Map::SetNewOnGrid(int x, int y, int layerNumber, int value)
