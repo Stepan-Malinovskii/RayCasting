@@ -2,11 +2,75 @@
 
 UIManager::UIManager(sf::RenderWindow* _window)
 {
-	window = window;
-	init();
+	window = _window;
+	initPlayer();
 }
 
-void UIManager::init()
+void UIManager::initDialog(std::vector<std::pair<std::wstring, int>> variants, 
+	std::wstring npcName)
+{
+	buttons.clear();
+	float textSize = 50;
+	sf::RectangleShape nameBase{ {DIALOG_W, textSize + 10} };
+	nameBase.setFillColor(sf::Color(100, 100, 100));
+	sf::Text nameText(npcName, Resources::UIFont, textSize);
+	Group g(nameBase, nameText);
+	g.setPosition({ SCREEN_W / 2, textSize });
+	buttons.push_back(DialogButton(g));
+
+	sf::RectangleShape dataBase{ {DIALOG_W, DIALOG_H / 3} };
+	dataBase.setFillColor(sf::Color(100, 100, 100));
+	sf::Text dataText(variants[0].first, Resources::UIFont, textSize - 10);
+	Group g1(dataBase, dataText);
+	g1.setPosition({ SCREEN_W / 2, g.getPosition().y +(g.getSize().y + g1.getSize().y + textSize) / 2});
+	buttons.push_back(DialogButton(g1));
+
+	sf::Vector2f pos(SCREEN_W / 2, g1.getPosition().y + (g1.getSize().y + textSize) / 2 + 10);
+
+	int i = 1;
+	for (; i < variants.size(); i++)
+	{
+		sf::Text text(variants[i].first, Resources::UIFont, textSize);
+		sf::RectangleShape rect({ DIALOG_W, textSize + 10 });
+		rect.setFillColor(sf::Color(50, 50, 50));
+		Group g2(rect, text);
+		g2.setPosition(pos);
+		
+		buttons.push_back(DialogButton(g2));
+		buttons.back().setFunc([=]() { keyButton = variants[i].second;});
+
+		pos.y += textSize + 10 + 10;
+	}
+}
+
+void UIManager::deleteDialog() { buttons.clear(); }
+
+int UIManager::checkButton(sf::Vector2i mousePos)
+{
+	for (auto b : buttons)
+	{
+		if (b.isClicked(mousePos))
+		{
+			b.update();
+			return keyButton;
+		}
+	}
+	return -1;
+}
+
+void UIManager::drawDialog()
+{
+	sf::Sprite back(Resources::dialogBackround);
+	back.setScale({ SCREEN_W / Resources::dialogBackround.getSize().x,
+		SCREEN_H / Resources::dialogBackround.getSize().y });
+	window->draw(back);
+	for (auto b : buttons)
+	{
+		b.drawButton(window);
+	}
+}
+
+void UIManager::initPlayer()
 {
 	playerUI = [&](Player* player) 
 		{

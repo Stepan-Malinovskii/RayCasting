@@ -105,9 +105,9 @@ bool Sprite::checkCollision(const Map& map, sf::Vector2f newPos, bool xAxis)
 Npc::Npc(SpriteDef _spDef, MapSprite _spMap, int _id, int _hisKey, Dialog* _dialog) :
 	Sprite(_spDef, _spMap, _id), startKey{ _hisKey }, dialog{ _dialog } {}
 
-int Npc::npcReac()
+int Npc::npcReac(int key)
 {
-	return 1;
+	return key;
 }
 
 void Npc::use()

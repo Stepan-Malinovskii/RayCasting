@@ -33,6 +33,12 @@ DialogButton::DialogButton(sf::RectangleShape _shape, sf::Text& _text) :
 	group.text = _text;
 }
 
+DialogButton::DialogButton(Group _group) :
+	BaseButton(group.shape.getPosition(), group.shape.getSize())
+{
+	group = _group;
+}
+
 void DialogButton::drawButton(sf::RenderTarget* window)
 {
 	window->draw(group.shape);

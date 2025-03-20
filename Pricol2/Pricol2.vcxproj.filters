@@ -115,13 +115,13 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\..\..\Users\HUAWEI\Desktop\Новая папка\ConsoleApplication1\KeyData.txt">
+    <Text Include="KeyData.txt">
       <Filter>Файлы ресурсов</Filter>
     </Text>
-    <Text Include="..\..\..\Users\HUAWEI\Desktop\Новая папка\ConsoleApplication1\Readme.txt">
+    <Text Include="Readme.txt">
       <Filter>Файлы ресурсов</Filter>
     </Text>
-    <Text Include="..\..\..\Users\HUAWEI\Desktop\Новая папка\ConsoleApplication1\TextData.txt">
+    <Text Include="TextData.txt">
       <Filter>Файлы ресурсов</Filter>
     </Text>
   </ItemGroup>

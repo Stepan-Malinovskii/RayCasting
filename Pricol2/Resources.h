@@ -14,6 +14,7 @@ constexpr float SCREEN_W = 1280.0f, SCREEN_H = 720.0f;
 class Resources
 {
 public:
+	static sf::Texture dialogBackround;
 	static sf::Texture textures;
 	static sf::Texture skyTextures;
 	static sf::Image textureImage;

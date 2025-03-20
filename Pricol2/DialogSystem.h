@@ -7,6 +7,7 @@
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "SFML/Window/Mouse.hpp"
 #include "Resources.h"
+#include "UIManeger.h"
 
 class Dialog
 {
@@ -21,9 +22,8 @@ public:
 	bool isActive;
 private:
 	Npc* npc;
-	int nowKey;
 	Data* data;
-	std::vector<std::shared_ptr<DialogButton>> buttons;
-	std::vector<Group> shapes;
+	int nowKey;
+	UIManager* uiManager;
 	sf::RenderWindow* window;
 };

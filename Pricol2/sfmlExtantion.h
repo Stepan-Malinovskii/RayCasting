@@ -34,6 +34,24 @@ private:
 
 struct Group
 {
+	Group(sf::RectangleShape _shape, sf::Text _text) : shape{_shape}, text{_text}
+	{
+		shape.setOrigin({ shape.getSize().x / 2, shape.getSize().y / 2 });
+		text.setOrigin({ text.getLocalBounds().width / 2, text.getLocalBounds().height / 2 });
+		text.setPosition({ shape.getPosition().x, shape.getPosition().y});
+	}
+
+	Group() = default;
+
+	void setPosition(sf::Vector2f position)
+	{
+		shape.setPosition(position);
+		text.setPosition({ position.x, position.y - text.getCharacterSize() / 4 });
+	}
+
+	sf::Vector2f getSize() { return shape.getSize(); }
+	sf::Vector2f getPosition() { return shape.getPosition(); }
+
 	sf::RectangleShape shape;
 	sf::Text text;
 };
@@ -42,6 +60,7 @@ class DialogButton : public BaseButton
 {
 public:
 	DialogButton(sf::RectangleShape _shape, sf::Text& _text);
+	DialogButton(Group _group);
 	DialogButton() = default;
 
 	void setFunc(std::function<void()> _fn);
@@ -50,9 +69,9 @@ public:
 
 	void update() override;
 
+	Group group;
 private:
 	std::function<void()> fn;
-	Group group;
 };
 
 class EdingButton : public Button

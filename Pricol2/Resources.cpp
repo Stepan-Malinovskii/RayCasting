@@ -1,6 +1,7 @@
 #include "Resources.h"
 
 sf::Texture Resources::textures{};
+sf::Texture Resources::dialogBackround{};
 sf::Image Resources::textureImage{};
 sf::Texture Resources::spriteIcon{};
 std::vector<sf::Texture> Resources::spritesTextures{};
@@ -70,6 +71,7 @@ void loadFor(std::string baseName, std::vector<sf::Texture>* data)
 void Resources::initResources()
 {
 	if (!textureImage.loadFromFile("Texture/wall_texture.png")) throw "TextureLoadError!";
+	if (!dialogBackround.loadFromFile("Texture/dialogBackground.png")) throw "TextureLoadError!";
 	if (!textures.loadFromImage(Resources::textureImage)) throw "TextureLoadError!";
 	if (!skyTextures.loadFromFile("Texture/sky_texture.png")) throw "TextureLoadError!";
 	if (!spriteIcon.loadFromFile("Texture/enemysIcon.png")) throw "TextureLoadError!";

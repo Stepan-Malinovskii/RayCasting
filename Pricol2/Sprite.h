@@ -92,7 +92,7 @@ public:
 	Npc(SpriteDef spDef, MapSprite spMap, int _id, int hisKey, Dialog* dialog);
 	Npc() = default;
 	void use();
-	int npcReac();
+	int npcReac(int key);
 	int startKey;
 private:
 	Dialog* dialog;

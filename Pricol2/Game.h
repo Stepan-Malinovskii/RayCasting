@@ -1,13 +1,11 @@
 #pragma once
 #ifndef GAME
 #define GAME
-
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
 #include <memory>
 #include <vector>
 #include <Windows.h>
-#include "UIManeger.h"
 #include "Sprite.h"
 #include "DataBase.h"
 #include "DialogSystem.h"
@@ -16,6 +14,7 @@
 #include "Renderer.h"
 #include "SpriteManager.h"
 #include "GunManager.h"
+#include "UIManeger.h"
 
 class Game
 {
