@@ -13,23 +13,6 @@
 
 constexpr int COUNT_ROW_TEXT = 7;
 
-class EdingButton : public Button
-{
-public:
-	EdingButton(sf::Vector2f _pos, sf::Vector2f _size, sf::Texture& _text, sf::IntRect teztureRect) :
-		Button(_pos, _size, _text, teztureRect) { }
-	EdingButton() = default;
-
-	void setFunc(std::function<void()> _fn) { fn = _fn; }
-
-	void update() override
-	{
-		fn();
-	}
-private:
-	std::function<void()> fn;
-};
-
 class Editor
 {
 public:

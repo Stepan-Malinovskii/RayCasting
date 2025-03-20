@@ -8,6 +8,8 @@
 #include <vector>
 
 #include "Sprite.h"
+#include "DataBase.h"
+#include "DialogSystem.h"
 #include "Map.h"
 #include "Player.h"
 #include "Renderer.h"
@@ -29,6 +31,9 @@ private:
 	void update(float deltaT);
 	void render();
 	
+	Data* data;
+	Npc nowNpc;
+	Dialog* dialogSys;
 	sf::Vector2i screenMidlePos;
 	SpriteManager* spManager;
 	GunManager* gunManager;

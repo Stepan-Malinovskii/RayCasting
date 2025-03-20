@@ -1,7 +1,8 @@
 #include "SpriteManager.h"
 
-SpriteManager::SpriteManager(Map* _nowMap) : nowMap{ _nowMap }
+SpriteManager::SpriteManager(Map* _nowMap, Dialog* _dialogSys) : nowMap{ _nowMap }
 {
+	diaologSys = _dialogSys;
 	id = 0;
 	init();
 }
@@ -14,7 +15,7 @@ void SpriteManager::init()
 	for (auto sp : nowMap->getMapSprites())
 	{
 		auto def = spriteDef[sp.spriteDefId];
-		auto sprite = std::make_shared<Sprite>(def, sp, id);
+		std::shared_ptr<Sprite> sprite = std::make_shared<Sprite>(def, sp, id);
 		id++;
 
 		if (sp.spriteDefId == 0) {
@@ -47,6 +48,14 @@ void SpriteManager::init()
 	{
 		nowMap->setupBlockmap(sp.get());
 	}
+}
+
+Npc SpriteManager::getNpc(MapSprite* mSp)
+{
+	auto def = spriteDef[mSp->spriteDefId];
+	Npc npc(def, *mSp, id, npcDef[ENEMY_COUNT - mSp->spriteDefId].hisKey, diaologSys);
+	id++;
+	return npc;
 }
 
 Player* SpriteManager::resetMap(Map* newMap)

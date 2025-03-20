@@ -5,7 +5,9 @@ Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
 	renderer(_window), window{ _window }, nowMap{ _nowMap }
 {
 	screenMidlePos = { (int)(SCREEN_W / 2), (int)(SCREEN_H / 2) };
-	spManager = new SpriteManager( nowMap );
+	data = new Data();
+	dialogSys = new Dialog(window, data);
+	spManager = new SpriteManager( nowMap, dialogSys );
 	gunManager = new GunManager();
 	player = spManager->getPlayer();
 	player->kick = gunManager->getGun(0);
@@ -28,6 +30,7 @@ void Game::save()
 
 void Game::getInput(sf::Event event, float deltaTime)
 {
+	if (dialogSys->isActive) { return; }
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{			
 		player->fire(0);
@@ -81,6 +84,15 @@ void Game::getInput(float deltaTime)
 		{
 			player->fire();
 		}
+		if (GetAsyncKeyState('E'))
+		{
+			MapSprite* mSp = player->dialog();
+			if (mSp != nullptr)
+			{
+				nowNpc = spManager->getNpc(mSp);
+				nowNpc.use();
+			}
+		}
 
 		sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
 		deltaX = (mousePos.x - screenMidlePos.x) / 2.0f;
@@ -113,15 +125,23 @@ void Game::update(float deltaTime)
 void Game::makeCycle(float deltaTime)
 {
 #if !_DEBUG
-	if (deltaTime > 1/144.0f)
+	if (deltaTime > 1/50.0f)
 	{
 		deltaTime = 0;
 	}
 #endif //_DEBUG
-
-	getInput(deltaTime);
-	update(deltaTime);
-	render();
+	if (dialogSys->isActive)
+	{
+		window->clear();
+		dialogSys->update();
+		dialogSys->draw();
+	}
+	else
+	{
+		getInput(deltaTime);
+		update(deltaTime);
+		render();
+	}
 }
 
 void Game::render()

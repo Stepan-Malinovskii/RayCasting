@@ -130,5 +130,5 @@ void Resources::initResources()
 	if (!gun6ShutSound.loadFromFile("Sound/gun6ShutSound.mp3")) throw "TextureLoadError!";
 	if (!gun6ResetSound.loadFromFile("Sound/gun6ResetSound.mp3")) throw "TextureLoadError!";
 
-	if (!UIFont.loadFromFile("Texture/Pshek_KY2.ttf")) throw "TextureLoadError!";
+	if (!UIFont.loadFromFile("Texture/dehinted-HandveticaNeue-Regular.ttf")) throw "TextureLoadError!";
 }

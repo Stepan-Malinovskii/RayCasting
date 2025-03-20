@@ -37,7 +37,7 @@ private:
 	sf::VertexArray spriteColumns{ sf::Lines };
 	float* distanceBuffer;
 
-	std::vector<std::jthread> threads;
+	std::vector<std::thread> threads;
 
 	void DrawFloor(sf::Vector2f& rayDirLeft, sf::Vector2f& rayDirRight, sf::Vector2f& rayPos, 
 		Player* player, Map* map, int startH, int endH);

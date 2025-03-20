@@ -5,7 +5,6 @@
 
 #include "SFML/System/Vector2.hpp"
 #include "SFML/Graphics/Texture.hpp"
-
 #include <functional>
 #include <algorithm>
 #include <memory>
@@ -16,6 +15,7 @@ constexpr float PI = 3.14159265359f;
 
 class Map;
 class Sprite;
+class Dialog;
 
 class Thinker
 {
@@ -51,12 +51,17 @@ struct MapSprite
 
 struct SpriteDef
 {
-	std::string name;
+	std::wstring name;
 	SpriteType type;
 	float size;
 	float maxHealpoint;
 	int texture;
 	bool isDirectional;
+};
+
+struct NpcDef
+{
+	int hisKey;
 };
 
 class Sprite
@@ -81,19 +86,36 @@ private:
 	bool checkCollision(const Map& map, sf::Vector2f newPos, bool xAxis);
 };
 
+class Npc : public Sprite
+{
+public:
+	Npc(SpriteDef spDef, MapSprite spMap, int _id, int hisKey, Dialog* dialog);
+	Npc() = default;
+	void use();
+	int npcReac();
+	int startKey;
+private:
+	Dialog* dialog;
+};
+
+static std::vector<NpcDef> npcDef = {
+	{1}};
+
+constexpr int ENEMY_COUNT = 14;
 static std::vector<SpriteDef> spriteDef = {
-	{ "player", SpriteType::Thing, 0.3f, 100.0f, -1, false},
-	{ "shar", SpriteType::Enemy, 1.0f, 100.f, 0, true },
-	{ "rog", SpriteType::Enemy, 1.0f, 100.f, 1, true },
-	{ "gorb", SpriteType::Enemy, 1.0f, 100.f, 2, true },
-	{ "kozel", SpriteType::Enemy, 1.0f, 100.f, 3, true },
-	{ "robot", SpriteType::Enemy, 1.0f, 100.f, 4, true},
-	{ "bachka", SpriteType::Enemy, 1.0f, 100.f, 5, true},
-	{ "pyshka", SpriteType::Enemy, 1.0f, 100.f, 6, true},
-	{ "gorbGreen", SpriteType::Enemy, 1.0f, 100.f, 7, true },
-	{ "bachkaSin", SpriteType::Enemy, 1.0f, 100.f, 8, true },
-	{ "revenant", SpriteType::Enemy, 1.0f, 100.f, 9, true },
-	{ "sharTre", SpriteType::Enemy, 1.0f, 100.f, 10, true },
-	{ "mather", SpriteType::Enemy, 1.0f, 100.f, 11, true },
-	{ "Boss", SpriteType::Enemy, 1.0f, 1000.f, 12, true }};
+	{ L"player", SpriteType::Thing, 0.3f, 100.0f, -1, false},
+	{ L"shar", SpriteType::Enemy, 1.0f, 100.f, 0, true },
+	{ L"rog", SpriteType::Enemy, 1.0f, 100.f, 1, true },
+	{ L"gorb", SpriteType::Enemy, 1.0f, 100.f, 2, true },
+	{ L"kozel", SpriteType::Enemy, 1.0f, 100.f, 3, true },
+	{ L"robot", SpriteType::Enemy, 1.0f, 100.f, 4, true},
+	{ L"bachka", SpriteType::Enemy, 1.0f, 100.f, 5, true},
+	{ L"pyshka", SpriteType::Enemy, 1.0f, 100.f, 6, true},
+	{ L"gorbGreen", SpriteType::Enemy, 1.0f, 100.f, 7, true },
+	{ L"bachkaSin", SpriteType::Enemy, 1.0f, 100.f, 8, true },
+	{ L"revenant", SpriteType::Enemy, 1.0f, 100.f, 9, true },
+	{ L"sharTre", SpriteType::Enemy, 1.0f, 100.f, 10, true },
+	{ L"mather", SpriteType::Enemy, 1.0f, 100.f, 11, true },
+	{ L"Boss", SpriteType::Enemy, 1.0f, 1000.f, 12, true },
+	{ L"Дима", SpriteType::NPC, 1.0f, 1000000.f, 13, true }};
 #endif // !SPRITE

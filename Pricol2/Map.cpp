@@ -115,7 +115,6 @@ void Map::LoadGrid(const std::string& path)
 	sprites.resize(numSp);
 	for (int i = 0; i < sprites.size(); i++)
 		in.read(reinterpret_cast<char*>(&sprites[i]), sizeof(sprites[i]));
-	sprites.clear();
 }
 
 void Map::SetNewOnGrid(int x, int y, int layerNumber, int value)

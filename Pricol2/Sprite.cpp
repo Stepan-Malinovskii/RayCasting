@@ -1,9 +1,10 @@
 #include "Sprite.h"
+#include "DialogSystem.h"
 #include "Map.h"
 
 Sprite::Sprite(sf::Vector2f pos, float _size, int indText, int _id, float HP, float _angle, bool isDirect, SpriteType _type)
 	: spMap{indText + 1, pos, _angle, HP}, 
-	spDef{ "", _type, _size, HP, indText, isDirect }, id{ _id } 
+	spDef{ L"", _type, _size, HP, indText, isDirect }, id{ _id } 
 {
 	if (spDef.texture != -1)
 	{
@@ -99,4 +100,17 @@ bool Sprite::checkCollision(const Map& map, sf::Vector2f newPos, bool xAxis)
 	}
 
 	return false;
+}
+
+Npc::Npc(SpriteDef _spDef, MapSprite _spMap, int _id, int _hisKey, Dialog* _dialog) :
+	Sprite(_spDef, _spMap, _id), startKey{ _hisKey }, dialog{ _dialog } {}
+
+int Npc::npcReac()
+{
+	return 1;
+}
+
+void Npc::use()
+{
+	dialog->start(this);
 }

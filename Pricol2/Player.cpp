@@ -165,6 +165,16 @@ void Player::fire(int gun)
 	}
 }
 
+MapSprite* Player::dialog()
+{
+	float radiansAngle = sprite->spMap.angle * PI / 180.0f;
+	sf::Vector2f verticalMoveParametrs(cos(radiansAngle), sin(radiansAngle));
+
+	RayHit hit = raycast(nowMap, sprite->spMap.position, verticalMoveParametrs, true, sprite, 1, pitch);
+	if (hit.sprite->spDef.type == SpriteType::NPC) { return &hit.sprite->spMap; }
+	return nullptr;
+}
+
 void Player::swapGun(bool flag)
 {
 	int delta = flag ? 1 : -1;

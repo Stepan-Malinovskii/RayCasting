@@ -7,7 +7,7 @@ Renderer::Renderer(sf::RenderWindow* _window)
 	Init();
 	screenPixels = new uint8_t[(int)SCREEN_H * (int)SCREEN_W * 4]();
 	distanceBuffer = new float[(int)SCREEN_W + 1] {};
-	threads = std::vector<std::jthread>(THREAD_COUNT);
+	threads = std::vector<std::thread>(THREAD_COUNT);
 }
 
 Renderer::~Renderer()
@@ -58,10 +58,10 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<
 
 	for (int cnt = 0; cnt < THREAD_COUNT - 1; cnt++)
 	{
-		threads[cnt] = std::jthread(floor_func, cnt);
+		threads[cnt] = std::thread(floor_func, cnt);
 	}
 
-	threads[THREAD_COUNT - 1] = std::jthread(sprite_func);
+	threads[THREAD_COUNT - 1] = std::thread(sprite_func);
 
 	//SkyPart
 	sf::Vector2u skyTextureSize = Resources::skyTextures.getSize();

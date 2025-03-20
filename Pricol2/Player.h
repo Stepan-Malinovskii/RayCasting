@@ -25,6 +25,7 @@ public:
 	void checkBoost(bool isPressed, float deltaTime);
 	void move(sf::Vector2f deltaPos, float deltaTime);
 	void jump();
+	MapSprite* dialog();
 	void fire(int gun = -1);
 	void swapGun(bool flag);
 	void reloadingGun();

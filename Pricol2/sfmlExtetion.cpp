@@ -1,17 +1,13 @@
 #include "sfmlExtantion.h"
 
-Button::Button(sf::Vector2f _pos, sf::Vector2f _size, sf::Texture& _text, sf::IntRect textureRect)
-{
-	shape.setPosition(_pos);
-	shape.setSize(_size);
-	shape.setTexture(&_text);
-	shape.setTextureRect(textureRect);
-}
+BaseButton::BaseButton(sf::Vector2f _pos, sf::Vector2f _size) : pos{ _pos }, size{ _size } {}
 
-bool Button::isClicked(sf::Vector2i& mousePos)
+const sf::Vector2f& BaseButton::getPosition() const { return pos; }
+
+bool BaseButton::isClicked(sf::Vector2i& mousePos)
 {
-	float x0 = shape.getPosition().x, x1 = x0 + shape.getSize().x;
-	float y0 = shape.getPosition().y, y1 = y0 + shape.getSize().y;
+	float x0 = pos.x, x1 = pos.x + size.x;
+	float y0 = pos.y, y1 = pos.y + size.y;
 
 	if (mousePos.x >= x0 && mousePos.x <= x1 && mousePos.y >= y0 && mousePos.y <= y1)
 	{
@@ -20,9 +16,35 @@ bool Button::isClicked(sf::Vector2i& mousePos)
 	return false;
 }
 
-void Button::drawButton(sf::RenderTarget& window)
+Button::Button(sf::Vector2f _pos, sf::Vector2f _size, sf::Texture& _text, sf::IntRect textureRect) : BaseButton(_pos, _size)
 {
-	window.draw(shape);
+	shape.setPosition(_pos);
+	shape.setSize(_size);
+	shape.setTexture(&_text);
+	shape.setTextureRect(textureRect);
 }
 
-const sf::Vector2f& Button::getPosition() const { return shape.getPosition(); };
+void Button::drawButton(sf::RenderTarget& window) { window.draw(shape); }
+
+DialogButton::DialogButton(sf::RectangleShape _shape, sf::Text& _text) :
+	BaseButton(_shape.getPosition(), _shape.getSize())
+{
+	group.shape = _shape;
+	group.text = _text;
+}
+
+void DialogButton::drawButton(sf::RenderTarget* window)
+{
+	window->draw(group.shape);
+	window->draw(group.text);
+}
+
+void DialogButton::setFunc(std::function<void()> _fn)
+{
+	fn = _fn;
+}
+
+void DialogButton::update()
+{
+	fn();
+}
