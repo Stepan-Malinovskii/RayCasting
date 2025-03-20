@@ -46,5 +46,15 @@ void DialogButton::setFunc(std::function<void()> _fn)
 
 void DialogButton::update()
 {
-	fn();
+	if (fn != NULL) fn();
+}
+
+void EdingButton::setFunc(std::function<void()> _fn)
+{
+	fn = _fn;
+}
+
+void EdingButton::update()
+{
+	if (fn != NULL) fn();
 }

@@ -62,12 +62,9 @@ public:
 		Button(_pos, _size, _text, teztureRect) { }
 	EdingButton() = default;
 
-	void setFunc(std::function<void()> _fn) { fn = _fn; }
+	void setFunc(std::function<void()> _fn);
 
-	void update() override
-	{
-		fn();
-	}
+	void update() override;
 private:
 	std::function<void()> fn;
 };

@@ -1,5 +1,4 @@
 #include "Game.h"
-#include <Windows.h>
 
 Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
 	renderer(_window), window{ _window }, nowMap{ _nowMap }
@@ -9,6 +8,7 @@ Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
 	dialogSys = new Dialog(window, data);
 	spManager = new SpriteManager( nowMap, dialogSys );
 	gunManager = new GunManager();
+	uiManager = new UIManager(window);
 	player = spManager->getPlayer();
 	player->kick = gunManager->getGun(0);
 	for (int i = 1; i < 8; i++)
@@ -21,6 +21,8 @@ Game::~Game()
 {
 	delete spManager;
 	delete gunManager;
+	delete spManager;
+	delete uiManager;
 }
 
 void Game::save()
@@ -148,7 +150,7 @@ void Game::render()
 {
 	window->clear();
 	renderer.Draw3DView(player, nowMap, spManager->getSprites());
-	player->DrawPlayerUI(window);
+	uiManager->drawPlayerUI(player);
 
 	sf::CircleShape aim{};
 	aim.setRadius(2.5f);

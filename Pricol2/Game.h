@@ -6,7 +6,8 @@
 #include <SFML/Graphics/CircleShape.hpp>
 #include <memory>
 #include <vector>
-
+#include <Windows.h>
+#include "UIManeger.h"
 #include "Sprite.h"
 #include "DataBase.h"
 #include "DialogSystem.h"
@@ -36,6 +37,7 @@ private:
 	Dialog* dialogSys;
 	sf::Vector2i screenMidlePos;
 	SpriteManager* spManager;
+	UIManager* uiManager;
 	GunManager* gunManager;
 	Player* player;
 	Renderer renderer;

@@ -30,21 +30,21 @@ public:
 	void swapGun(bool flag);
 	void reloadingGun();
 	void swapMap(Map* newMap);
-	void DrawPlayerUI(sf::RenderWindow* window);
 	void setGun(Gun* gun);
 	float getMoveSpeed();
+	Gun* getGun();
+	sf::Vector2f getDeltaShake();
 
 	Sprite* sprite;
-	float pitch, posZ;
 	Gun* kick;
+	float pitch, posZ, timeBoost, timerBoost;
 private:
 	bool isJump, jumpFlag;
 	Map* nowMap;
 	sf::Vector2f shakeDelta;
 	int nowGun;
 	std::vector<Gun*> guns;
-	float moveSpeed, nowSpeed, boostSpeed,
-		timeBoost, timerBoost, shakeTime;
+	float moveSpeed, nowSpeed, boostSpeed, shakeTime;
 
 	void shakeCamera(float deltaTime, bool isRun);
 	void gravity(float deltaTime);

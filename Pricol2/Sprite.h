@@ -117,5 +117,10 @@ static std::vector<SpriteDef> spriteDef = {
 	{ L"sharTre", SpriteType::Enemy, 1.0f, 100.f, 10, true },
 	{ L"mather", SpriteType::Enemy, 1.0f, 100.f, 11, true },
 	{ L"Boss", SpriteType::Enemy, 1.0f, 1000.f, 12, true },
-	{ L"Дима", SpriteType::NPC, 1.0f, 1000000.f, 13, true }};
+	{ L"Петрович", SpriteType::NPC, 1.0f, 1000000.f, 13, true },
+	{ L"Молотов", SpriteType::NPC, 1.0f, 1000000.f, 14, true }, 
+	{ L"Роман", SpriteType::NPC, 1.0f, 1000000.f, 15, true }, 
+	{ L"Ванька", SpriteType::NPC, 1.0f, 1000000.f, 16, true }, 
+	{ L"Тихон", SpriteType::NPC, 1.0f, 1000000.f, 17, true }, 
+	{ L"Виктор", SpriteType::NPC, 1.0f, 1000000.f, 18, true }};
 #endif // !SPRITE

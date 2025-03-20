@@ -62,7 +62,7 @@ void Gun::setSound(sf::SoundBuffer* shut, sf::SoundBuffer* reset, sf::SoundBuffe
 void Gun::update(float dt)
 {
 	Weapon::update(dt);
-	if (resetFn != nullptr)
+	if (resetFn != NULL)
 	{
 		if (nowTimeBetwenReset >= timeBetwenReset) return;
 		nowTimeBetwenReset += dt;

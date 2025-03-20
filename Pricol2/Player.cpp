@@ -182,52 +182,10 @@ void Player::swapGun(bool flag)
 	nowGun = nowGun < 0 ? nowGun = guns.size() - 1 : nowGun % guns.size();
 }
 
-void Player::DrawPlayerUI(sf::RenderWindow* window)
-{
-	if (!kick->isCanUsed())
-	{
-		kick->drawWeapon(window, { 0,0 });
-	}
-	else
-	{
-		auto gun = guns[nowGun];
-		gun->drawWeapon(window, shakeDelta);
-
-		if (gun->resetFn != nullptr)
-		{
-			sf::Text weaponInfo(std::to_string(guns[nowGun]->nowCount) + " / " + std::to_string(guns[nowGun]->maxCountPotron), Resources::UIFont, 50);
-			weaponInfo.setPosition({ SCREEN_W - 150, SCREEN_H - 60 });
-			weaponInfo.setFillColor({ 0, 0, 0 });
-			window->draw(weaponInfo);
-		}
-	}
-
-	float baseX = 300;
-	sf::RectangleShape hpShape({ baseX, 20 });
-	hpShape.setFillColor({ 128, 128, 128 });
-	hpShape.setPosition({ 20, SCREEN_H - 55 });
-	window->draw(hpShape);
-
-	sf::RectangleShape boostShape{ hpShape };
-	boostShape.move({ 0, 30 });
-	window->draw(boostShape);
-
-	hpShape.setFillColor({ 255, 23, 23 });
-	float newXH = baseX * (sprite->spMap.nowHealPoint <= 0 ? 0 : sprite->spMap.nowHealPoint) / sprite->spDef.maxHealpoint;
-	hpShape.setSize({ newXH, 20 });
-	window->draw(hpShape);
-
-	boostShape.setFillColor({ 44, 148, 15 });
-	float newXB = baseX * timerBoost / timeBoost;
-	boostShape.setSize({ newXB, 20 });
-	window->draw(boostShape);
-
-	sf::CircleShape aim(1.0f, 16);
-	aim.setFillColor(sf::Color::Black);
-	aim.setPosition({SCREEN_W / 2, SCREEN_H / 2});
-	window->draw(aim);
-}
-
 void Player::swapMap(Map* newMap) { nowMap = newMap; }
+
+Gun* Player::getGun() { return guns[nowGun]; }
+
+sf::Vector2f Player::getDeltaShake() { return shakeDelta; }
 
 float Player::getMoveSpeed() { return moveSpeed; }
