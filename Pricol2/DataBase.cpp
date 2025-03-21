@@ -51,6 +51,12 @@ Data::Data()
 	fileIn.close();
 }
 
+Data::~Data()
+{
+	delete key2key;
+	delete key2text;
+}
+
 std::vector<int> Data::getKeys(int key)
 {
 	for (int i = 0; i < key2key->size(); i++)

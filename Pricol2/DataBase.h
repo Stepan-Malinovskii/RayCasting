@@ -11,6 +11,7 @@ class Data
 {
 public:
 	Data();
+	~Data();
 	std::vector<int> getKeys(int key);
 	std::pair<std::wstring, int> getText(int key);
 private:

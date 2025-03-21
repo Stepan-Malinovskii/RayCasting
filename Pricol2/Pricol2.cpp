@@ -1,3 +1,7 @@
+#include <cstdlib>
+#include <crtdbg.h>
+
+
 #include "Map.h"
 #include "Editor.h"
 #include "Renderer.h"
@@ -6,7 +10,6 @@
 #include "SpriteManager.h"
 
 enum class State{Editor, Game};
-
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H),"Game");
@@ -108,4 +111,5 @@ int main()
 	}
 	game.save();
 	map->SaveGrid("Texture/test.map");
+	return 0;
 }

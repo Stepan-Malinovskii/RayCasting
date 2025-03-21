@@ -70,6 +70,7 @@ public:
 	Sprite(sf::Vector2f pos, float size, int indText, int id, float HP, float angle = 0.0f, bool isDirect = false, SpriteType type = SpriteType::Thing);
 	Sprite(SpriteDef spDef, MapSprite spMap, int _id);
 	Sprite() = default;
+	virtual ~Sprite() = default;
 
 	void move(Map* map, sf::Vector2f move);
 	int id;

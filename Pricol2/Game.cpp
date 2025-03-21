@@ -5,10 +5,10 @@ Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
 {
 	screenMidlePos = { (int)(SCREEN_W / 2), (int)(SCREEN_H / 2) };
 	data = new Data();
-	dialogSys = new Dialog(window, data);
-	spManager = new SpriteManager( nowMap, dialogSys );
 	gunManager = new GunManager();
 	uiManager = new UIManager(window);
+	dialogSys = new Dialog(window, data, uiManager);
+	spManager = new SpriteManager(nowMap, dialogSys);
 	player = spManager->getPlayer();
 	player->kick = gunManager->getGun(0);
 	for (int i = 1; i < 8; i++)
@@ -19,9 +19,10 @@ Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
 
 Game::~Game()
 {
+	delete data;
+	delete dialogSys;
 	delete spManager;
 	delete gunManager;
-	delete spManager;
 	delete uiManager;
 }
 

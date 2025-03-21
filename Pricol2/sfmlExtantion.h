@@ -14,6 +14,7 @@ class BaseButton
 public:
 	BaseButton(sf::Vector2f _pos, sf::Vector2f _size);
 	BaseButton() = default;
+	virtual ~BaseButton() = default;
 	bool isClicked(sf::Vector2i& mousePos);
 	virtual void update() = 0;
 	const sf::Vector2f& getPosition() const;
@@ -26,7 +27,7 @@ class Button : public BaseButton
 public:
 	Button(sf::Vector2f _pos, sf::Vector2f _size, sf::Texture& _text, sf::IntRect teztureRect);
 	Button() = default;
-
+	virtual ~Button() = default;
 	void drawButton(sf::RenderTarget& window);
 private:
 	sf::RectangleShape shape;

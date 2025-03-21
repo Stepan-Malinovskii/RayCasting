@@ -34,7 +34,7 @@ DialogButton::DialogButton(sf::RectangleShape _shape, sf::Text& _text) :
 }
 
 DialogButton::DialogButton(Group _group) :
-	BaseButton(group.shape.getPosition(), group.shape.getSize())
+	BaseButton(_group.shape.getGlobalBounds().getPosition(), _group.shape.getSize())
 {
 	group = _group;
 }

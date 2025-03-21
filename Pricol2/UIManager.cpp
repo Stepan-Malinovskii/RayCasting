@@ -10,28 +10,27 @@ void UIManager::initDialog(std::vector<std::pair<std::wstring, int>> variants,
 	std::wstring npcName)
 {
 	buttons.clear();
-	float textSize = 50;
-	sf::RectangleShape nameBase{ {DIALOG_W, textSize + 10} };
+	sf::RectangleShape nameBase{ {DIALOG_W, TEXTSIZE + 10} };
 	nameBase.setFillColor(sf::Color(100, 100, 100));
-	sf::Text nameText(npcName, Resources::UIFont, textSize);
+	sf::Text nameText(npcName, Resources::UIFont, TEXTSIZE);
 	Group g(nameBase, nameText);
-	g.setPosition({ SCREEN_W / 2, textSize });
+	g.setPosition({ SCREEN_W / 2, INTERVAL});
 	buttons.push_back(DialogButton(g));
 
-	sf::RectangleShape dataBase{ {DIALOG_W, DIALOG_H / 3} };
+	sf::RectangleShape dataBase{ {DIALOG_W, DIALOG_H / 2.5f} };
 	dataBase.setFillColor(sf::Color(100, 100, 100));
-	sf::Text dataText(variants[0].first, Resources::UIFont, textSize - 10);
+	sf::Text dataText(variants[0].first, Resources::UIFont, TEXTSIZE - 10);
 	Group g1(dataBase, dataText);
-	g1.setPosition({ SCREEN_W / 2, g.getPosition().y +(g.getSize().y + g1.getSize().y + textSize) / 2});
+	g1.setPosition({ SCREEN_W / 2, g.getPosition().y + g1.getSize().y / 2 + INTERVAL});
 	buttons.push_back(DialogButton(g1));
 
-	sf::Vector2f pos(SCREEN_W / 2, g1.getPosition().y + (g1.getSize().y + textSize) / 2 + 10);
+	sf::Vector2f pos(SCREEN_W / 2, g1.getPosition().y + g1.getSize().y / 2 + INTERVAL);
 
 	int i = 1;
 	for (; i < variants.size(); i++)
 	{
-		sf::Text text(variants[i].first, Resources::UIFont, textSize);
-		sf::RectangleShape rect({ DIALOG_W, textSize + 10 });
+		sf::Text text(variants[i].first, Resources::UIFont, TEXTSIZE);
+		sf::RectangleShape rect({ DIALOG_W, TEXTSIZE + 10 });
 		rect.setFillColor(sf::Color(50, 50, 50));
 		Group g2(rect, text);
 		g2.setPosition(pos);
@@ -39,7 +38,7 @@ void UIManager::initDialog(std::vector<std::pair<std::wstring, int>> variants,
 		buttons.push_back(DialogButton(g2));
 		buttons.back().setFunc([=]() { keyButton = variants[i].second;});
 
-		pos.y += textSize + 10 + 10;
+		pos.y +=  INTERVAL + g2.shape.getSize().y / 2;
 	}
 }
 

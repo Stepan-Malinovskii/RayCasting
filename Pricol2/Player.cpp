@@ -171,7 +171,7 @@ MapSprite* Player::dialog()
 	sf::Vector2f verticalMoveParametrs(cos(radiansAngle), sin(radiansAngle));
 
 	RayHit hit = raycast(nowMap, sprite->spMap.position, verticalMoveParametrs, true, sprite, 1, pitch);
-	if (hit.sprite->spDef.type == SpriteType::NPC) { return &hit.sprite->spMap; }
+	if (hit.sprite != nullptr && hit.sprite->spDef.type == SpriteType::NPC) { return &hit.sprite->spMap; }
 	return nullptr;
 }
 

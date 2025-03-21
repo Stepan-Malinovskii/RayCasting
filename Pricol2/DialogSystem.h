@@ -12,7 +12,7 @@
 class Dialog
 {
 public:
-	Dialog(sf::RenderWindow* _window, Data* data);
+	Dialog(sf::RenderWindow* _window, Data* data, UIManager* _uiManager);
 	void init();
 	void start(Npc* npc);
 	void stop();

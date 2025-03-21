@@ -4,7 +4,7 @@
 #include "sfmlExtantion.h"
 #include "SFML/Graphics/CircleShape.hpp"
 
-constexpr float DIALOG_W = SCREEN_W - 200, DIALOG_H = SCREEN_H - 100;
+constexpr float DIALOG_W = SCREEN_W - 200, DIALOG_H = SCREEN_H - 100, TEXTSIZE = 50, INTERVAL = 40;
 
 class UIManager
 {

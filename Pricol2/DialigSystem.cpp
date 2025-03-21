@@ -1,6 +1,6 @@
 #include "DialogSystem.h"
 
-Dialog::Dialog(sf::RenderWindow* _window, Data* _data) 
+Dialog::Dialog(sf::RenderWindow* _window, Data* _data, UIManager* _uiManager)
 {
 	window = _window;
 	data = _data;
@@ -8,7 +8,7 @@ Dialog::Dialog(sf::RenderWindow* _window, Data* _data)
 	isActive = false;
 	npc = nullptr;
 
-	uiManager = new UIManager(window);
+	uiManager = _uiManager;
 }
 
 void Dialog::start(Npc* _npc)
