@@ -16,9 +16,10 @@ void Map::Draw(sf::RenderTarget& target, int layerNumber)
 				int init = grid[y][x][layerNumber];
 				if (init != 0)
 				{
-					cell.setTextureRect(sf::IntRect(sf::Vector2i(TEXTURE_SIZE * (init - 1), 0.0f),
+					cell.setTextureRect(sf::IntRect(sf::Vector2i((init - 1) % TEXTURE_COUNT * TEXTURE_SIZE,
+						(init - 1) / TEXTURE_COUNT * TEXTURE_SIZE),
 						sf::Vector2i(TEXTURE_SIZE, TEXTURE_SIZE)));
-					cell.setPosition(TEXTURE_SIZE * (sf::Vector2f(x, y) + sf::Vector2f(0.025, 0.025)));
+					cell.setPosition((float)TEXTURE_SIZE * (sf::Vector2f(x, y) + sf::Vector2f(0.025, 0.025)));
 					target.draw(cell);
 				}
 			}
@@ -34,24 +35,25 @@ void Map::Draw(sf::RenderTarget& target, int layerNumber)
 				int init = grid[y][x][WALL_LAYER];
 				if (init != 0)
 				{
-					cell.setTextureRect(sf::IntRect(sf::Vector2i(TEXTURE_SIZE * (init - 1), 0.0f),
+					cell.setTextureRect(sf::IntRect(sf::Vector2i((init - 1) % TEXTURE_COUNT * TEXTURE_SIZE,
+						(init - 1) / TEXTURE_COUNT * TEXTURE_SIZE),
 						sf::Vector2i(TEXTURE_SIZE, TEXTURE_SIZE)));
-					cell.setPosition(TEXTURE_SIZE * (sf::Vector2f(x, y) + sf::Vector2f(0.025, 0.025)));
+					cell.setPosition((float)TEXTURE_SIZE * (sf::Vector2f(x, y) + sf::Vector2f(0.025, 0.025)));
 					target.draw(cell);
 				}
 			}
 		}
 
-		sf::RectangleShape spShape(sf::Vector2f(TEXTURE_SIZE * 0.95, TEXTURE_SIZE * 0.95));
+		sf::RectangleShape spShape(sf::Vector2f(ICON_SIZE, ICON_SIZE));
 		spShape.setTexture(&Resources::spriteIcon);
 
 		for (auto sp : sprites)
 		{
 			if (sp.spriteDefId != 0)
 			{
-				spShape.setTextureRect(sf::IntRect(sf::Vector2i(TEXTURE_SIZE * (sp.spriteDefId - 1), 0),
-					sf::Vector2i(TEXTURE_SIZE, TEXTURE_SIZE)));
-				spShape.setPosition((sf::Vector2f)((int)TEXTURE_SIZE * (sf::Vector2i)sp.position));
+				spShape.setTextureRect(sf::IntRect(sf::Vector2i(ICON_SIZE * (sp.spriteDefId - 1), 0),
+					sf::Vector2i(ICON_SIZE, ICON_SIZE)));
+				spShape.setPosition((float)TEXTURE_SIZE * sp.position);
 				target.draw(spShape);
 			}
 		}
@@ -83,13 +85,13 @@ void Map::SaveGrid(const std::string& path)
 	out.write(reinterpret_cast<const char*>(&numSp), sizeof(numSp));
 	for (int i = 0; i < sprites.size(); i++)
 		out.write(reinterpret_cast<const char*>(&sprites[i]), sizeof(sprites[i]));
+	out.close();
 }
 
 void Map::LoadGrid(const std::string& path)
 {
 	std::ifstream in{ path, std::ios::in | std::ios::binary };
 	if (!in.is_open()) return;
-
 	int h = 0, w = 0;
 	in.read(reinterpret_cast<char*>(&w), sizeof(w));
 	in.read(reinterpret_cast<char*>(&h), sizeof(h));
@@ -97,7 +99,7 @@ void Map::LoadGrid(const std::string& path)
 	{
 		return;
 	}
-
+	
 	grid = std::vector(h, std::vector(w, std::array<int, LAYER_COUNT>()));
 	blockMap = std::vector(h, std::vector(w, std::set<Sprite*>()));
 	for (int y = 0; y < h; y++)

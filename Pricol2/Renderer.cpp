@@ -106,11 +106,13 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<
 			if (brightnes < 0.11f) brightnes = 0.11f;
 			if (hit.isHitVert) brightnes -= 0.09f;
 			sf::Color colorShade(255 * brightnes, 255 * brightnes, 255 * brightnes);
-
+			
 			walls.append(sf::Vertex(sf::Vector2f((float)i, wallStart), colorShade,
-				sf::Vector2f(textureX + (hit.cell - 1) * TEXTURE_SIZE, 0.0f)));
+				sf::Vector2f(textureX + (hit.cell - 1) % (int)TEXTURE_COUNT * TEXTURE_SIZE, 
+					(hit.cell - 1) / (int)TEXTURE_COUNT * TEXTURE_SIZE)));
 			walls.append(sf::Vertex(sf::Vector2f((float)i, wallEnd + 1), colorShade,
-				sf::Vector2f(textureX + (hit.cell - 1) * TEXTURE_SIZE, TEXTURE_SIZE)));
+				sf::Vector2f(textureX + (hit.cell - 1) % (int)TEXTURE_COUNT * TEXTURE_SIZE, 
+					TEXTURE_SIZE + (hit.cell - 1) / (int)TEXTURE_COUNT * TEXTURE_SIZE)));
 
 			distanceBuffer[i] = hit.perpWallDist;
 		}
@@ -221,9 +223,9 @@ void Renderer::DrawFloor(sf::Vector2f& rayDirLeft, sf::Vector2f& rayDirRight, sf
 		for (int x = 0; x < SCREEN_W; x++)
 		{
 			sf::Vector2i cell{ floor };
-			sf::Vector2i textCoords{ TEXTURE_SIZE * (floor - (sf::Vector2f)cell) };
-			textCoords.x &= (int)TEXTURE_SIZE - 1;
-			textCoords.y &= (int)TEXTURE_SIZE - 1;
+			sf::Vector2i textCoords{ (float)TEXTURE_SIZE * (floor - (sf::Vector2f)cell) };
+			textCoords.x &= TEXTURE_SIZE - 1;
+			textCoords.y &= TEXTURE_SIZE - 1;
 
 			int floorText = map->GetOnGrid(cell.x, cell.y, FLOOR_LAYER);
 			int cellingText = map->GetOnGrid(cell.x, cell.y, CELL_LAYER);
@@ -232,12 +234,14 @@ void Renderer::DrawFloor(sf::Vector2f& rayDirLeft, sf::Vector2f& rayDirRight, sf
 			if (is_floor)
 			{
 				color = floorText == 0 ? sf::Color(0, 0, 0, 0) :
-				Resources::textureImage.getPixel((floorText - 1) * TEXTURE_SIZE + textCoords.x, textCoords.y);
+				Resources::textureImage.getPixel((floorText - 1) % TEXTURE_COUNT * TEXTURE_SIZE + textCoords.x, 
+					(floorText - 1) / TEXTURE_COUNT * TEXTURE_SIZE + textCoords.y);
 			}
 			else
 			{
 				color = cellingText == 0 ? sf::Color(0, 0, 0, 0) :
-				Resources::textureImage.getPixel((cellingText - 1) * TEXTURE_SIZE + textCoords.x, textCoords.y);
+					Resources::textureImage.getPixel((cellingText - 1) % (int)TEXTURE_COUNT * TEXTURE_SIZE + textCoords.x, 
+						(cellingText - 1) / (int)TEXTURE_COUNT * TEXTURE_SIZE + textCoords.y);
 			}
 			screenPixels[(x + y * (int)SCREEN_W) * 4 + 0] = color.r * brightnes;
 			screenPixels[(x + y * (int)SCREEN_W) * 4 + 1] = color.g * brightnes;

@@ -8,7 +8,7 @@
 #include <SFML/Audio.hpp>
 #include "array"
 
-const float TEXTURE_SIZE = 64.0f, GUN_SIZE = 1.0f;
+const int TEXTURE_SIZE = 128, GUN_SIZE = 1, ICON_SIZE = 64, TEXTURE_COUNT = 15;
 constexpr float SCREEN_W = 1280.0f, SCREEN_H = 720.0f;
 
 class Resources

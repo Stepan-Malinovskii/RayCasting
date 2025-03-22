@@ -77,3 +77,35 @@ std::pair<std::wstring, int> Data::getText(int key)
 		}
 	}
 }
+
+PlayerDef Data::getPlayerData()
+{
+	std::ifstream in{ "Texture/playerData.plr", std::ios::in | std::ios::binary };
+	if (!in.is_open()) return{-1, 0};
+	PlayerDef plDef{};
+	in.read(reinterpret_cast<char*>(&plDef), sizeof(plDef));
+	in.close();
+	return plDef;
+}
+
+void Data::savePlayerData(Player* player)
+{
+	std::ofstream out{ "Texture/playerData.plr", std::ios::out | std::ios::binary };
+	if (!out.is_open()) return;
+
+	PlayerDef pldef{ player->sprite->spDef.maxHealpoint,
+		player->sprite->spMap.nowHealPoint };
+
+	out.write(reinterpret_cast<const char*>(&pldef), sizeof(PlayerDef));
+	out.close();
+}
+
+std::vector<GunDef> Data::getGunData()
+{
+
+}
+
+void Data::saveGunData(std::vector<Gun*> guns)
+{
+
+}

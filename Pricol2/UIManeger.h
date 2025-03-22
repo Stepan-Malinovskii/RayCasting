@@ -18,7 +18,7 @@ public:
 	int checkButton(sf::Vector2i mousePos);
 private:
 	void initPlayer();
-
+	std::wstring splitText(std::wstring text, int maxLen, int textSize);
 	sf::RenderWindow* window;
 	std::vector<DialogButton> buttons;
 	int keyButton;

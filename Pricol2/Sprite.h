@@ -61,7 +61,8 @@ struct SpriteDef
 
 struct NpcDef
 {
-	int hisKey;
+	int startKey;
+	int trigerKey;
 };
 
 class Sprite
@@ -93,14 +94,13 @@ public:
 	Npc(SpriteDef spDef, MapSprite spMap, int _id, int hisKey, Dialog* dialog);
 	Npc() = default;
 	void use();
-	int npcReac(int key);
-	int startKey;
+	NpcDef npcDefData;
 private:
 	Dialog* dialog;
 };
 
 static std::vector<NpcDef> npcDef = {
-	{1}};
+	{1, 404}};
 
 constexpr int ENEMY_COUNT = 14;
 static std::vector<SpriteDef> spriteDef = {

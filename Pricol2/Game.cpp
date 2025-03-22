@@ -1,14 +1,15 @@
 #include "Game.h"
 
 Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
-	renderer(_window), window{ _window }, nowMap{ _nowMap }
+	window{ _window }, nowMap{ _nowMap }
 {
 	screenMidlePos = { (int)(SCREEN_W / 2), (int)(SCREEN_H / 2) };
 	data = new Data();
-	gunManager = new GunManager();
+	gunManager = new GunManager(data);
 	uiManager = new UIManager(window);
 	dialogSys = new Dialog(window, data, uiManager);
-	spManager = new SpriteManager(nowMap, dialogSys);
+	spManager = new SpriteManager(nowMap, data, dialogSys);
+	renderer = new Renderer(window);
 	player = spManager->getPlayer();
 	player->kick = gunManager->getGun(0);
 	for (int i = 1; i < 8; i++)
@@ -112,7 +113,6 @@ void Game::resetMap(Map* newMap)
 {
 	nowMap = newMap;
 	player = spManager->resetMap(newMap);
-	player->swapMap(newMap);
 	player->kick = gunManager->getGun(0);
 	for (int i = 1; i < 8; i++)
 	{
@@ -150,7 +150,7 @@ void Game::makeCycle(float deltaTime)
 void Game::render()
 {
 	window->clear();
-	renderer.Draw3DView(player, nowMap, spManager->getSprites());
+	renderer->Draw3DView(player, nowMap, spManager->getSprites());
 	uiManager->drawPlayerUI(player);
 
 	sf::CircleShape aim{};

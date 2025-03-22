@@ -39,8 +39,9 @@ void Weapon::startAnimation(int number)
 	weaponAnimator.setAnimation(number);
 }
 
-Gun::Gun(float _damage, int maxCnt, float _timeBetewen, float maxDist, float _timeBetewenReset) : Weapon(_timeBetewen, maxDist)
+Gun::Gun(int _id, int _damage, int maxCnt, float _timeBetewen, float maxDist, float _timeBetewenReset) : Weapon(_timeBetewen, maxDist)
 {
+	id = _id;
 	nowCount = maxCnt;
 	nowTimeBetwenReset = _timeBetewenReset;
 	timeBetwenReset = _timeBetewenReset;
@@ -48,7 +49,7 @@ Gun::Gun(float _damage, int maxCnt, float _timeBetewen, float maxDist, float _ti
 	damage = _damage;
 }
 
-void Gun::setResetFunc(std::function<void(Gun* gun)> _resetFn) { resetFn = _resetFn; }
+void Gun::setResetFunc(std::function<void()> _resetFn) { resetFn = _resetFn; }
 
 void Gun::setShutFunc(std::function<void(Sprite* sp, float dist)> _shutfn) { shutFn = _shutfn; }
 
@@ -75,7 +76,7 @@ void Gun::resetPatron()
 	{
 		if (nowTimeBetwenReset >= timeBetwenReset && nowCount < maxCountPotron && isCanUsed())
 		{
-			resetFn(this);
+			resetFn();
 			nowTimeBetwenReset = 0;
 			resetSound.play();
 			startAnimation(1);

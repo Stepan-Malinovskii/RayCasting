@@ -29,9 +29,9 @@ public:
 	void fire(int gun = -1);
 	void swapGun(bool flag);
 	void reloadingGun();
-	void swapMap(Map* newMap);
 	void setGun(Gun* gun);
 	float getMoveSpeed();
+	
 	Gun* getGun();
 	sf::Vector2f getDeltaShake();
 

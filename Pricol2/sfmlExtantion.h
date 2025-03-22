@@ -26,6 +26,7 @@ class Button : public BaseButton
 {
 public:
 	Button(sf::Vector2f _pos, sf::Vector2f _size, sf::Texture& _text, sf::IntRect teztureRect);
+	Button(sf::RectangleShape _shape) : BaseButton(_shape.getPosition(), _shape.getSize()) { shape = _shape; };
 	Button() = default;
 	virtual ~Button() = default;
 	void drawButton(sf::RenderTarget& window);
@@ -43,6 +44,13 @@ struct Group
 	}
 
 	Group() = default;
+
+	void setString(std::string data)
+	{
+		text.setString(data);
+		text.setOrigin({ text.getLocalBounds().width / 2, text.getLocalBounds().height / 2 });
+		text.setPosition({ shape.getPosition().x, shape.getPosition().y });
+	}
 
 	void setPosition(sf::Vector2f position)
 	{
@@ -80,6 +88,7 @@ class EdingButton : public Button
 public:
 	EdingButton(sf::Vector2f _pos, sf::Vector2f _size, sf::Texture& _text, sf::IntRect teztureRect) :
 		Button(_pos, _size, _text, teztureRect) { }
+	EdingButton(sf::RectangleShape _shape) : Button(_shape) {}
 	EdingButton() = default;
 
 	void setFunc(std::function<void()> _fn);

@@ -182,8 +182,6 @@ void Player::swapGun(bool flag)
 	nowGun = nowGun < 0 ? nowGun = guns.size() - 1 : nowGun % guns.size();
 }
 
-void Player::swapMap(Map* newMap) { nowMap = newMap; }
-
 Gun* Player::getGun() { return guns[nowGun]; }
 
 sf::Vector2f Player::getDeltaShake() { return shakeDelta; }

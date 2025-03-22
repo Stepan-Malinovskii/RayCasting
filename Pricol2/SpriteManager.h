@@ -6,11 +6,12 @@
 #include "Sprite.h"
 #include "Player.h"
 #include "Map.h"
+#include "DataBase.h"
 
 class SpriteManager
 {
 public:
-	SpriteManager(Map* _nowMap, Dialog* _dialogSys);
+	SpriteManager(Map* _nowMap, Data* _data, Dialog* _dialogSys);
 	~SpriteManager();
 	void saveSprite();
 	void update(float deltaTime);
@@ -23,7 +24,8 @@ private:
 	void deleteSprite(std::shared_ptr<Sprite> sp);
 	void init();
 
-	Dialog* diaologSys;
+	Dialog* dialogSys;
+	Data* data;
 	std::vector<std::shared_ptr<Sprite>> sprites;
 	std::unique_ptr<Player> player;
 	Map* nowMap;

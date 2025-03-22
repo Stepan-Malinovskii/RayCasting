@@ -39,7 +39,7 @@ private:
 	UIManager* uiManager;
 	GunManager* gunManager;
 	Player* player;
-	Renderer renderer;
+	Renderer* renderer;
 	Map* nowMap;
 	sf::RenderWindow* window;
 };

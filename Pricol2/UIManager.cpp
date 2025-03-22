@@ -1,9 +1,43 @@
 #include "UIManeger.h"
+#include <sstream>
+#include <iomanip>
 
 UIManager::UIManager(sf::RenderWindow* _window)
 {
 	window = _window;
 	initPlayer();
+}
+
+std::wstring UIManager::splitText(std::wstring text, int maxLen, int textSize)
+{
+	std::wstring result, word, curLine;
+	std::wistringstream stream(text);
+
+	while (stream >> word)
+	{
+		sf::Text tempText;
+		tempText.setFont(Resources::UIFont);
+		tempText.setCharacterSize(textSize);
+		std::wstring testLine = curLine.empty() ? word : curLine + L" " + word;
+		tempText.setString(testLine);
+
+		if (tempText.getLocalBounds().width > maxLen)
+		{
+			result += curLine + L"\n";
+			curLine = word;
+		}
+		else
+		{
+			curLine = testLine;
+		}
+	}
+
+	if (!curLine.empty())
+	{
+		result += curLine;
+	}
+
+	return result;
 }
 
 void UIManager::initDialog(std::vector<std::pair<std::wstring, int>> variants, 
@@ -19,7 +53,7 @@ void UIManager::initDialog(std::vector<std::pair<std::wstring, int>> variants,
 
 	sf::RectangleShape dataBase{ {DIALOG_W, DIALOG_H / 2.5f} };
 	dataBase.setFillColor(sf::Color(100, 100, 100));
-	sf::Text dataText(variants[0].first, Resources::UIFont, TEXTSIZE - 10);
+	sf::Text dataText(splitText(variants[0].first, DIALOG_W, 40), Resources::UIFont, TEXTSIZE - 10);
 	Group g1(dataBase, dataText);
 	g1.setPosition({ SCREEN_W / 2, g.getPosition().y + g1.getSize().y / 2 + INTERVAL});
 	buttons.push_back(DialogButton(g1));
@@ -71,7 +105,7 @@ void UIManager::drawDialog()
 
 void UIManager::initPlayer()
 {
-	playerUI = [&](Player* player) 
+	playerUI = [&](Player* player)
 		{
 			if (!player->kick->isCanUsed())
 			{
@@ -92,32 +126,51 @@ void UIManager::initPlayer()
 					weaponInfo.setFillColor({ 0, 0, 0 });
 					window->draw(weaponInfo);
 				}
-				float baseX = 300;
-				sf::RectangleShape hpShape({ baseX, 20 });
-				hpShape.setFillColor({ 128, 128, 128 });
-				hpShape.setPosition({ 20, SCREEN_H - 55 });
-				window->draw(hpShape);
-
-				sf::RectangleShape boostShape{ hpShape };
-				boostShape.move({ 0, 30 });
-				window->draw(boostShape);
-
-				hpShape.setFillColor({ 255, 23, 23 });
-				float newXH = baseX * (player->sprite->spMap.nowHealPoint <= 0 ? 0 : 
-					player->sprite->spMap.nowHealPoint) / player->sprite->spDef.maxHealpoint;
-				hpShape.setSize({ newXH, 20 });
-				window->draw(hpShape);
-
-				boostShape.setFillColor({ 44, 148, 15 });
-				float newXB = baseX * player->timerBoost / player->timeBoost;
-				boostShape.setSize({ newXB, 20 });
-				window->draw(boostShape);
-
-				sf::CircleShape aim(1.0f, 16);
-				aim.setFillColor(sf::Color::Black);
-				aim.setPosition({ SCREEN_W / 2, SCREEN_H / 2 });
-				window->draw(aim);
 			}
+			float baseX = 300;
+			sf::RectangleShape baseShape({ baseX, 40 });
+			baseShape.setFillColor({ 128, 128, 128 });
+			sf::Text text("", Resources::UIFont, 30);
+			Group group1({baseShape, text});
+			group1.setPosition({ 170, SCREEN_H - 80 });
+			window->draw(group1.shape);
+
+			Group group2(group1);
+			group2.setPosition({ group2.getPosition().x, group2.getPosition().y + 40});
+			window->draw(group2.shape);
+
+			std::ostringstream oss;
+			oss << std::fixed << std::setprecision(2) << player->sprite->spMap.nowHealPoint;
+			oss << " / ";
+			oss << std::fixed << std::setprecision(2) << player->sprite->spDef.maxHealpoint;
+			std::string str = oss.str();
+			
+			group1.shape.setFillColor({ 255, 23, 23 });
+			float newXH = baseX * (player->sprite->spMap.nowHealPoint <= 0 ? 0 :
+				player->sprite->spMap.nowHealPoint) / player->sprite->spDef.maxHealpoint;
+			group1.shape.setSize({ newXH, 40 });
+			group1.setString(str);
+			window->draw(group1.shape);
+			window->draw(group1.text);
+
+			oss.str("");
+			oss.clear();
+			oss << std::fixed << std::setprecision(2) << player->timerBoost;
+			oss << " / ";
+			oss << std::fixed << std::setprecision(2) << player->timeBoost;
+			str = oss.str();
+
+			group2.shape.setFillColor({ 44, 148, 15 });
+			float newXB = baseX * player->timerBoost / player->timeBoost;
+			group2.shape.setSize({ newXB, 40 });
+			group2.setString(str);
+			window->draw(group2.shape);
+			window->draw(group2.text);
+
+			sf::CircleShape aim(1.0f, 16);
+			aim.setFillColor(sf::Color::Black);
+			aim.setPosition({ SCREEN_W / 2, SCREEN_H / 2 });
+			window->draw(aim);
 		};
 }
 

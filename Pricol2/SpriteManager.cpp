@@ -1,8 +1,9 @@
 #include "SpriteManager.h"
 
-SpriteManager::SpriteManager(Map* _nowMap, Dialog* _dialogSys) : nowMap{ _nowMap }
+SpriteManager::SpriteManager(Map* _nowMap, Data* _data, Dialog* _dialogSys) : nowMap{ _nowMap }
 {
-	diaologSys = _dialogSys;
+	dialogSys = _dialogSys;
+	data = _data;
 	id = 0;
 	init();
 }
@@ -15,26 +16,29 @@ void SpriteManager::init()
 	for (auto sp : nowMap->getMapSprites())
 	{
 		auto def = spriteDef[sp.spriteDefId];
-		std::shared_ptr<Sprite> sprite = std::make_shared<Sprite>(def, sp, id);
-		id++;
+		std::shared_ptr<Sprite> sprite;
 
-		if (sp.spriteDefId == 0) {
+
+		if (sp.spriteDefId == 0)
+		{
+			PlayerDef plDef = data->getPlayerData();
+			if (plDef.maxHp != -1)
+			{
+				def.maxHealpoint = plDef.maxHp;
+				sp.nowHealPoint = plDef.nowHp;
+			}
+			sprite = std::make_shared<Sprite>(def, sp, id);
 			player = std::make_unique<Player>(Player(sprite.get(), nowMap));
+
 		}
 		else
 		{
-			
-			/*sprite->thinker = std::make_shared<ThinkerLogic>([](Sprite& sprite1, Map& map, float deltaT) {
-				sprite1.angle += 100 * deltaT;
-				});*/
+			sprite = std::make_shared<Sprite>(def, sp, id);
 		}
 
 		sprites.push_back(sprite);
+		id++;
 	}
-
-	/*sprites[2]->thinker = std::make_shared<ThinkerLogic>([](Sprite& sprite, Map& map, float deltaT) {
-		sprite.move(map, sf::Vector2f(0, 0.7f) * deltaT);
-		});*/
 
 	if (!player) {
 		auto def = spriteDef[0];
@@ -53,7 +57,7 @@ void SpriteManager::init()
 Npc SpriteManager::getNpc(MapSprite* mSp)
 {
 	auto def = spriteDef[mSp->spriteDefId];
-	Npc npc(def, *mSp, id, npcDef[ENEMY_COUNT - mSp->spriteDefId].hisKey, diaologSys);
+	Npc npc(def, *mSp, id, ENEMY_COUNT - mSp->spriteDefId, dialogSys);
 	id++;
 	return npc;
 }
@@ -106,6 +110,7 @@ void SpriteManager::deleteSprite(std::shared_ptr<Sprite> sp)
 
 void SpriteManager::saveSprite()
 {
+	data->savePlayerData(player.get());
 	nowMap->writeMapSprite(sprites);
 }
 

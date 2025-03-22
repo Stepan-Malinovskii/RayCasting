@@ -72,7 +72,7 @@ void Resources::initResources()
 {
 	if (!textureImage.loadFromFile("Texture/wall_texture.png")) throw "TextureLoadError!";
 	if (!dialogBackround.loadFromFile("Texture/dialogBackground.png")) throw "TextureLoadError!";
-	if (!textures.loadFromImage(Resources::textureImage)) throw "TextureLoadError!";
+	if (!textures.loadFromFile("Texture/wall_texture.png")) throw "TextureLoadError!";
 	if (!skyTextures.loadFromFile("Texture/sky_texture.png")) throw "TextureLoadError!";
 	if (!spriteIcon.loadFromFile("Texture/enemysIcon.png")) throw "TextureLoadError!";
 	loadFor("Texture/enemy", &spritesTextures);

@@ -2,17 +2,19 @@
 
 #include "Resources.h"
 #include "Weapon.h"
+#include "DataBase.h"
 
 class GunManager
 {
 public:
-	GunManager();
+	GunManager(Data* data);
 	~GunManager();
 	Gun* getGun(int index);
 private:
-	void init();
 	std::vector<Gun*> guns;
+	Data* data;
 };
+
 
 #endif // !GMAG
 

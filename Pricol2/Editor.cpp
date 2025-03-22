@@ -17,11 +17,16 @@ void Editor::init(sf::RenderWindow& window, sf::RenderWindow& editorWindow, Map*
 void Editor::initButton()
 {
 	EdingButton b;
-	int x = 0, y = 0;
-	for (; x < Resources::textures.getSize().x / TEXTURE_SIZE; x++, y++)
+	sf::RectangleShape shape;
+	shape.setTexture(&Resources::textures);
+	shape.setSize({ TEXTURE_SIZE, TEXTURE_SIZE});
+	shape.setScale({ 0.5f ,0.5f });
+	int x = 0, y = 0, h = 0;
+	for (; x < Resources::textures.getSize().x / TEXTURE_SIZE * 4; x++, y++)
 	{
-		b = EdingButton(TEXTURE_SIZE * (sf::Vector2f(x % COUNT_ROW_TEXT, y / COUNT_ROW_TEXT) + sf::Vector2f(0.025f, 0.025f)),
-			{ TEXTURE_SIZE * 0.95, TEXTURE_SIZE * 0.95, }, Resources::textures, { {(int)(x * TEXTURE_SIZE), 0}, {(int)TEXTURE_SIZE, (int)TEXTURE_SIZE} });
+		shape.setPosition({ (x % COUNT_ROW_TEXT ) * (float)ICON_SIZE, ( y / COUNT_ROW_TEXT) * (float)ICON_SIZE });
+		shape.setTextureRect({ {(int)(x % TEXTURE_COUNT * TEXTURE_SIZE), (int)(x / TEXTURE_COUNT * TEXTURE_SIZE )},{TEXTURE_SIZE, TEXTURE_SIZE} });
+		b = EdingButton(shape);
 		b.setFunc([=]() {
 			nowValue = x + 1;
 			});
@@ -32,8 +37,8 @@ void Editor::initButton()
 	y += (y / COUNT_ROW_TEXT + 1) * COUNT_ROW_TEXT - y;
 	for (x = 0; x < spriteDef.size() - 1; x++, y++)
 	{
-		b = EdingButton(TEXTURE_SIZE * (sf::Vector2f(x % COUNT_ROW_TEXT, y / COUNT_ROW_TEXT) + sf::Vector2f(0.025f, 0.025f)),
-			{ TEXTURE_SIZE, TEXTURE_SIZE }, Resources::spriteIcon, { { (int)(TEXTURE_SIZE * x), 0}, {(int)TEXTURE_SIZE, (int)TEXTURE_SIZE} });
+		b = EdingButton((float)ICON_SIZE * (sf::Vector2f(x % COUNT_ROW_TEXT, y / COUNT_ROW_TEXT) + sf::Vector2f(0.025f, 0.025f)),
+			{ ICON_SIZE, ICON_SIZE }, Resources::spriteIcon, { { ICON_SIZE * x, 0}, {ICON_SIZE, ICON_SIZE} });
 		b.setFunc([=]() {
 			nowSpriteDef = spriteDef[x + 1];
 			});
@@ -182,7 +187,6 @@ void Editor::editorWindowStateLeftClick(sf::RenderWindow& editorWindow)
 		{
 			if (b->isClicked(worldPos))
 			{
-				int a;
 				b->update();
 			}
 		}

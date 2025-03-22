@@ -16,7 +16,7 @@ void Dialog::start(Npc* _npc)
 	window->setMouseCursorVisible(true);
 	isActive = true;
 	npc = _npc;
-	nowKey = _npc->startKey;
+	nowKey = _npc->npcDefData.startKey;
 	check();
 }
 
@@ -30,14 +30,17 @@ void Dialog::stop()
 
 void Dialog::check()
 {
-	nowKey = npc->npcReac(nowKey);
 	if (nowKey == 0)
 	{
 		stop();
-		return;
 	}
 	else
 	{
+		if (npc->npcDefData.trigerKey == nowKey)
+		{
+			stop();
+			return;
+		}
 		init();
 	}
 }
