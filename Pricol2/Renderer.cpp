@@ -148,6 +148,12 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, P
 		float brightnes = 1 - spDist / BRIGHTNESTDIST;
 		if (brightnes < 0.1f) brightnes = 0.1f;
 		sf::Color colorShade(255 * brightnes, 255 * brightnes, 255 * brightnes);
+		if (sp->isDamages) 
+		{ 
+			if (colorShade.r * 1.5f > 255) colorShade.r = 255;
+			colorShade.g /= 2;
+			colorShade.b /= 2;
+		}
 
 		//transform sprite with the inverse camera matrix
 		// [ planeX   dirX ] -1    [x]                                     [ dirY      -dirX ]   [x]

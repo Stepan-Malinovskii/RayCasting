@@ -87,6 +87,7 @@ void SpriteManager::update(float deltaTime)
 	{
 		if (sp.get() != nullptr)
 		{
+			sp->update(deltaTime);
 			if (sp->spMap.nowHealPoint <= 0.0f)
 			{
 				deleteSprite(sp);

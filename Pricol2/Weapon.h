@@ -13,6 +13,7 @@
 #include "Resources.h"
 #include "Sprite.h"
 #include "Animation.h"
+#include "Randomizer.h"
 
 class Weapon
 {
@@ -31,6 +32,7 @@ public:
 	virtual void startAnimation(int number);
 
 	virtual void ussing(Sprite* sp, float dist) = 0;
+
 	float maxDist;
 private:
 	Animator<sf::Texture*> weaponAnimator;
@@ -51,30 +53,30 @@ struct GunDef
 class Gun : public Weapon
 {
 public:
-	Gun(int _id, int _damage, int maxCnt, int nowCnt, float _timeBetewen, float maxDist, float _timeBetewenReset);
-	Gun(GunDef def);
+	Gun(GunDef def, bool isReset);
 	Gun() = default;
 
-	void setSound(sf::SoundBuffer* shut = nullptr, sf::SoundBuffer* reset = nullptr, sf::SoundBuffer* cantShut = nullptr);
-
-	void setResetFunc(std::function<void()> _resetFn);
-
-	void setShutFunc(std::function<void(Sprite* sp, float dist)> _shutfn);
+	void setSound(sf::SoundBuffer* shut = nullptr, 
+				  sf::SoundBuffer* reset = nullptr, 
+		          sf::SoundBuffer* cantShut = nullptr);
 
 	void update(float dt) override;
+
+	void updateRad(bool isRun, float deltaTime);
 
 	void resetPatron();
 
 	void ussing(Sprite* sp, float dist) override;
 
+	bool isReset;
 	int nowCount;
-	int maxCountPotron;
+	int maxCount;
+	float nowRad;
+	float maxRad;
+private:
 	int damage;
 	int id;
-	std::function<void()> resetFn;
-private:
 	float timeBetwenReset, nowTimeBetwenReset;
-	std::function<void(Sprite* sp, float dist)> shutFn;
 	sf::Sound shutSound;
 	sf::Sound resetSound;
 	sf::Sound cantShutSound;

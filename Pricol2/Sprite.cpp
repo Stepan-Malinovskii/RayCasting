@@ -4,8 +4,9 @@
 
 Sprite::Sprite(sf::Vector2f pos, float _size, int indText, int _id, float HP, float _angle, bool isDirect, SpriteType _type)
 	: spMap{indText + 1, pos, _angle, HP}, 
-	spDef{ L"", _type, _size, HP, indText, isDirect }, id{ _id } 
+	spDef{ L"", _type, _size, HP, indText, isDirect }, id{ _id }, isDamages{false}
 {
+	timeAtecked = 0;
 	if (spDef.texture != -1)
 	{
 		texture = &Resources::spritesTextures[spDef.texture];
@@ -14,8 +15,9 @@ Sprite::Sprite(sf::Vector2f pos, float _size, int indText, int _id, float HP, fl
 }
 
 Sprite::Sprite(SpriteDef _spDef, MapSprite _spMap, int _id) : 
-	spDef{ _spDef }, spMap{ _spMap }, id { _id } 
+	spDef{ _spDef }, spMap{ _spMap }, id { _id }, isDamages{ false }
 {
+	timeAtecked = 0;
 	if (spDef.texture != -1)
 	{
 		texture = &Resources::spritesTextures[spDef.texture];
@@ -39,6 +41,24 @@ void Sprite::move(Map* map, sf::Vector2f move)
 	}
 
 	map->setupBlockmap(this);
+}
+
+void Sprite::update(float deltaTime)
+{
+	if (!isDamages) return;
+	if (timeAtecked >= 0.5f)
+	{
+		timeAtecked = 0;
+		isDamages = false;
+		return;
+	}
+	timeAtecked += deltaTime;
+}
+
+void Sprite::takeDamage(float damage)
+{
+	spMap.nowHealPoint -= damage;
+	isDamages = true;
 }
 
 bool Sprite::checkCollision(const Map& map, sf::Vector2f newPos, bool xAxis)

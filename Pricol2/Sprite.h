@@ -74,17 +74,21 @@ public:
 	virtual ~Sprite() = default;
 
 	void move(Map* map, sf::Vector2f move);
+	void takeDamage(float damage);
+	void update(float deltaTime);
 	int id;
 	SpriteDef spDef;
 	MapSprite spMap;
 
 	sf::Texture* texture;
+	bool isDamages;
 	int textSize;
 
 	std::shared_ptr<Thinker> thinker;
 	std::set<std::tuple<int, int>> blockmap_coords;
 
 private:
+	float timeAtecked;
 	bool checkCollision(const Map& map, sf::Vector2f newPos, bool xAxis);
 };
 

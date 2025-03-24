@@ -116,9 +116,9 @@ void UIManager::initPlayer()
 				auto gun = player->getGun();
 				gun->drawWeapon(window, player->getDeltaShake());
 
-				if (gun->resetFn != nullptr)
+				if (gun->isReset)
 				{
-					sf::Text weaponInfo(std::to_string(gun->nowCount) + " / " + std::to_string(gun->maxCountPotron), Resources::UIFont, 50);
+					sf::Text weaponInfo(std::to_string(gun->nowCount) + " / " + std::to_string(gun->maxCount), Resources::UIFont, 50);
 					auto b = weaponInfo.getLocalBounds();
 					weaponInfo.setOrigin({ b.width / 2, b.height / 2 });
 					weaponInfo.setPosition({ SCREEN_W / 2, SCREEN_H / 2 - weaponInfo.getCharacterSize() / 4 });
@@ -167,8 +167,11 @@ void UIManager::initPlayer()
 			window->draw(group2.shape);
 			window->draw(group2.text);
 
-			sf::CircleShape aim(1.0f, 16);
-			aim.setFillColor(sf::Color::Black);
+			sf::CircleShape aim(player->getGun()->nowRad, 16);
+			aim.setOrigin({ aim.getRadius(), aim.getRadius()});
+			aim.setFillColor(sf::Color(0,0,0,0));
+			aim.setOutlineColor(sf::Color::Black);
+			aim.setOutlineThickness(1.5f);
 			aim.setPosition({ SCREEN_W / 2, SCREEN_H / 2 });
 			window->draw(aim);
 		};

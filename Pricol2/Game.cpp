@@ -149,16 +149,6 @@ void Game::makeCycle(float deltaTime)
 
 void Game::render()
 {
-	window->clear();
 	renderer->Draw3DView(player, nowMap, spManager->getSprites());
 	uiManager->drawPlayerUI(player);
-
-	sf::CircleShape aim{};
-	aim.setRadius(2.5f);
-	aim.setOrigin({ aim.getRadius(),aim.getRadius() });
-	aim.setFillColor(sf::Color::Blue);
-	aim.setPointCount(16);
-	aim.setPosition((sf::Vector2f)screenMidlePos);
-
-	window->draw(aim);
 }

@@ -70,6 +70,7 @@ void Player::checkBoost(bool isPressed, float deltaTime)
 
 void Player::move(sf::Vector2f deltaPos, float deltaTime)
 {
+	guns[nowGun]->updateRad(deltaPos != sf::Vector2f(), deltaTime);
 	sprite->move(nowMap, deltaPos * deltaTime * nowSpeed);
 	shakeCamera(deltaTime, deltaPos != sf::Vector2f());
 }

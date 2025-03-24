@@ -39,30 +39,18 @@ void Weapon::startAnimation(int number)
 	weaponAnimator.setAnimation(number);
 }
 
-Gun::Gun(int _id, int _damage, int maxCnt, int nowCnt, float _timeBetewen, float maxDist, float _timeBetewenReset) 
-	: Weapon(_timeBetewen, maxDist)
+Gun::Gun(GunDef def, bool _isReset) : Weapon(def.shutTime, def.maxDist)
 {
-	id = _id;
-	nowCount = nowCnt;
-	nowTimeBetwenReset = _timeBetewenReset;
-	timeBetwenReset = _timeBetewenReset;
-	maxCountPotron = maxCnt;
-	damage = _damage;
-}
-
-Gun::Gun(GunDef def) : Weapon(def.shutTime, def.maxDist)
-{
+	nowRad = 1;
+	maxRad = 30;
 	id = def.id;
 	damage = def.damage;
-	maxCountPotron = def.maxCount;
+	maxCount = def.maxCount;
 	nowCount = def.nowCount;
 	nowTimeBetwenReset = def.resetTime;
 	timeBetwenReset = def.resetTime;
+	isReset = _isReset;
 }
-
-void Gun::setResetFunc(std::function<void()> _resetFn) { resetFn = _resetFn; }
-
-void Gun::setShutFunc(std::function<void(Sprite* sp, float dist)> _shutfn) { shutFn = _shutfn; }
 
 void Gun::setSound(sf::SoundBuffer* shut, sf::SoundBuffer* reset, sf::SoundBuffer* cantShut)
 {
@@ -74,20 +62,36 @@ void Gun::setSound(sf::SoundBuffer* shut, sf::SoundBuffer* reset, sf::SoundBuffe
 void Gun::update(float dt)
 {
 	Weapon::update(dt);
-	if (resetFn != NULL)
+	if (isReset)
 	{
 		if (nowTimeBetwenReset >= timeBetwenReset) return;
 		nowTimeBetwenReset += dt;
 	}
 }
 
+void Gun::updateRad(bool isRun, float deltaTime)
+{
+	if (isRun)
+	{
+		if (nowRad < maxRad)
+			nowRad += maxRad * deltaTime * 2;
+		else nowRad = maxRad;
+	}
+	else
+	{
+		if (nowRad > 1)
+			nowRad -= maxRad * deltaTime * 2;
+		else nowRad = 1;
+	}
+}
+
 void Gun::resetPatron()
 {
-	if (resetFn != nullptr)
+	if (isReset)
 	{
-		if (nowTimeBetwenReset >= timeBetwenReset && nowCount < maxCountPotron && isCanUsed())
+		if (nowTimeBetwenReset >= timeBetwenReset && nowCount < maxCount && isCanUsed())
 		{
-			resetFn();
+			nowCount = maxCount;
 			nowTimeBetwenReset = 0;
 			resetSound.play();
 			startAnimation(1);
@@ -97,14 +101,18 @@ void Gun::resetPatron()
 
 void Gun::ussing(Sprite* sp, float dist) 
 {
-	if (nowCount == 0 && resetFn != nullptr)
+	if (nowCount == 0 && isReset)
 	{
 		cantShutSound.play();
 		return;
 	}
-	else if (isCanUsed() && (nowTimeBetwenReset >= timeBetwenReset || resetFn == nullptr))
+	else if (isCanUsed() && (nowTimeBetwenReset >= timeBetwenReset || isReset))
 	{
-		if (sp != nullptr) shutFn(sp, dist);
+		if (sp != nullptr)
+		{
+			if (Random::bitRandom() > (nowRad - 0.1f) / maxRad || nowRad == 1)
+			sp->takeDamage(damage * (dist < maxDist ? 1 : 0));
+		}
 		nowCount--;
 		shutSound.play();
 		startAnimation(0);

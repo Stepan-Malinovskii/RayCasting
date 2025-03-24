@@ -89,22 +89,23 @@ int main()
 			}
 		}
 
+		window.clear();
+
 		if (state == State::Game)
 		{
 			game.makeCycle(deltaTime);
-			window.display();
 		}
 		else
 		{	
 			editorWindow.clear();
-			window.clear();
+
 			map->Draw(window, editor.drawerLayer());
 			editor.drawEditor(editorWindow);
 			
 			editorWindow.display();
-			window.display();
 		}
 
+		window.display();
 		window.setTitle("Game " + std::to_string(1.0f / deltaTime));
 		deltaTime = gameClock.getElapsedTime().asSeconds();
 		gameClock.restart();

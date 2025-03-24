@@ -148,6 +148,7 @@
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Pricol2.cpp" />
+    <ClCompile Include="Randomizer.cpp" />
     <ClCompile Include="Raycast.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Resources.cpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="GunManager.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Randomizer.h" />
     <ClInclude Include="Raycast.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Resources.h" />
