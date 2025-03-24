@@ -1,6 +1,4 @@
 #ifndef GMAG
-
-#include "Resources.h"
 #include "Weapon.h"
 #include "DataBase.h"
 
@@ -11,10 +9,11 @@ public:
 	~GunManager();
 	Gun* getGun(int index);
 private:
-	std::vector<Gun*> guns;
+	std::vector<std::unique_ptr<Gun>> guns;
 	Data* data;
 };
 
+extern std::vector<GunDef> gunsDef;
 
 #endif // !GMAG
 

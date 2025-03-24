@@ -17,8 +17,13 @@ public:
 
 	Animation(std::vector<Keyframe> keyframess = {}) : keyframes{ keyframess },
 		duration(keyframes.empty() ? 0.0f : keyframes[keyframes.size() - 1].time) {}
-
 	float getDuration() const { return duration; }
+
+	void setKeyframe(float time, T value)
+	{
+		keyframes.push_back(Keyframe{ time, value });
+		duration = keyframes[keyframes.size() - 1].time;
+	}
 
 	T get(float time) const
 	{

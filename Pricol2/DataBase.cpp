@@ -99,13 +99,3 @@ void Data::savePlayerData(Player* player)
 	out.write(reinterpret_cast<const char*>(&pldef), sizeof(PlayerDef));
 	out.close();
 }
-
-std::vector<GunDef> Data::getGunData()
-{
-
-}
-
-void Data::saveGunData(std::vector<Gun*> guns)
-{
-
-}

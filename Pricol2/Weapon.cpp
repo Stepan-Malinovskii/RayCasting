@@ -39,14 +39,25 @@ void Weapon::startAnimation(int number)
 	weaponAnimator.setAnimation(number);
 }
 
-Gun::Gun(int _id, int _damage, int maxCnt, float _timeBetewen, float maxDist, float _timeBetewenReset) : Weapon(_timeBetewen, maxDist)
+Gun::Gun(int _id, int _damage, int maxCnt, int nowCnt, float _timeBetewen, float maxDist, float _timeBetewenReset) 
+	: Weapon(_timeBetewen, maxDist)
 {
 	id = _id;
-	nowCount = maxCnt;
+	nowCount = nowCnt;
 	nowTimeBetwenReset = _timeBetewenReset;
 	timeBetwenReset = _timeBetewenReset;
 	maxCountPotron = maxCnt;
 	damage = _damage;
+}
+
+Gun::Gun(GunDef def) : Weapon(def.shutTime, def.maxDist)
+{
+	id = def.id;
+	damage = def.damage;
+	maxCountPotron = def.maxCount;
+	nowCount = def.nowCount;
+	nowTimeBetwenReset = def.resetTime;
+	timeBetwenReset = def.resetTime;
 }
 
 void Gun::setResetFunc(std::function<void()> _resetFn) { resetFn = _resetFn; }

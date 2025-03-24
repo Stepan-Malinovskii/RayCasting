@@ -14,14 +14,6 @@ struct PlayerDef
 	int nowHp;
 };
 
-struct GunDef
-{
-	int maxCount;
-	int nowCount;
-	int damage;
-	float maxDist;
-};
-
 class Data
 {
 public:
@@ -29,9 +21,6 @@ public:
 	~Data();
 	PlayerDef getPlayerData();
 	void savePlayerData(Player* player);
-
-	std::vector<GunDef> getGunData();
-	void saveGunData(std::vector<Gun*> guns);
 
 	std::vector<int> getKeys(int key);
 	std::pair<std::wstring, int> getText(int key);

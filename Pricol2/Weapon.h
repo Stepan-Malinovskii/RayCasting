@@ -37,10 +37,22 @@ private:
 	float timeBetwen, nowTime;
 };
 
+struct GunDef
+{
+	int id;
+	int damage;
+	int maxCount;
+	int nowCount;
+	float shutTime;
+	float maxDist;
+	float resetTime;
+};
+
 class Gun : public Weapon
 {
 public:
-	Gun(int _id, int _damage, int maxCnt, float _timeBetewen, float maxDist, float _timeBetewenReset);
+	Gun(int _id, int _damage, int maxCnt, int nowCnt, float _timeBetewen, float maxDist, float _timeBetewenReset);
+	Gun(GunDef def);
 	Gun() = default;
 
 	void setSound(sf::SoundBuffer* shut = nullptr, sf::SoundBuffer* reset = nullptr, sf::SoundBuffer* cantShut = nullptr);

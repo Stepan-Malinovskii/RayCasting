@@ -71,7 +71,6 @@ void Dialog::update()
 			{
 				nowKey = key;
 				check();
-				return;
 			}
 		}
 		if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
