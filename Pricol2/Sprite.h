@@ -12,6 +12,7 @@
 #include <iostream>
 
 constexpr float PI = 3.14159265359f;
+constexpr int ENEMY_COUNT = 14;
 
 class Map;
 class Sprite;
@@ -106,7 +107,6 @@ private:
 static std::vector<NpcDef> npcDef = {
 	{1, 404}};
 
-constexpr int ENEMY_COUNT = 14;
 static std::vector<SpriteDef> spriteDef = {
 	{ L"player", SpriteType::Thing, 0.3f, 100.0f, -1, false},
 	{ L"shar", SpriteType::Enemy, 1.0f, 100.f, 0, true },

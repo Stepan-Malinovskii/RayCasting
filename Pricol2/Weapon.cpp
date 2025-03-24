@@ -39,6 +39,12 @@ void Weapon::startAnimation(int number)
 	weaponAnimator.setAnimation(number);
 }
 
+Improve::Improve(ImproveType _type, std::wstring _name) : type{ _type }, name{ _name } {}
+
+void Improve::setGetFunc(std::function<void(Gun* gun)> _setEffect) { getImprove = _setEffect; }
+
+void Improve::setDelFunc(std::function<void(Gun* gun)> _delEffect) { deleteImprove = _delEffect; }
+
 Gun::Gun(GunDef def, bool _isReset) : Weapon(def.shutTime, def.maxDist)
 {
 	nowRad = 1;
@@ -106,15 +112,33 @@ void Gun::ussing(Sprite* sp, float dist)
 		cantShutSound.play();
 		return;
 	}
-	else if (isCanUsed() && (nowTimeBetwenReset >= timeBetwenReset || isReset))
+	else if (isCanUsed() && (nowTimeBetwenReset >= timeBetwenReset || !isReset))
 	{
 		if (sp != nullptr)
 		{
-			if (Random::bitRandom() > (nowRad - 0.1f) / maxRad || nowRad == 1)
+			if (Random::bitRandom() > (nowRad - 0.1f) / maxRad - 0.1f || nowRad == 1)
 			sp->takeDamage(damage * (dist < maxDist ? 1 : 0));
 		}
 		nowCount--;
 		shutSound.play();
 		startAnimation(0);
 	}
+}
+
+bool Gun::trySetImprove(Improve* improve)
+{
+	if (improvement[improve->type] != nullptr) return false;
+	improvement[improve->type] = improve;
+	improve->getImprove(this);
+	return true;
+}
+
+Improve* Gun::deleteImprove(ImproveType type)
+{
+	auto temp = improvement.extract(type);
+	if (!temp.empty())
+	{
+		temp.mapped()->deleteImprove(this);
+	}
+	return temp.mapped();
 }

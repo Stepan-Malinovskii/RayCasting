@@ -1,9 +1,15 @@
 #include "GunManager.h"
 
-GunManager::GunManager(Data* _data) 
+GunManager::GunManager(Data* _data)
 {
 	data = _data;
-	Gun gun;
+
+	improvements.push_back(std::make_unique<Improve>(ImproveType::Magazin, L"Малый магазин"));
+	improvements.back()->setGetFunc([=](Gun* gun) {gun->maxCount = (int)(gun->maxCount * 1.4f);
+	gun->nowCount = gun->maxCount;});
+	improvements.back()->setDelFunc([=](Gun* gun) {gun->maxCount = (int)(gun->maxCount / 1.4f);
+	gun->nowCount = std::min(gun->maxCount, gun->nowCount);});
+
 	for (int i = 0; i < gunsDef.size(); i++)
 	{
 		Animation<sf::Texture*> shutAnim{};
@@ -28,8 +34,9 @@ GunManager::GunManager(Data* _data)
 		guns.push_back(std::make_unique<Gun>(def, i > 1));
 		guns.back()->setAnimator(animr);
 		guns.back()->setSound(&Resources::gunsShutSound[i],
-							  &Resources::gunsResetSound[i], 
-							  &Resources::gunCantShoutSound);
+			&Resources::gunsResetSound[i],
+			&Resources::gunCantShoutSound);
+		guns.back()->trySetImprove(improvements[0].get());
 	}
 }
 

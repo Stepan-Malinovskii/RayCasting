@@ -59,6 +59,7 @@ void Sprite::takeDamage(float damage)
 {
 	spMap.nowHealPoint -= damage;
 	isDamages = true;
+	timeAtecked = 0;
 }
 
 bool Sprite::checkCollision(const Map& map, sf::Vector2f newPos, bool xAxis)

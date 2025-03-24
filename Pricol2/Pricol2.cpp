@@ -12,7 +12,7 @@
 enum class State{Editor, Game};
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H),"Game");
+	sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H), "Game");
 	window.setFramerateLimit(900);
 	window.setMouseCursorVisible(false);
 

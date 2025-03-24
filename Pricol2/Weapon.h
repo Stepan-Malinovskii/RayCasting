@@ -15,6 +15,37 @@
 #include "Animation.h"
 #include "Randomizer.h"
 
+class Gun;
+
+struct GunDef
+{
+	int id;
+	int damage;
+	int maxCount;
+	int nowCount;
+	float shutTime;
+	float maxDist;
+	float resetTime;
+};
+
+enum ImproveType
+{
+	Damage, Spread, Magazin
+};
+
+class Improve
+{
+public:
+	Improve(ImproveType type, std::wstring name);
+	Improve() = default;
+	void setGetFunc(std::function<void(Gun* gun)> setEffect);
+	void setDelFunc(std::function<void(Gun* gun)> delEffect);
+	ImproveType type;
+	std::wstring name;
+	std::function<void(Gun* gun)> getImprove;
+	std::function<void(Gun* gun)> deleteImprove;
+};
+
 class Weapon
 {
 public:
@@ -39,17 +70,6 @@ private:
 	float timeBetwen, nowTime;
 };
 
-struct GunDef
-{
-	int id;
-	int damage;
-	int maxCount;
-	int nowCount;
-	float shutTime;
-	float maxDist;
-	float resetTime;
-};
-
 class Gun : public Weapon
 {
 public:
@@ -59,6 +79,10 @@ public:
 	void setSound(sf::SoundBuffer* shut = nullptr, 
 				  sf::SoundBuffer* reset = nullptr, 
 		          sf::SoundBuffer* cantShut = nullptr);
+
+	bool trySetImprove(Improve* improve);
+
+	Improve* deleteImprove(ImproveType type);
 
 	void update(float dt) override;
 
@@ -77,10 +101,10 @@ private:
 	int damage;
 	int id;
 	float timeBetwenReset, nowTimeBetwenReset;
+	std::map<ImproveType, Improve*> improvement;
 	sf::Sound shutSound;
 	sf::Sound resetSound;
 	sf::Sound cantShutSound;
 };
 
 #endif // !WEAPON
-

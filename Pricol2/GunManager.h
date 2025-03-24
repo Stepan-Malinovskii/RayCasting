@@ -9,6 +9,7 @@ public:
 	~GunManager();
 	Gun* getGun(int index);
 private:
+	std::vector<std::unique_ptr<Improve>> improvements;
 	std::vector<std::unique_ptr<Gun>> guns;
 	Data* data;
 };
