@@ -25,5 +25,17 @@ static std::vector<GunDef> gunsDef{
 	{7, 15, 100, 100, 0.1f, 10.0f, 4.0f},
 };
 
+static std::vector<ImproveDef> improveDefs{
+	{ImproveType::Magazin, L"Малый магазин", 1.2f},
+	{ImproveType::Magazin, L"Средний магазин", 1.3f},
+	{ImproveType::Magazin, L"Большой магазин", 1.4f},
+	{ImproveType::Spread, L"Лазерный прицел", 1.3f},
+	{ImproveType::Spread, L"Галаграфический прицел", 1.45f},
+	{ImproveType::Spread, L"Оптический прицел", 1.6f},
+	{ImproveType::Damage, L"Пламя гаситель", 1.3f},
+	{ImproveType::Damage, L"Упор", 1.4f},
+	{ImproveType::Damage, L"Приклад", 1.5f}
+};
+
 #endif // !GMAG
 

@@ -33,10 +33,18 @@ enum ImproveType
 	Damage, Spread, Magazin
 };
 
+struct ImproveDef
+{
+	ImproveType type;
+	std::wstring name;
+	float effect;
+};
+
 class Improve
 {
 public:
 	Improve(ImproveType type, std::wstring name);
+	Improve(ImproveDef def);
 	Improve() = default;
 	void setGetFunc(std::function<void(Gun* gun)> setEffect);
 	void setDelFunc(std::function<void(Gun* gun)> delEffect);
@@ -95,10 +103,10 @@ public:
 	bool isReset;
 	int nowCount;
 	int maxCount;
+	int damage;
 	float nowRad;
 	float maxRad;
 private:
-	int damage;
 	int id;
 	float timeBetwenReset, nowTimeBetwenReset;
 	std::map<ImproveType, Improve*> improvement;

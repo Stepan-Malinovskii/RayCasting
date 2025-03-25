@@ -41,6 +41,32 @@ void Weapon::startAnimation(int number)
 
 Improve::Improve(ImproveType _type, std::wstring _name) : type{ _type }, name{ _name } {}
 
+Improve::Improve(ImproveDef def) : Improve(def.type, def.name)
+{
+	if (type == Damage)
+	{
+		setGetFunc([=](Gun* gun) {gun->damage = (int)(gun->damage * def.effect);});
+
+		setDelFunc([=](Gun* gun) {gun->damage = (int)(gun->damage / def.effect);});
+	}
+	else if (type == Spread)
+	{
+		setGetFunc([=](Gun* gun) {gun->maxRad = (int)(gun->maxRad / def.effect);
+		gun->nowRad = std::min(gun->maxRad, gun->nowRad);});
+
+		setDelFunc([=](Gun* gun) {gun->maxRad = (int)(gun->maxRad * def.effect);
+		gun->nowRad = std::min(gun->maxRad, gun->nowRad);});
+	}
+	else
+	{
+		setGetFunc([=](Gun* gun) {gun->maxCount = (int)(gun->maxCount * def.effect);
+		gun->nowCount = gun->maxCount;});
+
+		setDelFunc([=](Gun* gun) {gun->maxCount = (int)(gun->maxCount / def.effect);
+		gun->nowCount = std::min(gun->maxCount, gun->nowCount);});
+	}
+}
+
 void Improve::setGetFunc(std::function<void(Gun* gun)> _setEffect) { getImprove = _setEffect; }
 
 void Improve::setDelFunc(std::function<void(Gun* gun)> _delEffect) { deleteImprove = _delEffect; }
@@ -116,9 +142,10 @@ void Gun::ussing(Sprite* sp, float dist)
 	{
 		if (sp != nullptr)
 		{
-			if (Random::bitRandom() > (nowRad - 0.1f) / maxRad - 0.1f || nowRad == 1)
+			if (Random::bitRandom() > (nowRad - 0.05f) / maxRad - 0.35f || nowRad == 1)
 			sp->takeDamage(damage * (dist < maxDist ? 1 : 0));
 		}
+
 		nowCount--;
 		shutSound.play();
 		startAnimation(0);

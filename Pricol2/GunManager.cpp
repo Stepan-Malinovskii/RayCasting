@@ -4,11 +4,10 @@ GunManager::GunManager(Data* _data)
 {
 	data = _data;
 
-	improvements.push_back(std::make_unique<Improve>(ImproveType::Magazin, L"Малый магазин"));
-	improvements.back()->setGetFunc([=](Gun* gun) {gun->maxCount = (int)(gun->maxCount * 1.4f);
-	gun->nowCount = gun->maxCount;});
-	improvements.back()->setDelFunc([=](Gun* gun) {gun->maxCount = (int)(gun->maxCount / 1.4f);
-	gun->nowCount = std::min(gun->maxCount, gun->nowCount);});
+	for (int i = 0; i < improveDefs.size(); i++)
+	{
+		improvements.push_back(std::make_unique<Improve>(improveDefs[i]));
+	}
 
 	for (int i = 0; i < gunsDef.size(); i++)
 	{
@@ -36,8 +35,9 @@ GunManager::GunManager(Data* _data)
 		guns.back()->setSound(&Resources::gunsShutSound[i],
 			&Resources::gunsResetSound[i],
 			&Resources::gunCantShoutSound);
-		guns.back()->trySetImprove(improvements[0].get());
 	}
+
+	guns[2]->trySetImprove(improvements[4].get());
 }
 
 GunManager::~GunManager() {}
