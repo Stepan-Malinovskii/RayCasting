@@ -34,6 +34,7 @@ void SpriteManager::init()
 		else
 		{
 			sprite = std::make_shared<Sprite>(def, sp, id);
+			//sprite->thinker->ateck(sprite.get(), nowMap);
 		}
 
 		sprites.push_back(sprite);
@@ -79,7 +80,7 @@ void SpriteManager::update(float deltaTime)
 	{
 		if (sp->thinker != nullptr)
 		{
-			sp->thinker->update(*sp, *nowMap, deltaTime);
+			sp->thinker->update(sp.get(), nowMap, deltaTime);
 		}
 	}
 

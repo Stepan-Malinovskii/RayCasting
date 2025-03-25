@@ -18,28 +18,28 @@ class Map;
 class Sprite;
 class Dialog;
 
+enum SpriteType
+{
+	Enemy, PlayerT, NPC
+};
+
 class Thinker
 {
 public:
-	virtual void update(Sprite&, Map&, float) = 0;
+	virtual void update(Sprite*, Map*, float) = 0;
 };
 
 class ThinkerLogic : public Thinker
 {
 public:
-	template<typename Fn> ThinkerLogic(const Fn& _fn) : fn{ _fn } {}
+	template<typename Fn> ThinkerLogic(const Fn& _fn) : moveLogic{ _fn } {}
 
-	void update(Sprite& sprite, Map& map, float deltaT) override
+	void update(Sprite* sprite, Map* map, float deltaT) override
 	{
-		fn(sprite, map, deltaT);
+		moveLogic(sprite, map, deltaT);
 	}
 private:
-	std::function<void(Sprite&, Map&, float)> fn;
-};
-
-enum SpriteType
-{
-	Enemy, Thing, NPC
+	std::function<void(Sprite*, Map*, float)> moveLogic;
 };
 
 struct MapSprite
@@ -69,7 +69,8 @@ struct NpcDef
 class Sprite
 {
 public:
-	Sprite(sf::Vector2f pos, float size, int indText, int id, float HP, float angle = 0.0f, bool isDirect = false, SpriteType type = SpriteType::Thing);
+	Sprite(sf::Vector2f pos, float size, int indText, int id, float HP, 
+		float angle = 0.0f, bool isDirect = false, SpriteType type = SpriteType::PlayerT);
 	Sprite(SpriteDef spDef, MapSprite spMap, int _id);
 	Sprite() = default;
 	virtual ~Sprite() = default;
@@ -108,7 +109,7 @@ static std::vector<NpcDef> npcDef = {
 	{1, 404}};
 
 static std::vector<SpriteDef> spriteDef = {
-	{ L"player", SpriteType::Thing, 0.3f, 100.0f, -1, false},
+	{ L"player", SpriteType::PlayerT, 0.3f, 100.0f, -1, false},
 	{ L"shar", SpriteType::Enemy, 1.0f, 100.f, 0, true },
 	{ L"rog", SpriteType::Enemy, 1.0f, 100.f, 1, true },
 	{ L"gorb", SpriteType::Enemy, 1.0f, 100.f, 2, true },

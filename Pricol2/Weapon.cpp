@@ -39,9 +39,10 @@ void Weapon::startAnimation(int number)
 	weaponAnimator.setAnimation(number);
 }
 
-Improve::Improve(ImproveType _type, std::wstring _name) : type{ _type }, name{ _name } {}
+Improve::Improve(ImproveType _type, std::wstring _name, int _cost) : 
+	type{ _type }, name{ _name }, cost{ _cost } {}
 
-Improve::Improve(ImproveDef def) : Improve(def.type, def.name)
+Improve::Improve(ImproveDef def) : Improve(def.type, def.name, def.cost)
 {
 	if (type == Damage)
 	{
@@ -82,6 +83,7 @@ Gun::Gun(GunDef def, bool _isReset) : Weapon(def.shutTime, def.maxDist)
 	nowTimeBetwenReset = def.resetTime;
 	timeBetwenReset = def.resetTime;
 	isReset = _isReset;
+	cost = def.cost;
 }
 
 void Gun::setSound(sf::SoundBuffer* shut, sf::SoundBuffer* reset, sf::SoundBuffer* cantShut)

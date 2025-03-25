@@ -26,6 +26,7 @@ struct GunDef
 	float shutTime;
 	float maxDist;
 	float resetTime;
+	int cost;
 };
 
 enum ImproveType
@@ -38,18 +39,20 @@ struct ImproveDef
 	ImproveType type;
 	std::wstring name;
 	float effect;
+	int cost;
 };
 
 class Improve
 {
 public:
-	Improve(ImproveType type, std::wstring name);
+	Improve(ImproveType type, std::wstring name, int cost);
 	Improve(ImproveDef def);
 	Improve() = default;
 	void setGetFunc(std::function<void(Gun* gun)> setEffect);
 	void setDelFunc(std::function<void(Gun* gun)> delEffect);
 	ImproveType type;
 	std::wstring name;
+	int cost;
 	std::function<void(Gun* gun)> getImprove;
 	std::function<void(Gun* gun)> deleteImprove;
 };
@@ -106,6 +109,7 @@ public:
 	int damage;
 	float nowRad;
 	float maxRad;
+	int cost;
 private:
 	int id;
 	float timeBetwenReset, nowTimeBetwenReset;
