@@ -5,17 +5,13 @@ Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
 {
 	screenMidlePos = { (int)(SCREEN_W / 2), (int)(SCREEN_H / 2) };
 	data = new Data();
-	gunManager = new GunManager(data);
+	weaponManager = new WeaponManager(data);
 	uiManager = new UIManager(window);
 	dialogSys = new Dialog(window, data, uiManager);
 	spManager = new SpriteManager(nowMap, data, dialogSys);
 	renderer = new Renderer(window);
-	player = spManager->getPlayer();
-	player->kick = gunManager->getGun(0);
-	for (int i = 1; i < 8; i++)
-	{
-		player->setGun(gunManager->getGun(i));
-	}
+
+	initPlayer();
 }
 
 Game::~Game()
@@ -23,13 +19,37 @@ Game::~Game()
 	delete data;
 	delete dialogSys;
 	delete spManager;
-	delete gunManager;
+	delete weaponManager;
 	delete uiManager;
+}
+
+void Game::initPlayer()
+{
+	player = spManager->getPlayer();
+	player->kick = weaponManager->getGun(0);
+
+	for (int i = 1; i < 8; i++)
+	{
+		player->setGun(weaponManager->getGun(i));
+	}
+
+	for (int i = 0; i < itemsDefs.size(); i++)
+	{
+		player->takeItem(weaponManager->getItem(i), 0);
+	}
+
+	PlayerDef plDef = data->getPlayerData();
+	for (auto it : plDef.itemData)
+	{
+		player->takeItem(weaponManager->getItem(it.first), it.second);
+	}
 }
 
 void Game::save()
 {
 	spManager->saveSprite();
+	weaponManager->saveGun();
+	data->savePlayerData(player);
 }
 
 void Game::getInput(sf::Event event, float deltaTime)
@@ -97,6 +117,10 @@ void Game::getInput(float deltaTime)
 				nowNpc.use();
 			}
 		}
+		if (GetAsyncKeyState('H'))
+		{
+			player->heal();
+		}
 
 		sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
 		deltaX = (mousePos.x - screenMidlePos.x) / 2.0f;
@@ -113,10 +137,10 @@ void Game::resetMap(Map* newMap)
 {
 	nowMap = newMap;
 	player = spManager->resetMap(newMap);
-	player->kick = gunManager->getGun(0);
+	player->kick = weaponManager->getGun(0);
 	for (int i = 1; i < 8; i++)
 	{
-		player->setGun(gunManager->getGun(i));
+		player->setGun(weaponManager->getGun(i));
 	}
 }
 

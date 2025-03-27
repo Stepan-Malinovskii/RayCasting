@@ -8,12 +8,6 @@
 #include <codecvt>
 #include <locale>
 
-struct PlayerDef
-{
-	int maxHp;
-	int nowHp;
-};
-
 class Data
 {
 public:
@@ -21,6 +15,9 @@ public:
 	~Data();
 	PlayerDef getPlayerData();
 	void savePlayerData(Player* player);
+
+	std::vector<GunData> getGunData();
+	void saveGunData(std::vector<GunData> guns);
 
 	std::vector<int> getKeys(int key);
 	std::pair<std::wstring, int> getText(int key);

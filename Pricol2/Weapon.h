@@ -16,10 +16,10 @@
 #include "Randomizer.h"
 
 class Gun;
+class Player;
 
 struct GunDef
 {
-	int id;
 	int damage;
 	int maxCount;
 	int nowCount;
@@ -29,6 +29,12 @@ struct GunDef
 	int cost;
 };
 
+struct GunData
+{
+	int nowCount;
+	std::vector<int> improveId;
+};
+
 enum ImproveType
 {
 	Damage, Spread, Magazin
@@ -36,16 +42,46 @@ enum ImproveType
 
 struct ImproveDef
 {
+	int id;
 	ImproveType type;
 	std::wstring name;
 	float effect;
 	int cost;
 };
 
+enum ItemType
+{
+	MaxEnergy, MaxHeal, Heal, Armor
+};
+
+struct ItemsDef
+{
+	int id;
+	ItemType type;
+	std::wstring name;
+	float effect;
+	int maxUSing;
+	int cost;
+};
+
+class Item
+{
+public:
+	Item(ItemsDef def);
+	Item() = default;
+	void setFunc(std::function<void(Player* player)> _useFunc);
+	void useItem(Player* sprite);
+	ItemType type;
+	std::wstring name;
+	int maxUsing;
+	int cost;
+	int id;
+	std::function<void(Player* sprite)> useFunc;
+};
+
 class Improve
 {
 public:
-	Improve(ImproveType type, std::wstring name, int cost);
 	Improve(ImproveDef def);
 	Improve() = default;
 	void setGetFunc(std::function<void(Gun* gun)> setEffect);
@@ -53,6 +89,7 @@ public:
 	ImproveType type;
 	std::wstring name;
 	int cost;
+	int id;
 	std::function<void(Gun* gun)> getImprove;
 	std::function<void(Gun* gun)> deleteImprove;
 };
@@ -99,7 +136,9 @@ public:
 
 	void updateRad(bool isRun, float deltaTime);
 
-	void resetPatron();
+	int resetPatron(int count);
+
+	GunData getGunData();
 
 	void ussing(Sprite* sp, float dist) override;
 
@@ -111,7 +150,6 @@ public:
 	float maxRad;
 	int cost;
 private:
-	int id;
 	float timeBetwenReset, nowTimeBetwenReset;
 	std::map<ImproveType, Improve*> improvement;
 	sf::Sound shutSound;

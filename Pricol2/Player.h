@@ -16,29 +16,50 @@
 
 constexpr float ROTATION_SPEED = 80.0f, MOUSE_TURN_SPEED = 0.08f, VERTICAL_MOUSE_SPEED = 25.0f;
 
+struct PlayerDef
+{
+	float maxHp;
+	float nowHp;
+	float maxEnergy;
+	float nowEnergy;
+	float defence;
+	float maxStrenght;
+	float nowStrenght;
+	int countpantrons;
+	std::vector<std::pair<int, int>> itemData;
+};
+
+
 class Player
 {
 public:
-	Player(Sprite* sprite, Map* _nowMap = nullptr);
+	Player(Sprite* sprite, PlayerDef def, Map* _nowMap);
 
 	void updateMouseData(sf::Vector2f mousePos, float deltaTime);
 	void checkBoost(bool isPressed, float deltaTime);
 	void move(sf::Vector2f deltaPos, float deltaTime);
 	void jump();
 	MapSprite* dialog();
+	void takeDamage(float damage);
 	void fire(int gun = -1);
 	void swapGun(bool flag);
 	void reloadingGun();
 	void setGun(Gun* gun);
 	float getMoveSpeed();
+	void takeItem(Item* item, int cnt = 1);
+	void heal();
 	
 	Gun* getGun();
 	sf::Vector2f getDeltaShake();
+	PlayerDef getPlayerDef();
 
 	Sprite* sprite;
 	Gun* kick;
-	float pitch, posZ, timeBoost, timerBoost;
+	float pitch, posZ, maxEnergy, nowEnergy;
+	float defence, nowStrenght, maxStrenght;
+	int patrons;
 private:
+	std::vector<std::pair<Item*, int>> items;
 	bool isJump, jumpFlag;
 	Map* nowMap;
 	sf::Vector2f shakeDelta;

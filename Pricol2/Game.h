@@ -30,6 +30,7 @@ private:
 	void getInput(float deltaTime);
 	void update(float deltaT);
 	void render();
+	void initPlayer();
 	
 	Data* data;
 	Npc nowNpc;
@@ -37,7 +38,7 @@ private:
 	sf::Vector2i screenMidlePos;
 	SpriteManager* spManager;
 	UIManager* uiManager;
-	GunManager* gunManager;
+	WeaponManager* weaponManager;
 	Player* player;
 	Renderer* renderer;
 	Map* nowMap;

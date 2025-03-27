@@ -3,12 +3,14 @@
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 
-Player::Player(Sprite* _sprite, Map* _nowMap) : sprite{ _sprite }, nowGun{ 0 }
+Player::Player(Sprite* _sprite, PlayerDef def, Map* _nowMap) : 
+	sprite{ _sprite }, nowGun{ 0 }, nowEnergy{ def.nowEnergy }, maxEnergy { def.maxEnergy },
+	defence{ def.defence}, nowStrenght{ def.nowStrenght }, maxStrenght{ def.maxStrenght }, 
+	patrons{ def.countpantrons }, nowMap{ _nowMap }
 {
-	nowMap = _nowMap;
 	pitch = 0, shakeTime = 0, posZ = 0.0f;
 	isJump = false, jumpFlag = false;
-	moveSpeed = 5.0f, boostSpeed = 8.0f, timeBoost = 2.0f, timerBoost = timeBoost, nowSpeed = moveSpeed;
+	moveSpeed = 5.0f, boostSpeed = 8.0f, nowSpeed = moveSpeed;
 }
 
 void Player::setGun(Gun* gun) { guns.push_back(gun); }
@@ -36,13 +38,13 @@ void Player::checkBoost(bool isPressed, float deltaTime)
 
 	if (isPressed)
 	{
-		if (timerBoost > 0 && !boostFlag)
+		if (nowEnergy > 0 && !boostFlag)
 		{
 			used = true;
 			nowSpeed = boostSpeed;
-			timerBoost -= deltaTime * 1.2f;
+			nowEnergy -= deltaTime * 1.2f;
 		}
-		else if (timerBoost < 0)
+		else if (nowEnergy < 0)
 		{
 			boostFlag = true;
 			used = false;
@@ -56,13 +58,13 @@ void Player::checkBoost(bool isPressed, float deltaTime)
 	}
 	if (!used)
 	{
-		if (timerBoost < timeBoost)
+		if (nowEnergy < maxEnergy)
 		{
-			timerBoost += deltaTime;
+			nowEnergy += deltaTime;
 		}
 		else
 		{
-			timerBoost = timeBoost;
+			nowEnergy = maxEnergy;
 			boostFlag = false;
 		}
 	}
@@ -120,8 +122,6 @@ void Player::gravity(float deltaTime)
 			{
 				posZ -= 750 * deltaTime;
 			}
-			
-			
 		}
 	}
 	
@@ -137,7 +137,25 @@ void Player::jump()
 
 void Player::reloadingGun()
 {
-	guns[nowGun]->resetPatron();
+	patrons = guns[nowGun]->resetPatron(patrons);
+}
+
+void Player::takeDamage(float damage)
+{
+	if (nowStrenght > 0)
+	{
+		damage *= (1 - defence);
+		nowStrenght -= damage * defence;
+
+		if (nowStrenght <= 0)
+		{
+			nowStrenght = 0;
+			maxStrenght = 0;
+			defence = 0;
+		}
+	}
+
+	sprite->takeDamage(damage);
 }
 
 void Player::fire(int gun)
@@ -183,8 +201,57 @@ void Player::swapGun(bool flag)
 	nowGun = nowGun < 0 ? nowGun = guns.size() - 1 : nowGun % guns.size();
 }
 
+PlayerDef Player::getPlayerDef()
+{
+	std::vector<std::pair<int, int>> itemData;
+
+	for (auto it : items)
+	{
+		if (it.second != 0)
+		{
+			itemData.push_back({it.first->id, it.second});
+		}
+	}
+
+	return {sprite->spDef.maxHealpoint,
+	sprite->spMap.nowHealPoint,
+	maxEnergy,
+	nowEnergy,
+	defence,
+	maxStrenght,
+	nowStrenght, 
+	patrons, 
+	itemData};
+}
+
 Gun* Player::getGun() { return guns[nowGun]; }
 
 sf::Vector2f Player::getDeltaShake() { return shakeDelta; }
 
 float Player::getMoveSpeed() { return moveSpeed; }
+
+void Player::takeItem(Item* item, int cnt)
+{
+	for (int i = 0; i < items.size(); i++)
+	{
+		if (items[i].first->name == item->name)
+		{
+			items[i].second += cnt;
+			return;
+		}
+	}
+	items.push_back({ item, cnt });
+}
+
+void Player::heal()
+{
+	for (int i = 0; i < items.size(); i++)
+	{
+		if (items[i].first->type == Heal && items[i].second > 0)
+		{
+			items[i].second--;
+			items[i].first->useFunc(this);
+			return;
+		}
+	}
+}

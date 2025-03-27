@@ -122,8 +122,14 @@ void UIManager::initPlayer()
 					auto b = weaponInfo.getLocalBounds();
 					weaponInfo.setOrigin({ b.width / 2, b.height / 2 });
 					weaponInfo.setPosition({ SCREEN_W / 2, SCREEN_H / 2 - weaponInfo.getCharacterSize() / 4 });
-					weaponInfo.setPosition({ SCREEN_W - b.width / 2 - 20, SCREEN_H - 45 });
+					weaponInfo.setPosition({ SCREEN_W - b.width / 2 - 20, SCREEN_H - 100 });
 					weaponInfo.setFillColor({ 0, 0, 0 });
+					window->draw(weaponInfo);
+					weaponInfo.setString(std::to_string(player->patrons));
+					b = weaponInfo.getLocalBounds();
+					weaponInfo.setOrigin({ b.width / 2, b.height / 2 });
+					weaponInfo.setPosition({ SCREEN_W / 2, SCREEN_H / 2 - weaponInfo.getCharacterSize() / 4 });
+					weaponInfo.setPosition({ SCREEN_W - b.width / 2 - 20, SCREEN_H - 45 });
 					window->draw(weaponInfo);
 				}
 			}
@@ -132,12 +138,16 @@ void UIManager::initPlayer()
 			baseShape.setFillColor({ 128, 128, 128 });
 			sf::Text text("", Resources::UIFont, 30);
 			Group group1({baseShape, text});
-			group1.setPosition({ 170, SCREEN_H - 80 });
+			group1.setPosition({ 170, SCREEN_H - 120 });
 			window->draw(group1.shape);
 
 			Group group2(group1);
-			group2.setPosition({ group2.getPosition().x, group2.getPosition().y + 40});
+			group2.setPosition({ group2.getPosition().x, group2.getPosition().y + 40 });
 			window->draw(group2.shape);
+
+			Group group3(group1);
+			group3.setPosition({ group3.getPosition().x, group3.getPosition().y + 80});
+			window->draw(group3.shape);
 
 			std::ostringstream oss;
 			oss << std::fixed << std::setprecision(2) << player->sprite->spMap.nowHealPoint;
@@ -155,17 +165,31 @@ void UIManager::initPlayer()
 
 			oss.str("");
 			oss.clear();
-			oss << std::fixed << std::setprecision(2) << player->timerBoost;
+			oss << std::fixed << std::setprecision(2) << player->nowStrenght;
 			oss << " / ";
-			oss << std::fixed << std::setprecision(2) << player->timeBoost;
+			oss << std::fixed << std::setprecision(2) << player->maxStrenght;
 			str = oss.str();
 
-			group2.shape.setFillColor({ 44, 148, 15 });
-			float newXB = baseX * player->timerBoost / player->timeBoost;
-			group2.shape.setSize({ newXB, 40 });
+			group2.shape.setFillColor({ 70, 130, 80 });
+			float newXD = baseX * player->nowStrenght / player->maxStrenght;
+			group2.shape.setSize({ newXD, 40 });
 			group2.setString(str);
 			window->draw(group2.shape);
 			window->draw(group2.text);
+
+			oss.str("");
+			oss.clear();
+			oss << std::fixed << std::setprecision(2) << player->nowEnergy;
+			oss << " / ";
+			oss << std::fixed << std::setprecision(2) << player->maxEnergy;
+			str = oss.str();
+
+			group3.shape.setFillColor({ 44, 148, 15 });
+			float newXB = baseX * player->nowEnergy / player->maxEnergy;
+			group3.shape.setSize({ newXB, 40 });
+			group3.setString(str);
+			window->draw(group3.shape);
+			window->draw(group3.text);
 
 			sf::CircleShape aim(player->getGun()->nowRad, 16);
 			aim.setOrigin({ aim.getRadius(), aim.getRadius()});

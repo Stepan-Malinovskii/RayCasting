@@ -13,6 +13,7 @@ void SpriteManager::init()
 	id = 0;
 	sprites.clear();
 	player = nullptr;
+	PlayerDef plDef = data->getPlayerData();
 	for (auto sp : nowMap->getMapSprites())
 	{
 		auto def = spriteDef[sp.spriteDefId];
@@ -20,21 +21,17 @@ void SpriteManager::init()
 
 
 		if (sp.spriteDefId == 0)
-		{
-			PlayerDef plDef = data->getPlayerData();
-			if (plDef.maxHp != -1)
-			{
-				def.maxHealpoint = plDef.maxHp;
-				sp.nowHealPoint = plDef.nowHp;
-			}
+		{	
+			def.maxHealpoint = plDef.maxHp;
+			sp.nowHealPoint = plDef.nowHp;
+		
 			sprite = std::make_shared<Sprite>(def, sp, id);
-			player = std::make_unique<Player>(Player(sprite.get(), nowMap));
+			player = std::make_unique<Player>(Player(sprite.get(), plDef, nowMap));
 
 		}
 		else
 		{
 			sprite = std::make_shared<Sprite>(def, sp, id);
-			//sprite->thinker->ateck(sprite.get(), nowMap);
 		}
 
 		sprites.push_back(sprite);
@@ -43,10 +40,10 @@ void SpriteManager::init()
 
 	if (!player) {
 		auto def = spriteDef[0];
-		auto sprite = std::make_shared<Sprite>(sf::Vector2f{ 2,2 }, def.size, def.texture, id, 100);
+		auto sprite = std::make_shared<Sprite>(sf::Vector2f{ 2,2 }, def.size, def.texture, id, plDef.maxHp);
 		id++;
 		sprites.push_back(sprite);
-		player = std::make_unique<Player>(Player(sprite.get(), nowMap));
+		player = std::make_unique<Player>(Player(sprite.get(), plDef, nowMap));
 	}
 
 	for (auto sp : sprites)
@@ -112,7 +109,6 @@ void SpriteManager::deleteSprite(std::shared_ptr<Sprite> sp)
 
 void SpriteManager::saveSprite()
 {
-	data->savePlayerData(player.get());
 	nowMap->writeMapSprite(sprites);
 }
 

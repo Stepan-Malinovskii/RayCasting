@@ -48,7 +48,7 @@ Data::Data()
 			key2text->push_back({ fkey, text, eKey });
 		}
 	}
-	fileIn.close();
+	fileIn1.close();
 }
 
 Data::~Data()
@@ -83,7 +83,28 @@ PlayerDef Data::getPlayerData()
 	std::ifstream in{ "Texture/playerData.plr", std::ios::in | std::ios::binary };
 	if (!in.is_open()) return{-1, 0};
 	PlayerDef plDef{};
-	in.read(reinterpret_cast<char*>(&plDef), sizeof(plDef));
+
+	in.read(reinterpret_cast<char*>(&plDef.maxHp), sizeof(plDef.maxHp));
+	in.read(reinterpret_cast<char*>(&plDef.nowHp), sizeof(plDef.nowHp));
+	in.read(reinterpret_cast<char*>(&plDef.maxEnergy), sizeof(plDef.maxEnergy));
+	in.read(reinterpret_cast<char*>(&plDef.nowEnergy), sizeof(plDef.nowEnergy));
+	in.read(reinterpret_cast<char*>(&plDef.defence), sizeof(plDef.defence));
+	in.read(reinterpret_cast<char*>(&plDef.maxStrenght), sizeof(plDef.maxStrenght));
+	in.read(reinterpret_cast<char*>(&plDef.nowStrenght), sizeof(plDef.nowStrenght));
+	in.read(reinterpret_cast<char*>(&plDef.countpantrons), sizeof(plDef.countpantrons));
+
+	int size;
+	in.read(reinterpret_cast<char*>(&size), sizeof(size));
+	
+	plDef.itemData.reserve(size);
+	for (int i = 0; i < size; i++)
+	{
+		int first, second;
+		in.read(reinterpret_cast<char*>(&first), sizeof(first));
+		in.read(reinterpret_cast<char*>(&second), sizeof(second));
+		plDef.itemData.emplace_back(first, second);
+	}
+
 	in.close();
 	return plDef;
 }
@@ -93,9 +114,75 @@ void Data::savePlayerData(Player* player)
 	std::ofstream out{ "Texture/playerData.plr", std::ios::out | std::ios::binary };
 	if (!out.is_open()) return;
 
-	PlayerDef pldef{ player->sprite->spDef.maxHealpoint,
-		player->sprite->spMap.nowHealPoint };
+	PlayerDef plDef = player->getPlayerDef();
 
-	out.write(reinterpret_cast<const char*>(&pldef), sizeof(PlayerDef));
+	out.write(reinterpret_cast<const char*>(&plDef.maxHp), sizeof(plDef.maxHp));
+	out.write(reinterpret_cast<const char*>(&plDef.nowHp), sizeof(plDef.nowHp));
+	out.write(reinterpret_cast<const char*>(&plDef.maxEnergy), sizeof(plDef.maxEnergy));
+	out.write(reinterpret_cast<const char*>(&plDef.nowEnergy), sizeof(plDef.nowEnergy));
+	out.write(reinterpret_cast<const char*>(&plDef.defence), sizeof(plDef.defence));
+	out.write(reinterpret_cast<const char*>(&plDef.maxStrenght), sizeof(plDef.maxStrenght));
+	out.write(reinterpret_cast<const char*>(&plDef.nowStrenght), sizeof(plDef.nowStrenght));
+	out.write(reinterpret_cast<const char*>(&plDef.countpantrons), sizeof(plDef.countpantrons));
+
+	int size = plDef.itemData.size();
+	out.write(reinterpret_cast<const char*>(&size), sizeof(size));
+	for (auto it : plDef.itemData)
+	{
+		out.write(reinterpret_cast<const char*>(&it.first), sizeof(it.first));
+		out.write(reinterpret_cast<const char*>(&it.second), sizeof(it.second));
+	}
+
+	out.close();
+}
+
+std::vector<GunData> Data::getGunData()
+{
+	std::ifstream in{ "Texture/gunData.gun", std::ios::in | std::ios::binary };
+	if (!in.is_open()) return{};
+
+	int size;
+	in.read(reinterpret_cast<char*>(&size), sizeof(size));
+	std::vector<GunData> defs(size);
+
+	for (int i = 0; i < size; i++)
+	{
+		in.read(reinterpret_cast<char*>(&defs[i].nowCount), sizeof(defs[i].nowCount));
+
+		int unSize;
+		in.read(reinterpret_cast<char*>(&unSize), sizeof(unSize));
+
+		defs[i].improveId.reserve(unSize);
+		for (int j = 0; j < unSize; j++)
+		{
+			int id;
+			in.read(reinterpret_cast<char*>(&id), sizeof(id));
+			defs[i].improveId.push_back(id);
+		}
+	}
+
+	return defs;
+}
+
+void Data::saveGunData(std::vector<GunData> guns)
+{
+	std::ofstream out{ "Texture/gunData.gun", std::ios::out | std::ios::binary };
+	if (!out.is_open()) return;
+
+	int size = guns.size();
+	out.write(reinterpret_cast<const char*>(&size), sizeof(size));
+
+	for (auto def : guns)
+	{
+		out.write(reinterpret_cast<const char*>(&def.nowCount), sizeof(def.nowCount));
+
+		int unSize = def.improveId.size();
+		out.write(reinterpret_cast<const char*>(&unSize), sizeof(unSize));
+
+		for (auto im : def.improveId)
+		{
+			out.write(reinterpret_cast<const char*>(&im), sizeof(im));
+		}
+	}
 	out.close();
 }

@@ -1,6 +1,6 @@
 #include "GunManager.h"
 
-GunManager::GunManager(Data* _data)
+WeaponManager::WeaponManager(Data* _data)
 {
 	data = _data;
 
@@ -8,6 +8,13 @@ GunManager::GunManager(Data* _data)
 	{
 		improvements.push_back(std::make_unique<Improve>(improveDefs[i]));
 	}
+
+	for (int i = 0; i < itemsDefs.size(); i++)
+	{
+		items.push_back(std::make_unique<Item>(itemsDefs[i]));
+	}
+
+	auto gunsData = data->getGunData();
 
 	for (int i = 0; i < gunsDef.size(); i++)
 	{
@@ -30,16 +37,34 @@ GunManager::GunManager(Data* _data)
 		Animator<sf::Texture*> animr{ &Resources::gunsBaseText[i], {shutAnim, resetAnim} };
 
 		auto def = gunsDef[i];
+		def.nowCount = gunsData[i].nowCount;
+
 		guns.push_back(std::make_unique<Gun>(def, i > 1));
 		guns.back()->setAnimator(animr);
 		guns.back()->setSound(&Resources::gunsShutSound[i],
 			&Resources::gunsResetSound[i],
 			&Resources::gunCantShoutSound);
-	}
 
-	guns[2]->trySetImprove(improvements[4].get());
+		for (auto im : gunsData[i].improveId)
+		{
+			guns.back()->trySetImprove(improvements[im].get());
+		}
+	}
 }
 
-GunManager::~GunManager() {}
+WeaponManager::~WeaponManager() {}
 
-Gun* GunManager::getGun(int index) { return guns[index].get(); }
+Gun* WeaponManager::getGun(int index) { return guns[index].get(); }
+
+Item* WeaponManager::getItem(int index) { return items[index].get(); }
+
+void WeaponManager::saveGun()
+{
+	std::vector<GunData> defs;
+	for (int i = 0; i < guns.size(); i++)
+	{
+		defs.push_back(guns[i]->getGunData());
+	}
+
+	data->saveGunData(defs);
+}

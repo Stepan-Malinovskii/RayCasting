@@ -83,9 +83,9 @@ public:
 	MapSprite spMap;
 
 	sf::Texture* texture;
+
 	bool isDamages;
 	int textSize;
-
 	std::shared_ptr<Thinker> thinker;
 	std::set<std::tuple<int, int>> blockmap_coords;
 
@@ -110,19 +110,19 @@ static std::vector<NpcDef> npcDef = {
 
 static std::vector<SpriteDef> spriteDef = {
 	{ L"player", SpriteType::PlayerT, 0.3f, 100.0f, -1, false},
-	{ L"shar", SpriteType::Enemy, 1.0f, 100.f, 0, true },
-	{ L"rog", SpriteType::Enemy, 1.0f, 100.f, 1, true },
-	{ L"gorb", SpriteType::Enemy, 1.0f, 100.f, 2, true },
-	{ L"kozel", SpriteType::Enemy, 1.0f, 100.f, 3, true },
-	{ L"robot", SpriteType::Enemy, 1.0f, 100.f, 4, true},
-	{ L"bachka", SpriteType::Enemy, 1.0f, 100.f, 5, true},
-	{ L"pyshka", SpriteType::Enemy, 1.0f, 100.f, 6, true},
-	{ L"gorbGreen", SpriteType::Enemy, 1.0f, 100.f, 7, true },
-	{ L"bachkaSin", SpriteType::Enemy, 1.0f, 100.f, 8, true },
-	{ L"revenant", SpriteType::Enemy, 1.0f, 100.f, 9, true },
-	{ L"sharTre", SpriteType::Enemy, 1.0f, 100.f, 10, true },
-	{ L"mather", SpriteType::Enemy, 1.0f, 100.f, 11, true },
-	{ L"Boss", SpriteType::Enemy, 1.0f, 1000.f, 12, true },
+	{ L"Бабл", SpriteType::Enemy, 1.0f, 70.f, 0, true },
+	{ L"Рогастик", SpriteType::Enemy, 1.0f, 90.f, 1, true },
+	{ L"Розовый пинки", SpriteType::Enemy, 1.0f, 100.f, 2, true },
+	{ L"Кибер демон", SpriteType::Enemy, 1.0f, 120.f, 3, true },
+	{ L"Спайдер", SpriteType::Enemy, 1.0f, 200.f, 4, true},
+	{ L"Красный череп", SpriteType::Enemy, 1.0f, 150.f, 5, true},
+	{ L"Бомбастик", SpriteType::Enemy, 1.0f, 300.f, 6, true},
+	{ L"Зеленый пинки", SpriteType::Enemy, 1.0f, 200.f, 7, true },
+	{ L"Синий череп", SpriteType::Enemy, 1.0f, 200.f, 8, true },
+	{ L"Ревенант", SpriteType::Enemy, 1.0f, 180.f, 9, true },
+	{ L"Мега бабл", SpriteType::Enemy, 1.0f, 300.f, 10, true },
+	{ L"Мать", SpriteType::Enemy, 1.0f, 320.f, 11, true },
+	{ L"Boss", SpriteType::Enemy, 1.0f, 2000.f, 12, true },
 	{ L"Петрович", SpriteType::NPC, 1.0f, 1000000.f, 13, true },
 	{ L"Молотов", SpriteType::NPC, 1.0f, 1000000.f, 14, true }, 
 	{ L"Роман", SpriteType::NPC, 1.0f, 1000000.f, 15, true }, 
