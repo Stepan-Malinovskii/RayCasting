@@ -1,8 +1,9 @@
 #pragma once
 #ifndef TRADE
+#define TRADE
 
 #include "UIManeger.h"
-#include "WeaponManager.h"
+#include "GunManager.h"
 
 class Trade
 {
@@ -26,4 +27,5 @@ private:
 	void check();
 	void init();
 };
+
 #endif // !TRADE

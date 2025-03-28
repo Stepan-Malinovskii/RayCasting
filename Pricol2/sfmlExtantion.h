@@ -9,6 +9,31 @@
 #include <SFML/Graphics/Text.hpp>
 #include <functional>
 
+class BaseButton
+{
+public:
+	BaseButton(sf::Vector2f _pos, sf::Vector2f _size);
+	BaseButton() = default;
+	virtual ~BaseButton() = default;
+	bool isClicked(sf::Vector2i& mousePos);
+	virtual void update() = 0;
+	const sf::Vector2f& getPosition() const;
+private:
+	sf::Vector2f pos, size;
+};
+
+class Button : public BaseButton
+{
+public:
+	Button(sf::Vector2f _pos, sf::Vector2f _size, sf::Texture& _text, sf::IntRect teztureRect);
+	Button(sf::RectangleShape _shape) : BaseButton(_shape.getPosition(), _shape.getSize()) { shape = _shape; };
+	Button() = default;
+	virtual ~Button() = default;
+	void drawButton(sf::RenderTarget& window);
+private:
+	sf::RectangleShape shape;
+};
+
 struct Group
 {
 	Group(sf::RectangleShape _shape, sf::Text _text) : shape{_shape}, text{_text}
@@ -20,7 +45,7 @@ struct Group
 
 	Group() = default;
 
-	void setString(std::wstring data)
+	void setString(std::string data)
 	{
 		text.setString(data);
 		text.setOrigin({ text.getLocalBounds().width / 2, text.getLocalBounds().height / 2 });
@@ -33,35 +58,43 @@ struct Group
 		text.setPosition({ position.x, position.y - text.getCharacterSize() / 4 });
 	}
 
-	sf::Vector2f getSize() { return shape.getSize() ; }
+	sf::Vector2f getSize() { return shape.getSize(); }
 	sf::Vector2f getPosition() { return shape.getPosition(); }
 
 	sf::RectangleShape shape;
 	sf::Text text;
 };
 
-class Button : public sf::Drawable
+class DialogButton : public BaseButton
 {
 public:
-	Button(sf::RectangleShape _shape, sf::Text& _text);
-	Button(Group _group);
-	Button() = default;
+	DialogButton(sf::RectangleShape _shape, sf::Text& _text);
+	DialogButton(Group _group);
+	DialogButton() = default;
 
-	void setPosition(sf::Vector2f);
-	sf::Vector2f getPosition();
-	sf::Vector2f getSize();
-	void setString(std::wstring data);
-	void setTexture(sf::Texture* text);
-	void setTextureRect(sf::IntRect rect);
-	
 	void setFunc(std::function<void()> _fn);
-	bool isClicked(sf::Vector2i& mousePos);
-	void use() ;
+
+	void drawButton(sf::RenderTarget* window);
+
+	void update() override;
+
+	Group group;
 private:
 	std::function<void()> fn;
-	Group group;
-
-	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 };
 
+class EdingButton : public Button
+{
+public:
+	EdingButton(sf::Vector2f _pos, sf::Vector2f _size, sf::Texture& _text, sf::IntRect teztureRect) :
+		Button(_pos, _size, _text, teztureRect) { }
+	EdingButton(sf::RectangleShape _shape) : Button(_shape) {}
+	EdingButton() = default;
+
+	void setFunc(std::function<void()> _fn);
+
+	void update() override;
+private:
+	std::function<void()> fn;
+};
 #endif // !SFMLEXT

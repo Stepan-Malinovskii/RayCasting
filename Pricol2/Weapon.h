@@ -1,5 +1,6 @@
 #pragma once
 #ifndef WEAPON
+#define WEAPON
 
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -19,7 +20,6 @@ class Player;
 
 struct GunDef
 {
-	int id;
 	int damage;
 	int maxCount;
 	int nowCount;
@@ -27,13 +27,10 @@ struct GunDef
 	float maxDist;
 	float resetTime;
 	int cost;
-	std::wstring name;
-	std::wstring disc;
 };
 
 struct GunData
 {
-	int id;
 	int nowCount;
 	std::vector<int> improveId;
 };
@@ -50,7 +47,6 @@ struct ImproveDef
 	std::wstring name;
 	float effect;
 	int cost;
-	std::wstring disc;
 };
 
 enum ItemType
@@ -66,22 +62,9 @@ struct ItemsDef
 	float effect;
 	int maxUSing;
 	int cost;
-	std::wstring disc;
 };
 
-class Itemble
-{
-public:
-	Itemble(std::wstring name, std::wstring disc, int cost, int textureId);
-	Itemble() = default;
-	virtual ~Itemble() = default;
-	std::wstring name;
-	std::wstring disc;
-	int cost;
-	int textureId;
-};
-
-class Item : public Itemble
+class Item
 {
 public:
 	Item(ItemsDef def);
@@ -89,12 +72,14 @@ public:
 	void setFunc(std::function<void(Player* player)> _useFunc);
 	void useItem(Player* sprite);
 	ItemType type;
+	std::wstring name;
 	int maxUsing;
+	int cost;
 	int id;
 	std::function<void(Player* sprite)> useFunc;
 };
 
-class Improve : public Itemble
+class Improve
 {
 public:
 	Improve(ImproveDef def);
@@ -102,6 +87,8 @@ public:
 	void setGetFunc(std::function<void(Gun* gun)> setEffect);
 	void setDelFunc(std::function<void(Gun* gun)> delEffect);
 	ImproveType type;
+	std::wstring name;
+	int cost;
 	int id;
 	std::function<void(Gun* gun)> getImprove;
 	std::function<void(Gun* gun)> deleteImprove;
@@ -131,7 +118,7 @@ private:
 	float timeBetwen, nowTime;
 };
 
-class Gun : public Weapon, public Itemble
+class Gun : public Weapon
 {
 public:
 	Gun(GunDef def, bool isReset);
@@ -161,6 +148,7 @@ public:
 	int damage;
 	float nowRad;
 	float maxRad;
+	int cost;
 private:
 	float timeBetwenReset, nowTimeBetwenReset;
 	std::map<ImproveType, Improve*> improvement;

@@ -144,7 +144,7 @@
     <ClCompile Include="DialigSystem.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="Game.cpp" />
-    <ClCompile Include="WeaponManager.cpp" />
+    <ClCompile Include="GunManager.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Pricol2.cpp" />
@@ -155,7 +155,6 @@
     <ClCompile Include="sfmlExtetion.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="SpriteManager.cpp" />
-    <ClCompile Include="Trade.cpp" />
     <ClCompile Include="UIManager.cpp" />
     <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
@@ -165,7 +164,7 @@
     <ClInclude Include="DialogSystem.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="Game.h" />
-    <ClInclude Include="WeaponManager.h" />
+    <ClInclude Include="GunManager.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Randomizer.h" />
@@ -175,7 +174,6 @@
     <ClInclude Include="sfmlExtantion.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="SpriteManager.h" />
-    <ClInclude Include="Trade.h" />
     <ClInclude Include="UIManeger.h" />
     <ClInclude Include="Weapon.h" />
   </ItemGroup>

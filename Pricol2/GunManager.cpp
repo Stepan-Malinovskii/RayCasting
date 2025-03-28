@@ -1,4 +1,4 @@
-#include "WeaponManager.h"
+#include "GunManager.h"
 
 WeaponManager::WeaponManager(Data* _data)
 {
@@ -57,36 +57,6 @@ WeaponManager::~WeaponManager() {}
 Gun* WeaponManager::getGun(int index) { return guns[index].get(); }
 
 Item* WeaponManager::getItem(int index) { return items[index].get(); }
-
-std::vector<Gun*> WeaponManager::getGuns()
-{
-	std::vector<Gun*> g;
-	for (int i = 0; i < guns.size(); i++)
-	{
-		g.push_back(guns[i].get());
-	}
-	return g;
-}
-
-std::vector<Improve*> WeaponManager::getImprovs()
-{
-	std::vector<Improve*> g;
-	for (int i = 0; i < improvements.size(); i++)
-	{
-		g.push_back(improvements[i].get());
-	}
-	return g;
-}
-
-std::vector<Item*> WeaponManager::getItems()
-{
-	std::vector<Item*> g;
-	for (int i = 0; i < items.size(); i++)
-	{
-		g.push_back(items[i].get());
-	}
-	return g;
-}
 
 void WeaponManager::saveGun()
 {

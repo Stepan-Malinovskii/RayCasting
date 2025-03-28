@@ -1,4 +1,5 @@
 #include "Trade.h"
+#include <SFML/Window.hpp>
 
 Trade::Trade(UIManager* _uiManager, WeaponManager* _weaponManager,
 	Player* _player, sf::RenderWindow* _window)
@@ -47,7 +48,7 @@ void Trade::init()
 {
 	title.clear();
 
-	if (nowKey == 400)
+	if (startKey == 400)
 	{
 		auto item1 = weaponManager->getGuns();
 		int i = 0;
@@ -58,10 +59,10 @@ void Trade::init()
 		auto item2 = weaponManager->getImprovs();
 		for (; i < item2.size() + item1.size(); i++)
 		{
-			title[i] = (Itemble*)item2[i];
+			title[i] = (Itemble*)item2[i - item1.size()];
 		}
 	}
-	else if (nowKey == 401)
+	else if (startKey == 401)
 	{
 		auto item = weaponManager->getItems();
 		for (int i = 0; i < item.size(); i++)
@@ -80,7 +81,7 @@ void Trade::buy()
 		if (choose->cost <= player->money)
 		{
 			player->money -= choose->cost;
-			
+
 			if (startKey == 400)
 			{
 				if (dynamic_cast<Gun*>(choose) != nullptr)
@@ -89,7 +90,7 @@ void Trade::buy()
 				}
 				else if (dynamic_cast<Improve*>(choose) != nullptr)
 				{
-					player->improvments.push_back(dynamic_cast<Improve*>(choose));
+					//player->improvments.push_back(dynamic_cast<Improve*>(choose));
 				}
 			}
 			else if (startKey == 400)

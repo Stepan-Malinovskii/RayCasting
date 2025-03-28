@@ -1,4 +1,6 @@
 #include "UIManeger.h"
+#include <sstream>
+#include <iomanip>
 
 UIManager::UIManager(sf::RenderWindow* _window)
 {
@@ -47,14 +49,14 @@ void UIManager::initDialog(std::vector<std::pair<std::wstring, int>> variants,
 	sf::Text nameText(npcName, Resources::UIFont, TEXTSIZE);
 	Group g(nameBase, nameText);
 	g.setPosition({ SCREEN_W / 2, INTERVAL});
-	buttons.push_back(Button(g));
+	buttons.push_back(DialogButton(g));
 
 	sf::RectangleShape dataBase{ {DIALOG_W, DIALOG_H / 2.5f} };
 	dataBase.setFillColor(sf::Color(100, 100, 100));
 	sf::Text dataText(splitText(variants[0].first, DIALOG_W, 40), Resources::UIFont, TEXTSIZE - 10);
 	Group g1(dataBase, dataText);
 	g1.setPosition({ SCREEN_W / 2, g.getPosition().y + g1.getSize().y / 2 + INTERVAL});
-	buttons.push_back(Button(g1));
+	buttons.push_back(DialogButton(g1));
 
 	sf::Vector2f pos(SCREEN_W / 2, g1.getPosition().y + g1.getSize().y / 2 + INTERVAL);
 
@@ -67,18 +69,14 @@ void UIManager::initDialog(std::vector<std::pair<std::wstring, int>> variants,
 		Group g2(rect, text);
 		g2.setPosition(pos);
 		
-		buttons.push_back(Button(g2));
+		buttons.push_back(DialogButton(g2));
 		buttons.back().setFunc([=]() { keyButton = variants[i].second;});
 
 		pos.y +=  INTERVAL + g2.shape.getSize().y / 2;
 	}
 }
 
-void UIManager::initTrade(std::map<int, Itemble*> variants)
-{
-}
-
-void UIManager::deleteNow() { buttons.clear(); }
+void UIManager::deleteDialog() { buttons.clear(); }
 
 int UIManager::checkButton(sf::Vector2i mousePos)
 {
@@ -86,14 +84,14 @@ int UIManager::checkButton(sf::Vector2i mousePos)
 	{
 		if (b.isClicked(mousePos))
 		{
-			b.use();
+			b.update();
 			return keyButton;
 		}
 	}
 	return -1;
 }
 
-void UIManager::drawNow()
+void UIManager::drawDialog()
 {
 	sf::Sprite back(Resources::dialogBackround);
 	back.setScale({ SCREEN_W / Resources::dialogBackround.getSize().x,
@@ -101,7 +99,7 @@ void UIManager::drawNow()
 	window->draw(back);
 	for (auto b : buttons)
 	{
-		window->draw(b);
+		b.drawButton(window);
 	}
 }
 
@@ -151,11 +149,11 @@ void UIManager::initPlayer()
 			group3.setPosition({ group3.getPosition().x, group3.getPosition().y + 80});
 			window->draw(group3.shape);
 
-			std::wostringstream oss;
+			std::ostringstream oss;
 			oss << std::fixed << std::setprecision(2) << player->sprite->spMap.nowHealPoint;
 			oss << " / ";
 			oss << std::fixed << std::setprecision(2) << player->sprite->spDef.maxHealpoint;
-			std::wstring str = oss.str();
+			std::string str = oss.str();
 			
 			group1.shape.setFillColor({ 255, 23, 23 });
 			float newXH = baseX * (player->sprite->spMap.nowHealPoint <= 0 ? 0 :
@@ -165,7 +163,7 @@ void UIManager::initPlayer()
 			window->draw(group1.shape);
 			window->draw(group1.text);
 
-			oss.str(L"");
+			oss.str("");
 			oss.clear();
 			oss << std::fixed << std::setprecision(2) << player->nowStrenght;
 			oss << " / ";
@@ -179,7 +177,7 @@ void UIManager::initPlayer()
 			window->draw(group2.shape);
 			window->draw(group2.text);
 
-			oss.str(L"");
+			oss.str("");
 			oss.clear();
 			oss << std::fixed << std::setprecision(2) << player->nowEnergy;
 			oss << " / ";
@@ -192,17 +190,6 @@ void UIManager::initPlayer()
 			group3.setString(str);
 			window->draw(group3.shape);
 			window->draw(group3.text);
-			
-			sf::RectangleShape rect;
-			text.setFillColor(sf::Color::Black);
-			Group g4(rect, text);
-			g4.setString(L"Money: " + std::to_wstring(player->money));
-			g4.setPosition({ SCREEN_W - g4.text.getLocalBounds().width / 2 - 20, 50});
-			window->draw(g4.text);
-
-			g4.setString(L"Details: " + std::to_wstring(player->details));
-			g4.setPosition({ SCREEN_W - g4.text.getLocalBounds().width / 2 - 20, 100 });
-			window->draw(g4.text);
 
 			sf::CircleShape aim(player->getGun()->nowRad, 16);
 			aim.setOrigin({ aim.getRadius(), aim.getRadius()});

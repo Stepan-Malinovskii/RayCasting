@@ -1,7 +1,8 @@
 #pragma once
 #ifndef GAME
 #define GAME
-#include <SFML/Window/Event.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/CircleShape.hpp>
 #include <memory>
 #include <vector>
 #include <Windows.h>
@@ -12,9 +13,8 @@
 #include "Player.h"
 #include "Renderer.h"
 #include "SpriteManager.h"
-#include "WeaponManager.h"
+#include "GunManager.h"
 #include "UIManeger.h"
-#include "Trade.h"
 
 class Game
 {
@@ -39,7 +39,6 @@ private:
 	SpriteManager* spManager;
 	UIManager* uiManager;
 	WeaponManager* weaponManager;
-	Trade* trade;
 	Player* player;
 	Renderer* renderer;
 	Map* nowMap;
