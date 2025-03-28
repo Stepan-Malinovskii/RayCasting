@@ -3,13 +3,15 @@
 #ifndef SPRITE
 #define SPRITE
 
-#include "SFML/System/Vector2.hpp"
-#include "SFML/Graphics/Texture.hpp"
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Texture.hpp>
 #include <functional>
 #include <algorithm>
 #include <memory>
 #include <set>
 #include <iostream>
+#include "DialogSystem.h"
+#include "Map.h"
 
 constexpr float PI = 3.14159265359f;
 constexpr int ENEMY_COUNT = 14;
@@ -58,12 +60,12 @@ struct SpriteDef
 	float maxHealpoint;
 	int texture;
 	bool isDirectional;
+	int midleDrop;
 };
 
 struct NpcDef
 {
 	int startKey;
-	int trigerKey;
 };
 
 class Sprite
@@ -97,7 +99,7 @@ private:
 class Npc : public Sprite
 {
 public:
-	Npc(SpriteDef spDef, MapSprite spMap, int _id, int hisKey, Dialog* dialog);
+	Npc(SpriteDef spDef, MapSprite spMap, int _id, int npcId, Dialog* dialog);
 	Npc() = default;
 	void use();
 	NpcDef npcDefData;
@@ -106,23 +108,23 @@ private:
 };
 
 static std::vector<NpcDef> npcDef = {
-	{1, 404}};
+	{1} };
 
 static std::vector<SpriteDef> spriteDef = {
-	{ L"player", SpriteType::PlayerT, 0.3f, 100.0f, -1, false},
-	{ L"Бабл", SpriteType::Enemy, 1.0f, 70.f, 0, true },
-	{ L"Рогастик", SpriteType::Enemy, 1.0f, 90.f, 1, true },
-	{ L"Розовый пинки", SpriteType::Enemy, 1.0f, 100.f, 2, true },
-	{ L"Кибер демон", SpriteType::Enemy, 1.0f, 120.f, 3, true },
-	{ L"Спайдер", SpriteType::Enemy, 1.0f, 200.f, 4, true},
-	{ L"Красный череп", SpriteType::Enemy, 1.0f, 150.f, 5, true},
-	{ L"Бомбастик", SpriteType::Enemy, 1.0f, 300.f, 6, true},
-	{ L"Зеленый пинки", SpriteType::Enemy, 1.0f, 200.f, 7, true },
-	{ L"Синий череп", SpriteType::Enemy, 1.0f, 200.f, 8, true },
-	{ L"Ревенант", SpriteType::Enemy, 1.0f, 180.f, 9, true },
-	{ L"Мега бабл", SpriteType::Enemy, 1.0f, 300.f, 10, true },
-	{ L"Мать", SpriteType::Enemy, 1.0f, 320.f, 11, true },
-	{ L"Boss", SpriteType::Enemy, 1.0f, 2000.f, 12, true },
+	{ L"player", SpriteType::PlayerT, 0.3f, 100.0f, -1, false, 0 },
+	{ L"Бабл", SpriteType::Enemy, 1.0f, 70.f, 0, true, 10 },
+	{ L"Рогастик", SpriteType::Enemy, 1.0f, 90.f, 1, true, 15 },
+	{ L"Розовый пинки", SpriteType::Enemy, 1.0f, 100.f, 2, true, 20 },
+	{ L"Кибер демон", SpriteType::Enemy, 1.0f, 120.f, 3, true, 25 },
+	{ L"Спайдер", SpriteType::Enemy, 1.0f, 200.f, 4, true, 30 },
+	{ L"Красный череп", SpriteType::Enemy, 1.0f, 150.f, 5, true, 35 },
+	{ L"Бомбастик", SpriteType::Enemy, 1.0f, 300.f, 6, true, 40 },
+	{ L"Зеленый пинки", SpriteType::Enemy, 1.0f, 200.f, 7, true, 45 },
+	{ L"Синий череп", SpriteType::Enemy, 1.0f, 200.f, 8, true, 50 },
+	{ L"Ревенант", SpriteType::Enemy, 1.0f, 180.f, 9, true, 55 },
+	{ L"Мега бабл", SpriteType::Enemy, 1.0f, 300.f, 10, true, 60 },
+	{ L"Мать", SpriteType::Enemy, 1.0f, 320.f, 11, true, 65 },
+	{ L"Boss", SpriteType::Enemy, 1.0f, 2000.f, 12, true, 1000 },
 	{ L"Петрович", SpriteType::NPC, 1.0f, 1000000.f, 13, true },
 	{ L"Молотов", SpriteType::NPC, 1.0f, 1000000.f, 14, true }, 
 	{ L"Роман", SpriteType::NPC, 1.0f, 1000000.f, 15, true }, 

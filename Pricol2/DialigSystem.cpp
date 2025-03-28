@@ -1,7 +1,8 @@
 #include "DialogSystem.h"
 
-Dialog::Dialog(sf::RenderWindow* _window, Data* _data, UIManager* _uiManager)
+Dialog::Dialog(sf::RenderWindow* _window, Data* _data, UIManager* _uiManager, Trade* _trade)
 {
+	trade = _trade;
 	window = _window;
 	data = _data;
 	nowKey = 0;
@@ -25,24 +26,31 @@ void Dialog::stop()
 	window->setMouseCursorVisible(false);
 	isActive = false;
 	npc = nullptr;
-	uiManager->deleteDialog();
+	uiManager->deleteNow();
 }
 
 void Dialog::check()
 {
+	if (trade->isActive)
+	{
+		trade->update();
+		return;
+	}
+
 	if (nowKey == 0)
 	{
 		stop();
 	}
 	else
 	{
-		if (npc->npcDefData.trigerKey == nowKey)
+		if (nowKey >= 400)
 		{
-			stop();
+			trade->start(nowKey);
+			nowKey = 0;
 			return;
 		}
-		init();
 	}
+	init();
 }
 
 void Dialog::init()
@@ -82,5 +90,5 @@ void Dialog::update()
 
 void Dialog::draw()
 {
-	uiManager->drawDialog();
+	uiManager->drawNow();
 }

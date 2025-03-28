@@ -1,12 +1,9 @@
 #include "Player.h"
-#include "Raycast.h"
-#include <SFML/Graphics/CircleShape.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
 
 Player::Player(Sprite* _sprite, PlayerDef def, Map* _nowMap) : 
 	sprite{ _sprite }, nowGun{ 0 }, nowEnergy{ def.nowEnergy }, maxEnergy { def.maxEnergy },
 	defence{ def.defence}, nowStrenght{ def.nowStrenght }, maxStrenght{ def.maxStrenght }, 
-	patrons{ def.countpantrons }, nowMap{ _nowMap }
+	patrons{ def.countpantrons }, nowMap{ _nowMap }, money{ def.money }, details{ def.details }
 {
 	pitch = 0, shakeTime = 0, posZ = 0.0f;
 	isJump = false, jumpFlag = false;
@@ -184,13 +181,13 @@ void Player::fire(int gun)
 	}
 }
 
-MapSprite* Player::dialog()
+Sprite* Player::dialog()
 {
 	float radiansAngle = sprite->spMap.angle * PI / 180.0f;
 	sf::Vector2f verticalMoveParametrs(cos(radiansAngle), sin(radiansAngle));
 
 	RayHit hit = raycast(nowMap, sprite->spMap.position, verticalMoveParametrs, true, sprite, 1, pitch);
-	if (hit.sprite != nullptr && hit.sprite->spDef.type == SpriteType::NPC) { return &hit.sprite->spMap; }
+	if (hit.sprite != nullptr && hit.sprite->spDef.type == SpriteType::NPC) { return hit.sprite; }
 	return nullptr;
 }
 
@@ -220,7 +217,9 @@ PlayerDef Player::getPlayerDef()
 	defence,
 	maxStrenght,
 	nowStrenght, 
-	patrons, 
+	patrons,
+	money,
+	details,
 	itemData};
 }
 

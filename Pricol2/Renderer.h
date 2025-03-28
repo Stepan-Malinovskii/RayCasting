@@ -2,17 +2,12 @@
 #ifndef RENDERER
 #define RENDERER
 
+#include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <thread>
-
 #include "Player.h"
-#include "Map.h"
-#include "Sprite.h"
-#include "Raycast.h"
-#include "Resources.h"
 
 constexpr int THREAD_COUNT = 10, MAX_DETH = 64;
 constexpr float PLAYER_FOV = 60.0f, CAMERA_Z = SCREEN_H / 2.0f,

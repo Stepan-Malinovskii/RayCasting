@@ -6,12 +6,13 @@ Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
 	screenMidlePos = { (int)(SCREEN_W / 2), (int)(SCREEN_H / 2) };
 	data = new Data();
 	weaponManager = new WeaponManager(data);
+	initPlayer();
+
 	uiManager = new UIManager(window);
-	dialogSys = new Dialog(window, data, uiManager);
+	trade = new Trade(uiManager, weaponManager, player, window);
+	dialogSys = new Dialog(window, data, uiManager, trade);
 	spManager = new SpriteManager(nowMap, data, dialogSys);
 	renderer = new Renderer(window);
-
-	initPlayer();
 }
 
 Game::~Game()
@@ -19,6 +20,7 @@ Game::~Game()
 	delete data;
 	delete dialogSys;
 	delete spManager;
+	delete trade;
 	delete weaponManager;
 	delete uiManager;
 }
@@ -110,11 +112,14 @@ void Game::getInput(float deltaTime)
 		}
 		if (GetAsyncKeyState('E'))
 		{
-			MapSprite* mSp = player->dialog();
-			if (mSp != nullptr)
+			Sprite* sp = player->dialog();
+			if (sp != nullptr)
 			{
-				nowNpc = spManager->getNpc(mSp);
-				nowNpc.use();
+				Npc* npc = dynamic_cast<Npc*>(sp);
+				if (npc != nullptr)
+				{
+					npc->use();
+				}
 			}
 		}
 		if (GetAsyncKeyState('H'))
