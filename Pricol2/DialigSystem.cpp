@@ -35,21 +35,17 @@ void Dialog::stop()
 
 void Dialog::check()
 {
-	if (trade->isActive)
-	{
-		trade->update();
-		return;
-	}
+	if (trade->isActive) { return; }
 
 	if (nowKey == 0)
 	{
 		stop();
+		return;
 	}
 	else
 	{
 		if (nowKey >= 400)
 		{
-			uiManager->deleteNow();
 			trade->start(nowKey);
 			nowKey = 0;
 			return;
@@ -62,14 +58,25 @@ void Dialog::init()
 {
 	auto keys = data->getKeys(nowKey);
 
-	std::vector<std::pair<std::wstring, int>> variants;
-	for (int i = 0; i < keys.size(); i++) { variants.push_back(data->getText(keys[i])); }
+	std::map<int, std::wstring, std::greater<int>> variants;
+	for (int i = 0; i < keys.size(); i++) 
+	{ 
+		auto d = data->getText(keys[i]);
+		variants[d.second] = d.first; 
+	}
 
 	uiManager->initDialog(variants, npc->spDef.name);
 }
 
 void Dialog::update()
 {
+	if (trade->isActive)
+	{
+		trade->update();
+		check();
+		return;
+	}
+
 	if (window->hasFocus())
 	{
 		static bool flag = false;

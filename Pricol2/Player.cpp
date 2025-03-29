@@ -8,6 +8,8 @@ Player::Player(Sprite* _sprite, PlayerDef def, Map* _nowMap) :
 	defence{ def.defence}, nowStrenght{ def.nowStrenght }, maxStrenght{ def.maxStrenght }, 
 	patrons{ def.countpantrons }, nowMap{ _nowMap }, money{ def.money }, details{ def.details }
 {
+	maxHeal = nullptr;
+	kick = nullptr;
 	pitch = 0, shakeTime = 0, posZ = 0.0f;
 	isJump = false, jumpFlag = false;
 	moveSpeed = 5.0f, boostSpeed = 8.0f, nowSpeed = moveSpeed;
@@ -127,6 +129,24 @@ void Player::gravity(float deltaTime)
 	
 }
 
+void Player::takeMaxHeal()
+{
+	for (auto var : items)
+	{
+		auto t = dynamic_cast<Item*>(var.first);
+		if (t != nullptr)
+		{
+			if (t->type == Heal)
+			{
+				if (maxHeal == nullptr || t->id < maxHeal->id)
+				{
+					maxHeal = t;
+				}
+			}
+		}
+	}
+}
+
 void Player::jump()
 {
 	if (posZ == 0)
@@ -232,28 +252,18 @@ sf::Vector2f Player::getDeltaShake() { return shakeDelta; }
 
 float Player::getMoveSpeed() { return moveSpeed; }
 
-void Player::takeItem(Item* item, int cnt)
+void Player::takeItem(Itemble* item, int cnt)
 {
-	for (int i = 0; i < items.size(); i++)
-	{
-		if (items[i].first->name == item->name)
-		{
-			items[i].second += cnt;
-			return;
-		}
-	}
-	items.push_back({ item, cnt });
+	items[item] += cnt;
+	takeMaxHeal();
 }
 
 void Player::heal()
 {
-	for (int i = 0; i < items.size(); i++)
+	if (maxHeal != nullptr)
 	{
-		if (items[i].first->type == Heal && items[i].second > 0)
-		{
-			items[i].second--;
-			items[i].first->useFunc(this);
-			return;
-		}
+		maxHeal->useFunc(this);
+		maxHeal = nullptr;
+		takeMaxHeal();
 	}
 }

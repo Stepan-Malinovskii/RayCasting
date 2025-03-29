@@ -41,10 +41,11 @@ std::wstring UIManager::splitText(std::wstring text, int maxLen, int textSize)
 	return result;
 }
 
-void UIManager::initDialog(std::vector<std::pair<std::wstring, int>> variants, 
+void UIManager::initDialog(std::map<int, std::wstring, std::greater<int>> variants,
 	std::wstring npcName)
 {
-	buttons.clear();
+	deleteNow();
+
 	sf::RectangleShape nameBase{ {DIALOG_W, TEXTSIZE + 10} };
 	nameBase.setFillColor(sf::Color(100, 100, 100));
 	sf::Text nameText(npcName, Resources::UIFont, TEXTSIZE);
@@ -54,42 +55,129 @@ void UIManager::initDialog(std::vector<std::pair<std::wstring, int>> variants,
 
 	sf::RectangleShape dataBase{ {DIALOG_W, DIALOG_H / 2.5f} };
 	dataBase.setFillColor(sf::Color(100, 100, 100));
-	sf::Text dataText(splitText(variants[0].first, DIALOG_W, 40), Resources::UIFont, TEXTSIZE - 10);
+	sf::Text dataText(splitText(variants[-1], DIALOG_W, 40), Resources::UIFont, TEXTSIZE - 10);
 	Group g1(dataBase, dataText);
 	g1.setPosition({ SCREEN_W / 2, g.getPosition().y + g1.getSize().y / 2 + INTERVAL});
 	buttons.push_back(Button(g1));
 
 	sf::Vector2f pos(SCREEN_W / 2, g1.getPosition().y + g1.getSize().y / 2 + INTERVAL);
 
-	int i = 1;
-	for (; i < variants.size(); i++)
+	
+	for (auto var : variants)
 	{
-		sf::Text text(variants[i].first, Resources::UIFont, TEXTSIZE);
+		if (var.first == -1) continue;
+		sf::Text text(var.second, Resources::UIFont, TEXTSIZE);
 		sf::RectangleShape rect({ DIALOG_W, TEXTSIZE + 10 });
 		rect.setFillColor(sf::Color(50, 50, 50));
 		Group g2(rect, text);
 		g2.setPosition(pos);
 		
 		buttons.push_back(Button(g2));
-		buttons.back().setFunc([=]() { keyButton = variants[i].second;});
+		buttons.back().setFunc([=]() { keyButton = var.first;});
 
 		pos.y +=  INTERVAL + g2.shape.getSize().y / 2;
 	}
 }
 
-void UIManager::initTrade(std::map<int, Itemble*> variants)
+std::wstring UIManager::toMax(std::wstring str, float maxW, float textSize)
 {
+	sf::Text text(L"", Resources::UIFont, textSize);
+	std::wstring result = str;
+	while (true)
+	{
+		text.setString(result);
+
+		if (text.getLocalBounds().width > maxW)
+		{
+			break;
+		}
+
+		result += L" ";
+	}
+	return result;
 }
 
-void UIManager::deleteNow() { buttons.clear(); }
+void UIManager::initTrade(std::map<int, Itemble*> variants, Player* player)
+{
+	deleteNow();
+
+	float interval = 5.0f;
+	float size = 44;
+
+	float maxName = 0, maxDisc = 0, maxCost = 0;
+	sf::Text text(L"", Resources::UIFont, size - 25);
+	
+	for (auto pair : variants)
+	{
+		if (pair.second == nullptr) continue;
+		
+		text.setString(pair.second->name);
+		maxName = std::fmaxf(text.getLocalBounds().width, maxName);
+
+		text.setString(pair.second->disc);
+		maxDisc = std::fmaxf(text.getLocalBounds().width, maxDisc);
+
+		text.setString(std::to_wstring(pair.second->cost) + L" Û·");
+		maxCost = std::fmaxf(text.getLocalBounds().width, maxCost);
+	}
+	
+	sf::Vector2f pos(SCREEN_W / 2, INTERVAL);
+
+	sf::RectangleShape rect({ DIALOG_W, size });
+	rect.setFillColor(sf::Color(50, 50, 50));
+	Group g2(rect, text);
+
+	for (auto var : variants)
+	{
+		if (var.second == nullptr) continue;
+
+		std::wstring line = toMax(var.second->name, maxName, size - 25) + L" | " + 
+			toMax(std::to_wstring(var.second->cost) + L" Û·", maxCost, size - 25) + L" | " +
+			toMax(var.second->disc, maxDisc, size - 25);
+
+		g2.setString(line);
+		g2.setPosition(pos);
+
+		buttons.push_back(Button(g2));
+		buttons.back().setFunc([=]() { keyButton = var.first;});
+
+		pos.y += interval + g2.shape.getSize().y;
+	}
+
+	sf::Text text1(text);
+	text1.setString(L" \n”\nœ\n»\n“\n‹");
+	text1.setCharacterSize(50);
+	sf::RectangleShape rect1({ size, DIALOG_H });
+	rect1.setFillColor(sf::Color(50, 50, 50));
+	Group g3(rect1, text1);
+	g3.setPosition({ (SCREEN_W - DIALOG_W) / 2 - g3.getSize().x, SCREEN_H / 2});
+
+	buttons.push_back(Button(g3));
+	buttons.back().setFunc([=]() { keyButton = -2; });
+
+	g3.setString(L"¬\n€\n’\nŒ\nƒ");
+	g3.setPosition({ (SCREEN_W + DIALOG_W) / 2 + g3.getSize().x , SCREEN_H / 2});
+	
+	buttons.push_back(Button(g3));
+	buttons.back().setFunc([=]() { keyButton = -1; });
+}
+
+void UIManager::deleteNow() 
+{ 
+	buttons.clear();
+	choseBut = nullptr;
+}
 
 int UIManager::checkButton(sf::Vector2i mousePos)
 {
-	for (auto b : buttons)
+	for (int i = 0; i < buttons.size(); i++)
 	{
-		if (b.isClicked(mousePos))
+		if (buttons[i].isClicked(mousePos))
 		{
-			b.use();
+			if (choseBut != nullptr) choseBut->setFillColor(sf::Color(50, 50, 50));
+			choseBut = &buttons[i];
+			choseBut->setFillColor(sf::Color(223, 154, 51));
+			buttons[i].use();
 			return keyButton;
 		}
 	}
@@ -204,7 +292,7 @@ void UIManager::initPlayer()
 			window->draw(g4.text);
 
 			g4.setString(L"Details: " + std::to_wstring(player->details));
-			g4.setPosition({ SCREEN_W - g4.text.getLocalBounds().width / 2 - 20, 100 });
+			g4.setPosition({ SCREEN_W - g4.text.getLocalBounds().width / 2 - 20, 50 + INTERVAL });
 			window->draw(g4.text);
 
 			sf::CircleShape aim(player->getGun()->nowRad, 16);

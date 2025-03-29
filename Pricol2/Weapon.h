@@ -20,7 +20,6 @@ class Player;
 
 struct GunDef
 {
-	int id;
 	int damage;
 	int maxCount;
 	int nowCount;
@@ -46,7 +45,6 @@ enum ImproveType
 
 struct ImproveDef
 {
-	int id;
 	ImproveType type;
 	std::wstring name;
 	float effect;
@@ -61,7 +59,6 @@ enum ItemType
 
 struct ItemsDef
 {
-	int id;
 	ItemType type;
 	std::wstring name;
 	int effect;
@@ -79,31 +76,29 @@ public:
 	std::wstring name;
 	std::wstring disc;
 	int cost;
-	int textureId;
+	int id;
 };
 
 class Item : public Itemble
 {
 public:
-	Item(ItemsDef def);
+	Item(ItemsDef def, int id);
 	Item() = default;
 	void setFunc(std::function<void(Player* player)> _useFunc);
 	void useItem(Player* sprite);
 	ItemType type;
 	int maxUsing;
-	int id;
 	std::function<void(Player* sprite)> useFunc;
 };
 
 class Improve : public Itemble
 {
 public:
-	Improve(ImproveDef def);
+	Improve(ImproveDef def, int id);
 	Improve() = default;
 	void setGetFunc(std::function<void(Gun* gun)> setEffect);
 	void setDelFunc(std::function<void(Gun* gun)> delEffect);
 	ImproveType type;
-	int id;
 	std::function<void(Gun* gun)> getImprove;
 	std::function<void(Gun* gun)> deleteImprove;
 };
@@ -135,7 +130,7 @@ private:
 class Gun : public Weapon, public Itemble
 {
 public:
-	Gun(GunDef def, bool isReset);
+	Gun(GunDef def, bool isReset, int id);
 	Gun() = default;
 
 	void setSound(sf::SoundBuffer* shut = nullptr,

@@ -41,10 +41,10 @@ void Weapon::startAnimation(int number)
 }
 
 Itemble::Itemble(std::wstring _name, std::wstring _disc, int _cost, int _textureId) :
-	name{ _name }, disc{ _disc }, cost{ _cost }, textureId{ _textureId } {}
+	name{ _name }, disc{ _disc }, cost{ _cost }, id{ _textureId } {}
 
-Improve::Improve(ImproveDef def) : Itemble(def.name, def.disc, def.cost, id),
-type{ def.type }, id{ def.id }
+Improve::Improve(ImproveDef def, int id) : Itemble(def.name, def.disc, def.cost, id),
+type{ def.type }
 {
 	if (type == Damage)
 	{
@@ -74,12 +74,9 @@ void Improve::setGetFunc(std::function<void(Gun* gun)> _setEffect) { getImprove 
 
 void Improve::setDelFunc(std::function<void(Gun* gun)> _delEffect) { deleteImprove = _delEffect; }
 
-Item::Item(ItemsDef def) : Itemble(def.name, def.disc, def.cost, id),
-type{ def.type }, maxUsing{ def.maxUSing }, id{ def.id }
+Item::Item(ItemsDef def, int id) : Itemble(def.name, def.disc, def.cost, id),
+type{ def.type }, maxUsing{ def.maxUSing }
 {
-	maxUsing = def.maxUSing;
-	id = def.id;
-
 	if (def.type == Heal)
 	{
 		setFunc([=](Player* pl) {pl->sprite->spMap.nowHealPoint += def.effect;
@@ -114,14 +111,13 @@ void Item::setFunc(std::function<void(Player* sprite)> _useFunc) { useFunc = _us
 
 void Item::useItem(Player* sprite) { useFunc(sprite); }
 
-Gun::Gun(GunDef def, bool _isReset) : Weapon(def.shutTime, def.maxDist),
-Itemble(def.name, def.disc, def.cost, def.id),
+Gun::Gun(GunDef def, bool _isReset, int id) : Weapon(def.shutTime, def.maxDist),
+Itemble(def.name, def.disc, def.cost, id),
 damage{ def.damage }, maxCount{ def.maxCount }, nowCount{ def.nowCount },
-nowTimeBetwenReset{ def.resetTime }, timeBetwenReset{ def.resetTime }
+nowTimeBetwenReset{ def.resetTime }, timeBetwenReset{ def.resetTime }, isReset{ _isReset }
 {
 	nowRad = 1;
 	maxRad = 30;
-	isReset = _isReset;
 }
 
 void Gun::setSound(sf::SoundBuffer* shut, sf::SoundBuffer* reset, sf::SoundBuffer* cantShut)
@@ -238,5 +234,5 @@ GunData Gun::getGunData()
 		}
 	}
 
-	return { textureId, nowCount, ids };
+	return { id, nowCount, ids };
 }

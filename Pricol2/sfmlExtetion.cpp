@@ -14,6 +14,11 @@ sf::Vector2f Button::getSize() { return group.getSize(); }
 
 void Button::setString(std::wstring data) { group.setString(data); }
 
+void Button::setFillColor(sf::Color color)
+{
+	group.shape.setFillColor(color);
+}
+
 void Button::setPosition(sf::Vector2f pos) { group.setPosition(pos); }
 
 bool Button::isClicked(sf::Vector2i& mousePos)

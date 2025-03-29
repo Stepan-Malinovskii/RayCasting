@@ -6,12 +6,17 @@ WeaponManager::WeaponManager(Data* _data)
 
 	for (int i = 0; i < improveDefs.size(); i++)
 	{
-		improvements.push_back(std::make_unique<Improve>(improveDefs[i]));
+
+		improvements.push_back(std::make_unique<Improve>(improveDefs[i], id));
+		itemble[id] = improvements.back().get();
+		id++;
 	}
 
 	for (int i = 0; i < itemsDefs.size(); i++)
 	{
-		items.push_back(std::make_unique<Item>(itemsDefs[i]));
+		items.push_back(std::make_unique<Item>(itemsDefs[i], id));
+		itemble[id] = items.back().get();
+		id++;
 	}
 
 	auto gunsData = data->getGunData();
@@ -39,16 +44,17 @@ WeaponManager::WeaponManager(Data* _data)
 		auto def = gunsDef[i];
 		def.nowCount = gunsData[i].nowCount;
 
-		guns.push_back(std::make_unique<Gun>(def, i > 1));
+		guns.push_back(std::make_unique<Gun>(def, i > 1, id));
 		guns.back()->setAnimator(animr);
 		guns.back()->setSound(&Resources::gunsShutSound[i],
 			&Resources::gunsResetSound[i],
 			&Resources::gunCantShoutSound);
-
+		itemble[id] = guns.back().get();
 		for (auto im : gunsData[i].improveId)
 		{
 			guns.back()->trySetImprove(improvements[im].get());
 		}
+		id++;
 	}
 }
 
@@ -56,7 +62,7 @@ WeaponManager::~WeaponManager() {}
 
 Gun* WeaponManager::getGun(int index) { return guns[index].get(); }
 
-Item* WeaponManager::getItem(int index) { return items[index].get(); }
+Itemble* WeaponManager::getItem(int index) { return itemble[index]; }
 
 std::vector<Gun*> WeaponManager::getGuns()
 {

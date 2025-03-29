@@ -49,6 +49,7 @@ public:
 	Button(Group _group);
 	Button() = default;
 
+	void setFillColor(sf::Color color);
 	void setPosition(sf::Vector2f);
 	sf::Vector2f getPosition();
 	sf::Vector2f getSize();

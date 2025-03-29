@@ -23,6 +23,7 @@ Game::~Game()
 	delete spManager;
 	delete weaponManager;
 	delete uiManager;
+	delete trade;
 }
 
 void Game::initPlayer()
@@ -35,12 +36,8 @@ void Game::initPlayer()
 		player->setGun(weaponManager->getGun(i));
 	}
 
-	for (int i = 0; i < itemsDefs.size(); i++)
-	{
-		player->takeItem(weaponManager->getItem(i), 0);
-	}
-
 	PlayerDef plDef = data->getPlayerData();
+
 	for (auto it : plDef.itemData)
 	{
 		player->takeItem(weaponManager->getItem(it.first), it.second);

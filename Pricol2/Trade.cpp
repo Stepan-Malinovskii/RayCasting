@@ -24,6 +24,8 @@ void Trade::stop()
 {
 	uiManager->deleteNow();
 	isActive = false;
+	title.clear();
+	startKey = 0;
 	nowKey = 0;
 }
 
@@ -32,11 +34,11 @@ void Trade::check()
 	if (nowKey == -1)
 	{
 		stop();
+		return;
 	}
 	else if (nowKey == -2)
 	{
 		buy();
-		init();
 	}
 	else
 	{
@@ -51,8 +53,8 @@ void Trade::init()
 	if (startKey == 400)
 	{
 		auto item1 = weaponManager->getGuns();
-		int i = 0;
-		for (i = 0; i < item1.size(); i++)
+		int i = 3;
+		for (; i < item1.size(); i++)
 		{
 			title[i] = (Itemble*)item1[i];
 		}
@@ -71,7 +73,7 @@ void Trade::init()
 		}
 	}
 
-	uiManager->initTrade(title);
+	uiManager->initTrade(title, player);
 }
 
 void Trade::buy()
@@ -82,21 +84,8 @@ void Trade::buy()
 		{
 			player->money -= choose->cost;
 
-			if (startKey == 400)
-			{
-				if (dynamic_cast<Gun*>(choose) != nullptr)
-				{
-					player->setGun(dynamic_cast<Gun*>(choose));
-				}
-				else if (dynamic_cast<Improve*>(choose) != nullptr)
-				{
-					//player->improvments.push_back(dynamic_cast<Improve*>(choose));
-				}
-			}
-			else if (startKey == 400)
-			{
-				player->takeItem(dynamic_cast<Item*>(choose));
-			}
+			player->takeItem(choose);
+			init();
 		}
 		choose = nullptr;
 	}
@@ -114,11 +103,11 @@ void Trade::update()
 
 			flag = true;
 			nowKey = uiManager->checkButton(worldPos);
+			check();
 		}
 		if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
 			flag = false;
 		}
-		check();
 	}
 }

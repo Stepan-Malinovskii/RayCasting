@@ -48,7 +48,7 @@ public:
 	void reloadingGun();
 	void setGun(Gun* gun);
 	float getMoveSpeed();
-	void takeItem(Item* item, int cnt = 1);
+	void takeItem(Itemble*, int cnt = 1);
 	void heal();
 
 	Gun* getGun();
@@ -63,11 +63,11 @@ public:
 	int patrons;
 	int money;
 	int details;
-	std::vector<Improve*> improvments;
+	std::map<Itemble*, int> items;
 private:
-	std::vector<std::pair<Item*, int>> items;
 	bool isJump, jumpFlag;
 	Map* nowMap;
+	Item* maxHeal;
 	sf::Vector2f shakeDelta;
 	int nowGun;
 	std::vector<Gun*> guns;
@@ -75,6 +75,7 @@ private:
 
 	void shakeCamera(float deltaTime, bool isRun);
 	void gravity(float deltaTime);
+	void takeMaxHeal();
 };
 
 #endif // !PLAYER
