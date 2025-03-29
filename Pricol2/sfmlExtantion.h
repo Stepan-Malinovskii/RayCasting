@@ -35,7 +35,7 @@ struct Group
 		text.setPosition({ position.x, position.y - text.getCharacterSize() / 4 });
 	}
 
-	sf::Vector2f getSize() { return shape.getSize() ; }
+	sf::Vector2f getSize() { return shape.getSize(); }
 	sf::Vector2f getPosition() { return shape.getPosition(); }
 
 	sf::RectangleShape shape;
@@ -56,13 +56,6 @@ public:
 	void setTexture(sf::Texture* text);
 	void setTextureRect(sf::IntRect rect);
 
-	void setPosition(sf::Vector2f);
-	sf::Vector2f getPosition();
-	sf::Vector2f getSize();
-	void setString(std::wstring data);
-	void setTexture(sf::Texture* text);
-	void setTextureRect(sf::IntRect rect);
-	
 	void setFunc(std::function<void()> _fn);
 	bool isClicked(sf::Vector2i& mousePos);
 	void use();

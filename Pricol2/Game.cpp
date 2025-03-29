@@ -8,8 +8,7 @@ Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
 	weaponManager = new WeaponManager(data);
 	renderer = new Renderer(window);
 	uiManager = new UIManager(window);
-	trade = new Trade(uiManager, weaponManager, player, window);
-	dialogSys = new Dialog(window, data, uiManager, trade);
+	dialogSys = new Dialog(window, data, uiManager);
 	spManager = new SpriteManager(nowMap, data, dialogSys);
 	initPlayer();
 
@@ -22,7 +21,6 @@ Game::~Game()
 	delete data;
 	delete dialogSys;
 	delete spManager;
-	delete trade;
 	delete weaponManager;
 	delete uiManager;
 }

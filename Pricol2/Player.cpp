@@ -1,4 +1,7 @@
 #include "Player.h"
+#include "Raycast.h"
+#include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 
 Player::Player(Sprite* _sprite, PlayerDef def, Map* _nowMap) : 
 	sprite{ _sprite }, nowGun{ 0 }, nowEnergy{ def.nowEnergy }, maxEnergy { def.maxEnergy },

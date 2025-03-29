@@ -1,4 +1,7 @@
 #include "Editor.h"
+#include <SFML/Window/Mouse.hpp>
+#include <SFML/Window/Event.hpp>
+#include "SpriteManager.h"
 
 void Editor::init(sf::RenderWindow& window, sf::RenderWindow& editorWindow, Map* map)
 {

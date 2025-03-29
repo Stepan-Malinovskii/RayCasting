@@ -1,8 +1,15 @@
 #pragma once
 #ifndef PLAYER
+#define PLAYER
 
+#include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Window/Event.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/Text.hpp>
 #include <vector>
-#include "Raycast.h"
+
+#include "Map.h"
 #include "Resources.h"
 #include "Animation.h"
 #include "Weapon.h"

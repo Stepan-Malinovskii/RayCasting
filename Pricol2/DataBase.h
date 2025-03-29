@@ -7,10 +7,9 @@
 #include <fstream>
 #include <string>
 #include <tuple>
+#include "Player.h"
 #include <codecvt>
 #include <locale>
-
-#include "Player.h"
 
 class Data
 {

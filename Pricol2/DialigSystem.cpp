@@ -1,8 +1,7 @@
 #include "DialogSystem.h"
 
-Dialog::Dialog(sf::RenderWindow* _window, Data* _data, UIManager* _uiManager, Trade* _trade)
+Dialog::Dialog(sf::RenderWindow* _window, Data* _data, UIManager* _uiManager)
 {
-	trade = _trade;
 	window = _window;
 	data = _data;
 	nowKey = 0;

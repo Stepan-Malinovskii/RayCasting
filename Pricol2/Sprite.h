@@ -2,15 +2,13 @@
 #ifndef SPRITE
 #define SPRITE
 
-#include <SFML/System/Vector2.hpp>
-#include <SFML/Graphics/Texture.hpp>
+#include "SFML/System/Vector2.hpp"
+#include "SFML/Graphics/Texture.hpp"
 #include <functional>
 #include <algorithm>
 #include <memory>
 #include <set>
 #include <iostream>
-#include "DialogSystem.h"
-#include "Map.h"
 
 constexpr float PI = 3.14159265359f;
 constexpr int ENEMY_COUNT = 14;

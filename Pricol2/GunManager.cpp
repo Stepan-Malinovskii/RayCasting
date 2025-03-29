@@ -1,4 +1,4 @@
-#include "WeaponManager.h"
+#include "GunManager.h"
 
 WeaponManager::WeaponManager(Data* _data)
 {

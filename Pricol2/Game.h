@@ -14,7 +14,7 @@
 #include "Player.h"
 #include "Renderer.h"
 #include "SpriteManager.h"
-#include "WeaponManager.h"
+#include "GunManager.h"
 #include "UIManeger.h"
 #include "Trade.h"
 

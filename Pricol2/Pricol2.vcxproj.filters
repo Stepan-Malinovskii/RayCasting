@@ -51,7 +51,7 @@
     <ClCompile Include="SpriteManager.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="WeaponManager.cpp">
+    <ClCompile Include="GunManager.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="DataBase.cpp">
@@ -107,7 +107,7 @@
     <ClInclude Include="SpriteManager.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="WeaponManager.h">
+    <ClInclude Include="GunManager.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="DataBase.h">

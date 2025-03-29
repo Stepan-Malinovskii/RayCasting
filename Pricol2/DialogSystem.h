@@ -2,7 +2,9 @@
 #ifndef DIALOG
 #define DIALOG
 
-#include "Sprite.h"
+#include "sfmlExtantion.h"
+#include <functional>
+#include"Sprite.h"
 #include "DataBase.h"
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "SFML/Window/Mouse.hpp"
