@@ -1,5 +1,4 @@
 #include "Renderer.h"
-#include <SFML/Graphics/RectangleShape.hpp>
 
 Renderer::Renderer(sf::RenderWindow* _window)
 {

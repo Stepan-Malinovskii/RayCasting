@@ -21,13 +21,18 @@ void SpriteManager::init()
 
 
 		if (sp.spriteDefId == 0)
-		{	
+		{
 			def.maxHealpoint = plDef.maxHp;
 			sp.nowHealPoint = plDef.nowHp;
-		
+
 			sprite = std::make_shared<Sprite>(def, sp, id);
 			player = std::make_unique<Player>(Player(sprite.get(), plDef, nowMap));
 
+		}
+		else if (sp.spriteDefId >= ENEMY_COUNT)
+		{
+			int in = sp.spriteDefId - ENEMY_COUNT;
+			sprite = std::make_shared<Npc>(Npc(def, sp, id, in, dialogSys));
 		}
 		else
 		{
@@ -88,6 +93,7 @@ void SpriteManager::update(float deltaTime)
 			sp->update(deltaTime);
 			if (sp->spMap.nowHealPoint <= 0.0f)
 			{
+				player->money += Random::intRandom((int)(sp->spDef.midleDrop * 0.8f), (int)(sp->spDef.midleDrop * 1.2f));
 				deleteSprite(sp);
 			}
 		}

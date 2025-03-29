@@ -1,15 +1,8 @@
 #pragma once
 #ifndef PLAYER
-#define PLAYER
 
-#include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/Sprite.hpp>
-#include <SFML/Window/Event.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/Graphics/Text.hpp>
 #include <vector>
-
-#include "Map.h"
+#include "Raycast.h"
 #include "Resources.h"
 #include "Animation.h"
 #include "Weapon.h"
@@ -26,6 +19,8 @@ struct PlayerDef
 	float maxStrenght;
 	float nowStrenght;
 	int countpantrons;
+	int money;
+	int details;
 	std::vector<std::pair<int, int>> itemData;
 };
 
@@ -39,7 +34,7 @@ public:
 	void checkBoost(bool isPressed, float deltaTime);
 	void move(sf::Vector2f deltaPos, float deltaTime);
 	void jump();
-	MapSprite* dialog();
+	Sprite* dialog();
 	void takeDamage(float damage);
 	void fire(int gun = -1);
 	void swapGun(bool flag);
@@ -48,16 +43,20 @@ public:
 	float getMoveSpeed();
 	void takeItem(Item* item, int cnt = 1);
 	void heal();
-	
+
 	Gun* getGun();
 	sf::Vector2f getDeltaShake();
 	PlayerDef getPlayerDef();
+
 
 	Sprite* sprite;
 	Gun* kick;
 	float pitch, posZ, maxEnergy, nowEnergy;
 	float defence, nowStrenght, maxStrenght;
 	int patrons;
+	int money;
+	int details;
+	std::vector<Improve*> improvments;
 private:
 	std::vector<std::pair<Item*, int>> items;
 	bool isJump, jumpFlag;

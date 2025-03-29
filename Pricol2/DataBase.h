@@ -1,12 +1,16 @@
 #pragma once
+#ifndef DATA
+#define DATA
+
 #include <vector>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <tuple>
-#include "Player.h"
 #include <codecvt>
 #include <locale>
+
+#include "Player.h"
 
 class Data
 {
@@ -25,3 +29,5 @@ private:
 	std::vector<std::pair<int, std::vector<int>>>* key2key;
 	std::vector<std::tuple<int, std::wstring, int>>* key2text;
 };
+
+#endif // !DATA

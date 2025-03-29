@@ -5,47 +5,24 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <functional>
 
-class BaseButton
-{
-public:
-	BaseButton(sf::Vector2f _pos, sf::Vector2f _size);
-	BaseButton() = default;
-	virtual ~BaseButton() = default;
-	bool isClicked(sf::Vector2i& mousePos);
-	virtual void update() = 0;
-	const sf::Vector2f& getPosition() const;
-private:
-	sf::Vector2f pos, size;
-};
-
-class Button : public BaseButton
-{
-public:
-	Button(sf::Vector2f _pos, sf::Vector2f _size, sf::Texture& _text, sf::IntRect teztureRect);
-	Button(sf::RectangleShape _shape) : BaseButton(_shape.getPosition(), _shape.getSize()) { shape = _shape; };
-	Button() = default;
-	virtual ~Button() = default;
-	void drawButton(sf::RenderTarget& window);
-private:
-	sf::RectangleShape shape;
-};
 
 struct Group
 {
-	Group(sf::RectangleShape _shape, sf::Text _text) : shape{_shape}, text{_text}
+	Group(sf::RectangleShape _shape, sf::Text _text) : shape{ _shape }, text{ _text }
 	{
 		shape.setOrigin({ shape.getSize().x / 2, shape.getSize().y / 2 });
 		text.setOrigin({ text.getLocalBounds().width / 2, text.getLocalBounds().height / 2 });
-		text.setPosition({ shape.getPosition().x, shape.getPosition().y});
+		text.setPosition({ shape.getPosition().x, shape.getPosition().y });
 	}
 
 	Group() = default;
 
-	void setString(std::string data)
+	void setString(std::wstring data)
 	{
 		text.setString(data);
 		text.setOrigin({ text.getLocalBounds().width / 2, text.getLocalBounds().height / 2 });
@@ -58,43 +35,42 @@ struct Group
 		text.setPosition({ position.x, position.y - text.getCharacterSize() / 4 });
 	}
 
-	sf::Vector2f getSize() { return shape.getSize(); }
+	sf::Vector2f getSize() { return shape.getSize() ; }
 	sf::Vector2f getPosition() { return shape.getPosition(); }
 
 	sf::RectangleShape shape;
 	sf::Text text;
 };
 
-class DialogButton : public BaseButton
+class Button : public sf::Drawable
 {
 public:
-	DialogButton(sf::RectangleShape _shape, sf::Text& _text);
-	DialogButton(Group _group);
-	DialogButton() = default;
+	Button(sf::RectangleShape _shape, sf::Text& _text);
+	Button(Group _group);
+	Button() = default;
 
+	void setPosition(sf::Vector2f);
+	sf::Vector2f getPosition();
+	sf::Vector2f getSize();
+	void setString(std::wstring data);
+	void setTexture(sf::Texture* text);
+	void setTextureRect(sf::IntRect rect);
+
+	void setPosition(sf::Vector2f);
+	sf::Vector2f getPosition();
+	sf::Vector2f getSize();
+	void setString(std::wstring data);
+	void setTexture(sf::Texture* text);
+	void setTextureRect(sf::IntRect rect);
+	
 	void setFunc(std::function<void()> _fn);
-
-	void drawButton(sf::RenderTarget* window);
-
-	void update() override;
-
+	bool isClicked(sf::Vector2i& mousePos);
+	void use();
+private:
+	std::function<void()> fn;
 	Group group;
-private:
-	std::function<void()> fn;
+
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 };
 
-class EdingButton : public Button
-{
-public:
-	EdingButton(sf::Vector2f _pos, sf::Vector2f _size, sf::Texture& _text, sf::IntRect teztureRect) :
-		Button(_pos, _size, _text, teztureRect) { }
-	EdingButton(sf::RectangleShape _shape) : Button(_shape) {}
-	EdingButton() = default;
-
-	void setFunc(std::function<void()> _fn);
-
-	void update() override;
-private:
-	std::function<void()> fn;
-};
 #endif // !SFMLEXT

@@ -1,7 +1,4 @@
 #include "Editor.h"
-#include <SFML/Window/Mouse.hpp>
-#include <SFML/Window/Event.hpp>
-#include "SpriteManager.h"
 
 void Editor::init(sf::RenderWindow& window, sf::RenderWindow& editorWindow, Map* map)
 {
@@ -16,33 +13,37 @@ void Editor::init(sf::RenderWindow& window, sf::RenderWindow& editorWindow, Map*
 
 void Editor::initButton()
 {
-	EdingButton b;
-	sf::RectangleShape shape;
-	shape.setTexture(&Resources::textures);
-	shape.setSize({ TEXTURE_SIZE, TEXTURE_SIZE});
+	sf::RectangleShape shape(sf::Vector2f{ TEXTURE_SIZE, TEXTURE_SIZE });
 	shape.setScale({ 0.5f ,0.5f });
+	Button b({ shape, {} });
+	b.setTexture(&Resources::textures);
 	int x = 0, y = 0, h = 0;
 	for (; x < Resources::textures.getSize().x / TEXTURE_SIZE * 4; x++, y++)
 	{
-		shape.setPosition({ (x % COUNT_ROW_TEXT ) * (float)ICON_SIZE, ( y / COUNT_ROW_TEXT) * (float)ICON_SIZE });
-		shape.setTextureRect({ {(int)(x % TEXTURE_COUNT * TEXTURE_SIZE), (int)(x / TEXTURE_COUNT * TEXTURE_SIZE )},{TEXTURE_SIZE, TEXTURE_SIZE} });
-		b = EdingButton(shape);
+		b.setPosition({ (x % COUNT_ROW_TEXT) * (float)ICON_SIZE + ICON_SIZE / 2, (y / COUNT_ROW_TEXT) * (float)ICON_SIZE });
+		b.setTextureRect({ {(int)(x % TEXTURE_COUNT * TEXTURE_SIZE), (int)(x / TEXTURE_COUNT * TEXTURE_SIZE)},{TEXTURE_SIZE, TEXTURE_SIZE} });
+
 		b.setFunc([=]() {
 			nowValue = x + 1;
 			});
 
-		buttons.push_back(std::make_shared<EdingButton>(b));
+		buttons.push_back(std::make_shared<Button>(b));
 	}
 
 	y += (y / COUNT_ROW_TEXT + 1) * COUNT_ROW_TEXT - y;
+
+	sf::RectangleShape shape1(sf::Vector2f{ ICON_SIZE, ICON_SIZE });
+	b = Button({ shape1, {} });
+	b.setTexture(&Resources::spriteIcon);
 	for (x = 0; x < spriteDef.size() - 1; x++, y++)
 	{
-		b = EdingButton((float)ICON_SIZE * (sf::Vector2f(x % COUNT_ROW_TEXT, y / COUNT_ROW_TEXT) + sf::Vector2f(0.025f, 0.025f)),
-			{ ICON_SIZE, ICON_SIZE }, Resources::spriteIcon, { { ICON_SIZE * x, 0}, {ICON_SIZE, ICON_SIZE} });
+		b.setPosition({ (float)ICON_SIZE * (x % COUNT_ROW_TEXT) + ICON_SIZE / 2, y / COUNT_ROW_TEXT * (float)ICON_SIZE });
+		b.setTextureRect({ { ICON_SIZE * x, 0}, {ICON_SIZE, ICON_SIZE} });
+
 		b.setFunc([=]() {
 			nowSpriteDef = spriteDef[x + 1];
 			});
-		buttons.push_back(std::make_shared<EdingButton>(b));
+		buttons.push_back(std::make_shared<Button>(b));
 	}
 }
 
@@ -76,7 +77,7 @@ void Editor::takeWindowInput(sf::RenderWindow& window, sf::Event event)
 	{
 		windowStateNoRightClick(window);
 	}
-	
+
 
 	static bool da = false;
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !da)
@@ -101,7 +102,7 @@ void Editor::takeWindowInput(sf::RenderWindow& window, sf::Event event)
 		{
 			nowLayer++;
 			nowLayer = nowLayer % ALL_LAYER;
-	}
+		}
 	}
 
 	window.setView(windowView);
@@ -187,7 +188,7 @@ void Editor::editorWindowStateLeftClick(sf::RenderWindow& editorWindow)
 		{
 			if (b->isClicked(worldPos))
 			{
-				b->update();
+				b->use();
 			}
 		}
 	}
@@ -197,7 +198,7 @@ void Editor::drawEditor(sf::RenderWindow& editorWindow)
 {
 	for (auto b : buttons)
 	{
-		b->drawButton(editorWindow);
+		editorWindow.draw(*b.get());
 	}
 }
 

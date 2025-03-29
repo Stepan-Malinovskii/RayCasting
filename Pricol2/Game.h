@@ -1,6 +1,7 @@
 #pragma once
 #ifndef GAME
 #define GAME
+
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
 #include <memory>
@@ -13,8 +14,10 @@
 #include "Player.h"
 #include "Renderer.h"
 #include "SpriteManager.h"
-#include "GunManager.h"
+#include "WeaponManager.h"
 #include "UIManeger.h"
+#include "Trade.h"
+
 
 class Game
 {
@@ -31,7 +34,7 @@ private:
 	void update(float deltaT);
 	void render();
 	void initPlayer();
-	
+
 	Data* data;
 	Npc nowNpc;
 	Dialog* dialogSys;
@@ -39,6 +42,7 @@ private:
 	SpriteManager* spManager;
 	UIManager* uiManager;
 	WeaponManager* weaponManager;
+	Trade* trade;
 	Player* player;
 	Renderer* renderer;
 	Map* nowMap;

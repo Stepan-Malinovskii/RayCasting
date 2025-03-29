@@ -40,8 +40,11 @@ void Weapon::startAnimation(int number)
 	weaponAnimator.setAnimation(number);
 }
 
-Improve::Improve(ImproveDef def) : 
-	type{ def.type }, name{ def.name }, cost{ def.cost }, id{ def.id }
+Itemble::Itemble(std::wstring _name, std::wstring _disc, int _cost, int _textureId) :
+	name{ _name }, disc{ _disc }, cost{ _cost }, textureId{ _textureId } {}
+
+Improve::Improve(ImproveDef def) : Itemble(def.name, def.disc, def.cost, id),
+type{ def.type }, id{ def.id }
 {
 	if (type == Damage)
 	{
@@ -71,9 +74,50 @@ void Improve::setGetFunc(std::function<void(Gun* gun)> _setEffect) { getImprove 
 
 void Improve::setDelFunc(std::function<void(Gun* gun)> _delEffect) { deleteImprove = _delEffect; }
 
+Item::Item(ItemsDef def) : Itemble(def.name, def.disc, def.cost, id),
+type{ def.type }, maxUsing{ def.maxUSing }, id{ def.id }
+{
+	maxUsing = def.maxUSing;
+	id = def.id;
+
+	if (def.type == Heal)
+	{
+		setFunc([=](Player* pl) {pl->sprite->spMap.nowHealPoint += def.effect;
+		pl->sprite->spMap.nowHealPoint = std::min(pl->sprite->spDef.maxHealpoint, pl->sprite->spMap.nowHealPoint);});
+	}
+	else if (def.type == MaxHeal)
+	{
+		setFunc([=](Player* pl) {
+			if (Random::bitRandom() > 0.2f)
+				pl->sprite->spDef.maxHealpoint += def.effect;
+			else
+				pl->sprite->spDef.maxHealpoint -= def.effect / 2;
+			pl->sprite->spMap.nowHealPoint = std::min(pl->sprite->spDef.maxHealpoint, pl->sprite->spMap.nowHealPoint);});
+	}
+	else if (def.type == MaxEnergy)
+	{
+		setFunc([=](Player* pl) {
+			if (Random::bitRandom() > 0.2f)
+				pl->maxEnergy += def.effect;
+			else
+				pl->maxEnergy -= def.effect / 2;
+			pl->nowEnergy = std::min(pl->maxEnergy, pl->nowEnergy);});
+	}
+	else if (def.type == Armor)
+	{
+		setFunc([=](Player* pl) {pl->defence = def.effect;
+		pl->maxStrenght = def.maxUSing; pl->nowStrenght = def.maxUSing;});
+	}
+}
+
+void Item::setFunc(std::function<void(Player* sprite)> _useFunc) { useFunc = _useFunc; }
+
+void Item::useItem(Player* sprite) { useFunc(sprite); }
+
 Gun::Gun(GunDef def, bool _isReset) : Weapon(def.shutTime, def.maxDist),
+Itemble(def.name, def.disc, def.cost, def.id),
 damage{ def.damage }, maxCount{ def.maxCount }, nowCount{ def.nowCount },
-nowTimeBetwenReset{ def.resetTime }, timeBetwenReset{ def.resetTime }, cost{ def.cost  }
+nowTimeBetwenReset{ def.resetTime }, timeBetwenReset{ def.resetTime }
 {
 	nowRad = 1;
 	maxRad = 30;
@@ -142,7 +186,7 @@ int Gun::resetPatron(int count)
 	return count;
 }
 
-void Gun::ussing(Sprite* sp, float dist) 
+void Gun::ussing(Sprite* sp, float dist)
 {
 	if (nowCount == 0 && isReset)
 	{
@@ -183,42 +227,6 @@ Improve* Gun::deleteImprove(ImproveType type)
 	return temp.mapped();
 }
 
-Item::Item(ItemsDef def) : 
-	type{ def.type }, name{ def.name }, cost{ def.cost }, maxUsing{ def.maxUSing }, id{ def.id }
-{
-	maxUsing = def.maxUSing;
-	id = def.id;
-
-	if (def.type == Heal)
-	{
-		setFunc([=](Player* pl) {pl->sprite->spMap.nowHealPoint += def.effect;
-		pl->sprite->spMap.nowHealPoint = std::min(pl->sprite->spDef.maxHealpoint, pl->sprite->spMap.nowHealPoint);});
-	}
-	else if (def.type == MaxHeal)
-	{
-		setFunc([=](Player* pl) {
-			if (Random::bitRandom() > 0.2f)
-				pl->sprite->spDef.maxHealpoint += def.effect;
-			else
-				pl->sprite->spDef.maxHealpoint -= def.effect / 2;
-			pl->sprite->spMap.nowHealPoint = std::min(pl->sprite->spDef.maxHealpoint, pl->sprite->spMap.nowHealPoint);});
-	}
-	else if (def.type == MaxEnergy)
-	{
-		setFunc([=](Player* pl) {
-			if (Random::bitRandom() > 0.2f)
-				pl->maxEnergy += def.effect;
-			else
-				pl->maxEnergy -= def.effect / 2;
-		pl->nowEnergy = std::min(pl->maxEnergy, pl->nowEnergy);});
-	}
-	else if (def.type == Armor)
-	{
-		setFunc([=](Player* pl) {pl->defence = def.effect;
-		pl->maxStrenght = def.maxUSing; pl->nowStrenght = def.maxUSing;});
-	}
-}
-
 GunData Gun::getGunData()
 {
 	std::vector<int> ids;
@@ -230,9 +238,5 @@ GunData Gun::getGunData()
 		}
 	}
 
-	return {nowCount, ids};
+	return { textureId, nowCount, ids };
 }
-
-void Item::setFunc(std::function<void(Player* sprite)> _useFunc) { useFunc = _useFunc; }
-
-void Item::useItem(Player* sprite) { useFunc(sprite); }

@@ -1,6 +1,4 @@
 #include "Sprite.h"
-#include "DialogSystem.h"
-#include "Map.h"
 
 Sprite::Sprite(sf::Vector2f pos, float _size, int indText, int _id, float HP, float _angle, bool isDirect, SpriteType _type)
 	: spMap{indText + 1, pos, _angle, HP}, 

@@ -2,7 +2,6 @@
 #ifndef ANIMATION
 #define ANIMATION
 
-
 #include <vector>
 #include <cstddef>
 

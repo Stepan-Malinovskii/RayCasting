@@ -92,6 +92,8 @@ PlayerDef Data::getPlayerData()
 	in.read(reinterpret_cast<char*>(&plDef.maxStrenght), sizeof(plDef.maxStrenght));
 	in.read(reinterpret_cast<char*>(&plDef.nowStrenght), sizeof(plDef.nowStrenght));
 	in.read(reinterpret_cast<char*>(&plDef.countpantrons), sizeof(plDef.countpantrons));
+	in.read(reinterpret_cast<char*>(&plDef.money), sizeof(plDef.money));
+	in.read(reinterpret_cast<char*>(&plDef.details), sizeof(plDef.details));
 
 	int size;
 	in.read(reinterpret_cast<char*>(&size), sizeof(size));
@@ -124,6 +126,8 @@ void Data::savePlayerData(Player* player)
 	out.write(reinterpret_cast<const char*>(&plDef.maxStrenght), sizeof(plDef.maxStrenght));
 	out.write(reinterpret_cast<const char*>(&plDef.nowStrenght), sizeof(plDef.nowStrenght));
 	out.write(reinterpret_cast<const char*>(&plDef.countpantrons), sizeof(plDef.countpantrons));
+	out.write(reinterpret_cast<const char*>(&plDef.money), sizeof(plDef.money));
+	out.write(reinterpret_cast<const char*>(&plDef.details), sizeof(plDef.details));
 
 	int size = plDef.itemData.size();
 	out.write(reinterpret_cast<const char*>(&size), sizeof(size));
@@ -147,6 +151,7 @@ std::vector<GunData> Data::getGunData()
 
 	for (int i = 0; i < size; i++)
 	{
+		in.read(reinterpret_cast<char*>(&defs[i].id), sizeof(defs[i].id));
 		in.read(reinterpret_cast<char*>(&defs[i].nowCount), sizeof(defs[i].nowCount));
 
 		int unSize;
@@ -174,6 +179,7 @@ void Data::saveGunData(std::vector<GunData> guns)
 
 	for (auto def : guns)
 	{
+		out.write(reinterpret_cast<const char*>(&def.id), sizeof(def.id));
 		out.write(reinterpret_cast<const char*>(&def.nowCount), sizeof(def.nowCount));
 
 		int unSize = def.improveId.size();
