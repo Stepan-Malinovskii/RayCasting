@@ -1,7 +1,10 @@
 #include "Inventory.h"
 
-Inventory::Inventory(Player* _player, UIManager* _uiManager):
-	uiManager{ _uiManager}, player{ _player } {}
+Inventory::Inventory(sf::RenderWindow* _window, Player* _player, UIManager* _uiManager) :
+	window{ _window }, uiManager { _uiManager }, player{ _player } 
+{
+	isOpen = false;
+}
 
 Item* Inventory::takeMaxHeal()
 {
@@ -51,4 +54,16 @@ std::vector<std::pair<int, int>> Inventory::getInventToSave()
 	}
 
 	return inv;
+}
+
+void Inventory::useInvent() { isOpen = !isOpen; }
+
+void Inventory::update()
+{
+
+}
+
+void Inventory::drawInvent()
+{
+
 }

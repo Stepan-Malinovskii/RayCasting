@@ -38,7 +38,7 @@ void Game::initPlayer()
 		player->setGun(weaponManager->getGunById(it));
 	}
 
-	invent = new Inventory(player, uiManager);
+	invent = new Inventory(window, player, uiManager);
 	auto a = data->getInvent();
 	player->setInventory(invent);
 
@@ -58,7 +58,16 @@ void Game::save()
 
 void Game::getInput(sf::Event event, float deltaTime)
 {
-	if (dialogSys->isActive) { return; }
+	if (event.type == sf::Event::KeyPressed)
+	{
+		if (event.key.code == sf::Keyboard::Q)
+		{
+			invent->useInvent();
+		}
+	}
+
+	if (dialogSys->isActive || invent->isOpen) { return; }
+
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{			
 		player->fire(0);
@@ -80,68 +89,68 @@ void Game::getInput(sf::Event event, float deltaTime)
 
 void Game::getInput(float deltaTime)
 {
+	if (!window->hasFocus()) return;
+
 	float radiansAngle = player->sprite->spMap.angle * PI / 180.0f;
 	sf::Vector2f verticalMoveParametrs(cos(radiansAngle), sin(radiansAngle));
 	sf::Vector2f horizontalMoveParametrs(-verticalMoveParametrs.y, verticalMoveParametrs.x);
 	sf::Vector2f deltaPos(0, 0);
 	bool lShiftPressed = false;
 	float deltaX = 0, deltaY = 0;
-	if (window->hasFocus())
+
+	if (GetAsyncKeyState('A'))
 	{
-		if (GetAsyncKeyState('A'))
+		deltaPos -= horizontalMoveParametrs;
+	}
+	else if (GetAsyncKeyState('D'))
+	{
+		deltaPos += horizontalMoveParametrs;
+	}
+	if (GetAsyncKeyState('W'))
+	{
+		deltaPos += verticalMoveParametrs;
+	}
+	else if (GetAsyncKeyState('S'))
+	{
+		deltaPos -= verticalMoveParametrs;
+	}
+	if (GetAsyncKeyState('R'))
+	{
+		player->reloadingGun();
+	}
+	if (GetAsyncKeyState(VK_LSHIFT))
+	{
+		lShiftPressed = true;
+	}
+	if (GetAsyncKeyState(VK_SPACE))
+	{
+		player->jump();
+	}
+	if (GetAsyncKeyState('F'))
+	{
+		player->fire();
+	}
+	if (GetAsyncKeyState('E'))
+	{
+		Sprite* sp = player->dialog();
+		if (sp != nullptr)
 		{
-			deltaPos -= horizontalMoveParametrs;
-		}
-		else if (GetAsyncKeyState('D'))
-		{
-			deltaPos += horizontalMoveParametrs;
-		}
-		if (GetAsyncKeyState('W'))
-		{
-			deltaPos += verticalMoveParametrs;
-		}
-		else if (GetAsyncKeyState('S'))
-		{
-			deltaPos -= verticalMoveParametrs;
-		}
-		if (GetAsyncKeyState('R'))
-		{
-			player->reloadingGun();
-		}
-		if (GetAsyncKeyState(VK_LSHIFT))
-		{
-			lShiftPressed = true;
-		}
-		if (GetAsyncKeyState(VK_SPACE))
-		{
-			player->jump();
-		}
-		if (GetAsyncKeyState('F'))
-		{
-			player->fire();
-		}
-		if (GetAsyncKeyState('E'))
-		{
-			Sprite* sp = player->dialog();
-			if (sp != nullptr)
+			Npc* npc = dynamic_cast<Npc*>(sp);
+			if (npc != nullptr)
 			{
-				Npc* npc = dynamic_cast<Npc*>(sp);
-				if (npc != nullptr)
-				{
-					npc->use();
-				}
+				npc->use();
 			}
 		}
-
-		sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
-		deltaX = (mousePos.x - screenMidlePos.x) / 2.0f;
-		deltaY = (mousePos.y - screenMidlePos.y) / 2.0f;
-		sf::Mouse::setPosition(screenMidlePos, *window);
 	}
+
+	sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+	deltaX = (mousePos.x - screenMidlePos.x) / 2.0f;
+	deltaY = (mousePos.y - screenMidlePos.y) / 2.0f;
+	sf::Mouse::setPosition(screenMidlePos, *window);
 
 	player->checkBoost(lShiftPressed, deltaTime);
 	player->move(deltaPos, deltaTime);
-	player->updateMouseData({deltaX, deltaY}, deltaTime);
+	player->updateMouseData({ deltaX, deltaY }, deltaTime);
 }
 
 void Game::resetMap(Map* newMap)
@@ -168,7 +177,13 @@ void Game::makeCycle(float deltaTime)
 		deltaTime = 0;
 	}
 #endif //_DEBUG
-	if (dialogSys->isActive)
+	if (invent->isOpen)
+	{
+		window->clear();
+		invent->update();
+		invent->drawInvent();
+	}
+	else if (dialogSys->isActive)
 	{
 		window->clear();
 		dialogSys->update();

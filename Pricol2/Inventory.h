@@ -9,17 +9,22 @@
 class Inventory
 {
 public:
-	Inventory(Player* _player, UIManager* _uiManager);
+	Inventory(sf::RenderWindow* _window, Player* _player, UIManager* _uiManager);
 
 	Item* takeMaxHeal();
 	void takeItem(Itemble*, int cnt = 1);
 	void useItem(Itemble*, int cnt = 1);
-	//void setInventFromLoad(std::vector < std::pair<int, int>> data);
 	std::vector < std::pair<int, int>> getInventToSave();
-private:
 
+	void useInvent();
+	void update();
+	void drawInvent();
+
+	bool isOpen;
+private:
 	std::map<Itemble*, int> items;
 	UIManager* uiManager;
+	sf::RenderWindow* window;
 	Player* player;
 };
 
