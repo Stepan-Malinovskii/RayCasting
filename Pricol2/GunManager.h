@@ -10,8 +10,9 @@ class WeaponManager
 public:
 	WeaponManager(Data* data);
 	~WeaponManager();
-	Gun* getGun(int index);
-	Itemble* getItem(int index);
+	Gun* getGunByIndex(int index);
+	Gun* getGunById(int id);
+	Itemble* getItem(int id);
 	std::vector<Gun*> getGuns();
 	std::vector<Improve*> getImprovs();
 	std::vector<Item*> getItems();

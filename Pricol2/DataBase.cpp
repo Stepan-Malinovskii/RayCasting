@@ -57,6 +57,44 @@ Data::~Data()
 	delete key2text;
 }
 
+std::vector<std::pair<int, int>> Data::getInvent()
+{
+	std::ifstream in{ "Texture/inventory.inv", std::ios::in | std::ios::binary };
+	if (!in.is_open()) return {};
+	
+	int size;
+	in.read(reinterpret_cast<char*>(&size), sizeof(size));
+	std::vector<std::pair<int, int>> inv(size);
+
+	for (int i = 0; i < size; i++)
+	{
+		int first, second;
+		in.read(reinterpret_cast<char*>(&first), sizeof(first));
+		in.read(reinterpret_cast<char*>(&second), sizeof(second));
+		inv[i] = {first, second};
+	}
+	in.close();
+
+	return inv;
+}
+
+void Data::saveInvent(std::vector<std::pair<int, int>> inv)
+{
+	std::ofstream out{ "Texture/inventory.inv", std::ios::out | std::ios::binary };
+	if (!out.is_open()) return;
+
+	int size = inv.size();
+	out.write(reinterpret_cast<const char*>(&size), sizeof(size));
+
+	for (auto it : inv)
+	{
+		out.write(reinterpret_cast<const char*>(&it.first), sizeof(it.first));
+		out.write(reinterpret_cast<const char*>(&it.second), sizeof(it.second));
+	}
+
+	out.close();
+}
+
 std::vector<int> Data::getKeys(int key)
 {
 	for (int i = 0; i < key2key->size(); i++)
@@ -98,14 +136,13 @@ PlayerDef Data::getPlayerData()
 	int size;
 	in.read(reinterpret_cast<char*>(&size), sizeof(size));
 	
-	plDef.itemData.reserve(size);
-	for (int i = 0; i < size; i++)
+	plDef.gunsData.reserve(size);
+	/*for (int i = 0; i < size; i++)
 	{
-		int first, second;
-		in.read(reinterpret_cast<char*>(&first), sizeof(first));
-		in.read(reinterpret_cast<char*>(&second), sizeof(second));
-		plDef.itemData.emplace_back(first, second);
-	}
+		int id;
+		in.read(reinterpret_cast<char*>(&id), sizeof(id));
+		plDef.itemData.push_back(id);
+	}*/
 
 	in.close();
 	return plDef;
@@ -129,12 +166,11 @@ void Data::savePlayerData(Player* player)
 	out.write(reinterpret_cast<const char*>(&plDef.money), sizeof(plDef.money));
 	out.write(reinterpret_cast<const char*>(&plDef.details), sizeof(plDef.details));
 
-	int size = plDef.itemData.size();
+	int size = plDef.gunsData.size();
 	out.write(reinterpret_cast<const char*>(&size), sizeof(size));
-	for (auto it : plDef.itemData)
+	for (auto it : plDef.gunsData)
 	{
-		out.write(reinterpret_cast<const char*>(&it.first), sizeof(it.first));
-		out.write(reinterpret_cast<const char*>(&it.second), sizeof(it.second));
+		out.write(reinterpret_cast<const char*>(&it), sizeof(it));
 	}
 
 	out.close();
@@ -165,6 +201,7 @@ std::vector<GunData> Data::getGunData()
 			defs[i].improveId.push_back(id);
 		}
 	}
+	in.close();
 
 	return defs;
 }

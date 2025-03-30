@@ -60,7 +60,9 @@ WeaponManager::WeaponManager(Data* _data)
 
 WeaponManager::~WeaponManager() {}
 
-Gun* WeaponManager::getGun(int index) { return guns[index].get(); }
+Gun* WeaponManager::getGunByIndex(int index) { return guns[index].get(); }
+
+Gun* WeaponManager::getGunById(int id) { return dynamic_cast<Gun*>(itemble[id]); }
 
 Itemble* WeaponManager::getItem(int index) { return itemble[index]; }
 

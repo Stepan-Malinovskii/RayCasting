@@ -230,7 +230,7 @@ void UIManager::initPlayer()
 			}
 			else
 			{
-				auto gun = player->getGun();
+				auto gun = player->getNowGun();
 				gun->drawWeapon(window, player->getDeltaShake());
 
 				if (gun->isReset)
@@ -327,7 +327,7 @@ void UIManager::initPlayer()
 				window->draw(rect);
 			}
 
-			sf::CircleShape aim(player->getGun()->nowRad, 16);
+			sf::CircleShape aim(player->getNowGun()->nowRad, 16);
 			aim.setOrigin({ aim.getRadius(), aim.getRadius()});
 			aim.setFillColor(sf::Color(0,0,0,0));
 			aim.setOutlineColor(sf::Color::Black);

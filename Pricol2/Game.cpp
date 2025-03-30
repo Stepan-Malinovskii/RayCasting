@@ -22,19 +22,29 @@ Game::~Game()
 	delete spManager;
 	delete weaponManager;
 	delete uiManager;
+	delete invent;
 }
 
 void Game::initPlayer()
 {
 	player = spManager->getPlayer();
-	player->kick = weaponManager->getGun(0);
-	player->setGun(weaponManager->getGun(1));
+	player->kick = weaponManager->getGunByIndex(0);
+	player->setGun(weaponManager->getGunByIndex(1));
 
 	PlayerDef plDef = data->getPlayerData();
 
-	for (auto it : plDef.itemData)
+	for (auto it : plDef.gunsData)
 	{
-		player->takeItem(weaponManager->getItem(it.first), it.second);
+		player->setGun(weaponManager->getGunById(it));
+	}
+
+	invent = new Inventory(player, uiManager);
+	auto a = data->getInvent();
+	player->setInventory(invent);
+
+	for (auto b : a)
+	{
+		player->takeItem(weaponManager->getItem(b.first), b.second);
 	}
 }
 
@@ -43,6 +53,7 @@ void Game::save()
 	spManager->saveSprite();
 	weaponManager->saveGun();
 	data->savePlayerData(player);
+	data->saveInvent(invent->getInventToSave());
 }
 
 void Game::getInput(sf::Event event, float deltaTime)
@@ -137,10 +148,10 @@ void Game::resetMap(Map* newMap)
 {
 	nowMap = newMap;
 	player = spManager->resetMap(newMap);
-	player->kick = weaponManager->getGun(0);
+	player->kick = weaponManager->getGunById(0);
 	for (int i = 1; i < 8; i++)
 	{
-		player->setGun(weaponManager->getGun(i));
+		player->setGun(weaponManager->getGunById(i));
 	}
 }
 

@@ -16,6 +16,7 @@
 #include "SpriteManager.h"
 #include "GunManager.h"
 #include "UIManeger.h"
+#include "Inventory.h"
 
 class Game
 {
@@ -34,7 +35,7 @@ private:
 	void initPlayer();
 
 	Data* data;
-	Npc nowNpc;
+	Inventory* invent;
 	Dialog* dialogSys;
 	sf::Vector2i screenMidlePos;
 	SpriteManager* spManager;

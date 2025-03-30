@@ -2,6 +2,7 @@
 #include "Raycast.h"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
+#include "Inventory.h"
 
 Player::Player(Sprite* _sprite, PlayerDef def, Map* _nowMap) : 
 	sprite{ _sprite }, nowGun{ 0 }, nowEnergy{ def.nowEnergy }, maxEnergy { def.maxEnergy },
@@ -16,6 +17,8 @@ Player::Player(Sprite* _sprite, PlayerDef def, Map* _nowMap) :
 }
 
 void Player::setGun(Gun* gun) { guns.push_back(gun); }
+
+void Player::setInventory(Inventory* _invent) { invent = _invent; }
 
 void Player::updateMouseData(sf::Vector2f mousePos, float deltaTime)
 {
@@ -129,24 +132,6 @@ void Player::gravity(float deltaTime)
 	
 }
 
-void Player::takeMaxHeal()
-{
-	for (auto var : items)
-	{
-		auto t = dynamic_cast<Item*>(var.first);
-		if (t != nullptr)
-		{
-			if (t->type == Heal)
-			{
-				if (nowHeal == nullptr || t->id > nowHeal->id)
-				{
-					nowHeal = t;
-				}
-			}
-		}
-	}
-}
-
 void Player::jump()
 {
 	if (posZ == 0)
@@ -223,13 +208,13 @@ void Player::swapGun(bool flag)
 
 PlayerDef Player::getPlayerDef()
 {
-	std::vector<std::pair<int, int>> itemData;
+	std::vector<int> gunsData;
 
-	for (auto it : items)
+	for (auto it : guns)
 	{
-		if (it.second != 0)
+		if (it != nullptr && it->name != L"Кулаки")
 		{
-			itemData.push_back({it.first->id, it.second});
+			gunsData.push_back(it->id);
 		}
 	}
 
@@ -243,10 +228,10 @@ PlayerDef Player::getPlayerDef()
 	patrons,
 	money,
 	details,
-	itemData };
+	gunsData };
 }
 
-Gun* Player::getGun() { return guns[nowGun]; }
+Gun* Player::getNowGun() { return guns[nowGun]; }
 
 sf::Vector2f Player::getDeltaShake() { return shakeDelta; }
 
@@ -254,8 +239,8 @@ float Player::getMoveSpeed() { return moveSpeed; }
 
 void Player::takeItem(Itemble* item, int cnt)
 {
-	items[item] += cnt;
-	takeMaxHeal();
+	invent->takeItem(item, cnt);
+	nowHeal = invent->takeMaxHeal();
 }
 
 void Player::heal()
@@ -263,17 +248,8 @@ void Player::heal()
 	if (nowHeal != nullptr)
 	{
 		nowHeal->useFunc(this);
-		items[nowHeal]--;
+		invent->useItem(nowHeal);
 
-		if (items[nowHeal] > 0)
-		{
-			nowHeal = nullptr;
-			takeMaxHeal();
-		}
-		else
-		{
-			items.erase(nowHeal);
-			nowHeal = nullptr;
-		}
+		nowHeal = invent->takeMaxHeal();
 	}
 }
