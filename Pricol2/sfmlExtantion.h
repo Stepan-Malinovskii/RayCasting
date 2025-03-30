@@ -12,11 +12,10 @@
 
 struct Group
 {
+public:
 	Group(sf::RectangleShape _shape, sf::Text _text) : shape{ _shape }, text{ _text }
 	{
-		shape.setOrigin({ shape.getLocalBounds().width / 2, shape.getLocalBounds().height / 2 });
-		text.setOrigin({ text.getLocalBounds().width / 2, text.getLocalBounds().height / 2 });
-		text.setPosition({ shape.getPosition().x, shape.getPosition().y - text.getCharacterSize() / 4});
+		centrlized();
 	}
 
 	Group() = default;
@@ -24,8 +23,7 @@ struct Group
 	void setString(std::wstring data)
 	{
 		text.setString(data);
-		text.setOrigin({ text.getLocalBounds().width / 2, text.getLocalBounds().height / 2 });
-		text.setPosition({ shape.getPosition().x, shape.getPosition().y - text.getCharacterSize() / 4 });
+		centrlized();
 	}
 
 	void setPosition(sf::Vector2f position)
@@ -34,11 +32,26 @@ struct Group
 		text.setPosition({ position.x, position.y - text.getCharacterSize() / 4 });
 	}
 
+	void setSize(sf::Vector2f size)
+	{
+		shape.setSize(size);
+		centrlized();
+	}
+
+	void move(sf::Vector2f pos) { setPosition({ getPosition().x + pos.x, getPosition().y + pos.y }); }
+
 	sf::Vector2f getSize() { return shape.getSize(); }
 	sf::Vector2f getPosition() { return shape.getPosition(); }
 
 	sf::RectangleShape shape;
 	sf::Text text;
+private:
+	void centrlized()
+	{
+		shape.setOrigin({ shape.getLocalBounds().width / 2, shape.getLocalBounds().height / 2 });
+		text.setOrigin({ text.getLocalBounds().width / 2, text.getLocalBounds().height / 2 });
+		text.setPosition({ shape.getPosition().x, shape.getPosition().y - text.getCharacterSize() / 4 });
+	}
 };
 
 class Button : public sf::Drawable

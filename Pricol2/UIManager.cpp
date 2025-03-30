@@ -51,14 +51,14 @@ void UIManager::initDialog(std::map<int, std::wstring, std::greater<int>> varian
 	sf::Text nameText(npcName, Resources::UIFont, TEXTSIZE);
 	Group g(nameBase, nameText);
 	g.setPosition({ SCREEN_W / 2, INTERVAL});
-	buttons.push_back(Button(g));
+	buttons.push_back(g);
 
 	sf::RectangleShape dataBase{ {DIALOG_W, DIALOG_H / 2.5f} };
 	dataBase.setFillColor(sf::Color(100, 100, 100));
 	sf::Text dataText(splitText(variants[-1], DIALOG_W, 40), Resources::UIFont, TEXTSIZE - 10);
 	Group g1(dataBase, dataText);
 	g1.setPosition({ SCREEN_W / 2, g.getPosition().y + g1.getSize().y / 2 + INTERVAL});
-	buttons.push_back(Button(g1));
+	buttons.push_back(g1);
 
 	sf::Vector2f pos(SCREEN_W / 2, g1.getPosition().y + g1.getSize().y / 2 + INTERVAL);
 
@@ -164,7 +164,7 @@ void UIManager::initTrade(std::map<int, Itemble*> variants, Player* player)
 	Group g9(rect2, text);
 	g9.setString(L"Баланс: " + std::to_wstring(player->money) + L" | Запчасти: " + std::to_wstring(player->details));
 	g9.setPosition({SCREEN_W / 2, g9.getSize().y / 2 + interval});
-	buttons.push_back(Button(g9));
+	buttons.push_back(g9);
 
 	sf::Text text1(text);
 	text1.setString(L"К\nУ\nП\nИ\nТ\nЬ");
@@ -182,6 +182,138 @@ void UIManager::initTrade(std::map<int, Itemble*> variants, Player* player)
 	
 	buttons.push_back(Button(g3));
 	buttons.back().setFunc([=]() { keyButton = -100; });
+}
+
+void UIManager::initInvent(std::map<Itemble*, int> items, Itemble* choose)
+{
+	deleteNow();
+
+	sf::RectangleShape baseShape({ DIALOG_W / 2 + 15, DIALOG_H + 10});
+	baseShape.setFillColor(sf::Color(70, 70, 70));
+	Group baseGroup(baseShape, {});
+	baseGroup.setPosition({ INTERVAL + baseShape.getSize().x / 2 - 5,
+							INTERVAL + baseShape.getSize().y / 2 - 5});
+	buttons.push_back(baseGroup);
+	
+	sf::RectangleShape invShape({ DIALOG_W / 4, ICON_SIZE / 2  });
+	invShape.setFillColor(sf::Color(50, 50, 50));
+	sf::Text invText(L"", Resources::UIFont, ICON_SIZE / 2 - 20);
+	Group invGroup(invShape, invText);
+	Button invBut(invGroup);
+
+	sf::Vector2f pos{ DIALOG_W / 8 + INTERVAL, INTERVAL + invGroup.getSize().y / 2 };
+	int i = 0;
+
+	for (auto pair : items)
+	{
+		invBut.setPosition(pos);
+		invBut.setString(pair.first->name + L" | " + std::to_wstring(pair.second) + L" шт");
+		invBut.setFunc([=]() { keyButton = pair.first->id;});
+
+		buttons.push_back(invBut);
+
+		if (i % 2 == 0)
+		{
+			pos.x = DIALOG_W / 8 + invGroup.getSize().x + INTERVAL + 5;
+		}
+		else
+		{
+			pos.y += invGroup.getSize().y + 5;
+			pos.x = DIALOG_W / 8 + INTERVAL;
+		}
+		i++;
+	}
+
+	if (choose != nullptr)
+	{
+		sf::RectangleShape dataShape({ DIALOG_W / 4 + 15, DIALOG_H / 3 });
+		dataShape.setFillColor(sf::Color(70, 70, 70));
+		Group dataGroup(dataShape, {});
+		dataGroup.setPosition({ baseGroup.getPosition().x, INTERVAL + dataGroup.getSize().y / 2 });
+		dataGroup.move({ dataGroup.getSize().x / 2 + baseGroup.getSize().x / 2 + INTERVAL, 0 });
+		buttons.push_back(dataGroup);
+
+		sf::RectangleShape textureShape({ ICON_SIZE, ICON_SIZE });
+		textureShape.setScale({ 2, 2 });
+		Group textureGroup(textureShape, {});
+		textureGroup.setPosition({ dataGroup.getPosition().x, INTERVAL + ICON_SIZE / 2 + 10 });
+		buttons.push_back(Button(textureGroup));
+		buttons.back().setTexture(&Resources::itembleIcon);
+		buttons.back().setTextureRect({ {ICON_SIZE * choose->id, 0},{ICON_SIZE, ICON_SIZE} });
+
+		Group dataGroup1(invGroup);
+		dataGroup1.setPosition(textureGroup.getPosition());
+		dataGroup1.move({ 0, textureGroup.getSize().y / 2 + dataGroup1.getSize().y + 5 });
+		dataGroup1.setString(choose->name);
+		buttons.push_back(dataGroup1);
+
+		float oldSize = dataGroup1.getSize().y;
+		dataGroup1.setSize({ dataGroup1.getSize().x, dataGroup1.getSize().y * 2 });
+		dataGroup1.move({ 0, oldSize / 2 + dataGroup1.getSize().y / 2 + 5 });
+		dataGroup1.setString(splitText(choose->disc, dataGroup1.getSize().x, dataGroup1.text.getCharacterSize()));
+		buttons.push_back(dataGroup1);
+
+		auto test = dynamic_cast<Item*>(choose);
+		if (test == nullptr || test->type != Heal)
+		{
+			oldSize = dataGroup.getSize().y;
+			dataGroup.setSize({ dataGroup.getSize().x, DIALOG_H * 2 / 3 - INTERVAL });
+			dataGroup.move({ 0, oldSize / 2 + dataGroup.getSize().y / 2 + INTERVAL });
+			buttons.push_back(Button(dataGroup));
+
+			Group makeGroup(invGroup);
+			sf::Vector2f pos = dataGroup.getPosition();
+			pos.y -= dataGroup.getSize().y / 2 - 5 - makeGroup.getSize().y / 2;
+			makeGroup.setPosition(pos);
+
+			if (dynamic_cast<Item*>(choose) != nullptr)
+			{
+				auto item = dynamic_cast<Item*>(choose);
+				if (item->type != Heal)
+				{
+					makeGroup.setString(L"Использовать");
+					buttons.push_back(Button(makeGroup));
+					buttons.back().setFunc([&]() { keyButton = 100;});
+				}
+			}
+			else if (dynamic_cast<Gun*>(choose) != nullptr)
+			{
+				auto gun = dynamic_cast<Gun*>(choose);
+				makeGroup.setString(L"Надеть вместо 1-го");
+				buttons.push_back(Button(makeGroup));
+				buttons.back().setFunc([&]() { keyButton = 100;});
+
+				makeGroup.move({ 0, makeGroup.getSize().y + 5 });
+				makeGroup.setString(L"Надеть вместо 2-го");
+				buttons.push_back(Button(makeGroup));
+				buttons.back().setFunc([&]() { keyButton = 101;});
+
+				int i = 102;
+				for (auto it : gun->improvement)
+				{
+					makeGroup.move({ 0, makeGroup.getSize().y + 5 });
+					makeGroup.setString(L"Снять " + it.second->name);
+					buttons.push_back(Button(makeGroup));
+					buttons.back().setFunc([=]() { keyButton = i;});
+					i++;
+				}
+			}
+			else
+			{
+				auto imp = dynamic_cast<Improve*>(choose);
+
+				auto gun = dynamic_cast<Gun*>(choose);
+				makeGroup.setString(L"Надеть на 1-ое");
+				buttons.push_back(Button(makeGroup));
+				buttons.back().setFunc([&]() { keyButton = 100;});
+
+				makeGroup.move({ 0, makeGroup.getSize().y + 5 });
+				makeGroup.setString(L"Надеть на 2-ое");
+				buttons.push_back(Button(makeGroup));
+				buttons.back().setFunc([&]() { keyButton = 101;});
+			}
+		}
+	}
 }
 
 void UIManager::deleteNow() 

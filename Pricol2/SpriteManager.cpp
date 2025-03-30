@@ -24,6 +24,7 @@ void SpriteManager::init()
 		{
 			def.maxHealpoint = plDef.maxHp;
 			sp.nowHealPoint = plDef.nowHp;
+			sp.position = { 3,3 };
 
 			sprite = std::make_shared<Sprite>(def, sp, id);
 			player = std::make_unique<Player>(Player(sprite.get(), plDef, nowMap));
@@ -45,6 +46,7 @@ void SpriteManager::init()
 
 	if (!player) {
 		auto def = spriteDef[0];
+		def.maxHealpoint = plDef.maxHp;
 		auto sprite = std::make_shared<Sprite>(sf::Vector2f{ 2,2 }, def.size, def.texture, id, plDef.maxHp);
 		id++;
 		sprites.push_back(sprite);

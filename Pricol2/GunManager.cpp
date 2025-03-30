@@ -3,10 +3,10 @@
 WeaponManager::WeaponManager(Data* _data)
 {
 	data = _data;
+	id = 0;
 
 	for (int i = 0; i < improveDefs.size(); i++)
 	{
-
 		improvements.push_back(std::make_unique<Improve>(improveDefs[i], id));
 		itemble[id] = improvements.back().get();
 		id++;

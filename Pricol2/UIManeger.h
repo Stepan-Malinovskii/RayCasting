@@ -19,6 +19,7 @@ public:
 	void initDialog(std::map<int, std::wstring, std::greater<int>> variants,
 		std::wstring npcName);
 	void initTrade(std::map<int, Itemble*> variants, Player* player);
+	void initInvent(std::map<Itemble*, int> items, Itemble* chose);
 	void deleteNow();
 	void drawNow();
 	int checkButton(sf::Vector2i mousePos);

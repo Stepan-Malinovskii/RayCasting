@@ -12,6 +12,14 @@ Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
 	spManager = new SpriteManager(nowMap, data, dialogSys);
 	initPlayer();
 
+	invent = new Inventory(window, player, uiManager);
+	player->setInventory(invent);
+	auto a = data->getInvent();
+
+	for (auto b : a)
+	{
+		player->takeItem(weaponManager->getItem(b.first), b.second);
+	}
 	dialogSys->setPlayer(player);
 }
 
@@ -29,22 +37,15 @@ void Game::initPlayer()
 {
 	player = spManager->getPlayer();
 	player->kick = weaponManager->getGunByIndex(0);
-	player->setGun(weaponManager->getGunByIndex(1));
+	player->setGun(weaponManager->getGunByIndex(1), 0);
 
 	PlayerDef plDef = data->getPlayerData();
 
+	int i = 1;
 	for (auto it : plDef.gunsData)
 	{
-		player->setGun(weaponManager->getGunById(it));
-	}
-
-	invent = new Inventory(window, player, uiManager);
-	auto a = data->getInvent();
-	player->setInventory(invent);
-
-	for (auto b : a)
-	{
-		player->takeItem(weaponManager->getItem(b.first), b.second);
+		player->setGun(weaponManager->getGunById(it), i);
+		i++;
 	}
 }
 
@@ -158,10 +159,8 @@ void Game::resetMap(Map* newMap)
 	nowMap = newMap;
 	player = spManager->resetMap(newMap);
 	player->kick = weaponManager->getGunById(0);
-	for (int i = 1; i < 8; i++)
-	{
-		player->setGun(weaponManager->getGunById(i));
-	}
+	initPlayer();
+	player->setInventory(invent);
 }
 
 void Game::update(float deltaTime)

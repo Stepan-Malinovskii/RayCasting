@@ -22,6 +22,10 @@ public:
 
 	bool isOpen;
 private:
+	void initInv();
+	void checkChose();
+	int nowKey;
+	Itemble* choose;
 	std::map<Itemble*, int> items;
 	UIManager* uiManager;
 	sf::RenderWindow* window;

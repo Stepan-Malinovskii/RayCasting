@@ -47,7 +47,8 @@ public:
 	void fire(int gun = -1);
 	void swapGun(bool flag);
 	void reloadingGun();
-	void setGun(Gun* gun);
+	Gun* setGun(Gun* gun, int pos);
+	Gun* getGun(int pos);
 	float getMoveSpeed();
 	void takeItem(Itemble*, int cnt = 1);
 	void heal();
@@ -70,7 +71,7 @@ private:
 	Map* nowMap;
 	sf::Vector2f shakeDelta;
 	int nowGun;
-	std::vector<Gun*> guns;
+	Gun* guns[3]{};
 	float moveSpeed, nowSpeed, boostSpeed, shakeTime;
 
 	void shakeCamera(float deltaTime, bool isRun);

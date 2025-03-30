@@ -13,10 +13,20 @@ Player::Player(Sprite* _sprite, PlayerDef def, Map* _nowMap) :
 	kick = nullptr;
 	pitch = 0, shakeTime = 0, posZ = 0.0f;
 	isJump = false, jumpFlag = false;
-	moveSpeed = 5.0f, boostSpeed = 8.0f, nowSpeed = moveSpeed;
+	moveSpeed = 5.0f, boostSpeed = 8.0f, nowSpeed = 5.0f;
 }
 
-void Player::setGun(Gun* gun) { guns.push_back(gun); }
+Gun* Player::setGun(Gun* gun, int pos) 
+{
+	auto temp = guns[pos];
+	guns[pos] = gun;
+	return temp;
+}
+
+Gun* Player::getGun(int pos)
+{
+	return guns[pos];
+}
 
 void Player::setInventory(Inventory* _invent) { invent = _invent; }
 
@@ -203,7 +213,13 @@ void Player::swapGun(bool flag)
 {
 	int delta = flag ? 1 : -1;
 	nowGun += delta;
-	nowGun = nowGun < 0 ? nowGun = guns.size() - 1 : nowGun % guns.size();
+	nowGun = nowGun < 0 ? nowGun = 2 : nowGun % 3;
+	while (guns[nowGun] == nullptr)
+	{
+		nowGun += delta;
+		nowGun = nowGun < 0 ? nowGun = 2 : nowGun % 3;
+	}
+	
 }
 
 PlayerDef Player::getPlayerDef()
@@ -212,7 +228,7 @@ PlayerDef Player::getPlayerDef()
 
 	for (auto it : guns)
 	{
-		if (it != nullptr && it->name != L"Кулаки")
+		if (it != nullptr && it->name != L"Кулак")
 		{
 			gunsData.push_back(it->id);
 		}

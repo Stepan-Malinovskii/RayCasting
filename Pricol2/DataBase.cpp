@@ -119,9 +119,9 @@ std::pair<std::wstring, int> Data::getText(int key)
 PlayerDef Data::getPlayerData()
 {
 	std::ifstream in{ "Texture/playerData.plr", std::ios::in | std::ios::binary };
-	if (!in.is_open()) return{-1, 0};
-	PlayerDef plDef{};
+	if (!in.is_open()) return { 100, 100, 2, 2, 10, 50, 50, 500, 10000, 0, {} };
 
+	PlayerDef plDef{};
 	in.read(reinterpret_cast<char*>(&plDef.maxHp), sizeof(plDef.maxHp));
 	in.read(reinterpret_cast<char*>(&plDef.nowHp), sizeof(plDef.nowHp));
 	in.read(reinterpret_cast<char*>(&plDef.maxEnergy), sizeof(plDef.maxEnergy));
@@ -137,12 +137,12 @@ PlayerDef Data::getPlayerData()
 	in.read(reinterpret_cast<char*>(&size), sizeof(size));
 	
 	plDef.gunsData.reserve(size);
-	/*for (int i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
 		int id;
 		in.read(reinterpret_cast<char*>(&id), sizeof(id));
-		plDef.itemData.push_back(id);
-	}*/
+		plDef.gunsData.push_back(id);
+	}
 
 	in.close();
 	return plDef;

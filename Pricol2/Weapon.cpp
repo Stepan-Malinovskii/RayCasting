@@ -48,24 +48,24 @@ type{ def.type }
 {
 	if (type == Damage)
 	{
-		setGetFunc([=](Gun* gun) {gun->damage = (int)(gun->damage * def.effect);});
+		setGetFunc([=](Gun* gun) {gun->damage = round(gun->damage * def.effect);});
 
-		setDelFunc([=](Gun* gun) {gun->damage = (int)(gun->damage / def.effect);});
+		setDelFunc([=](Gun* gun) {gun->damage = round(gun->damage / def.effect);});
 	}
 	else if (type == Spread)
 	{
-		setGetFunc([=](Gun* gun) {gun->maxRad = (int)(gun->maxRad / def.effect);
+		setGetFunc([=](Gun* gun) {gun->maxRad = round(gun->maxRad / def.effect);
 		gun->nowRad = std::min(gun->maxRad, gun->nowRad);});
 
-		setDelFunc([=](Gun* gun) {gun->maxRad = (int)(gun->maxRad * def.effect);
+		setDelFunc([=](Gun* gun) {gun->maxRad = round(gun->maxRad * def.effect);
 		gun->nowRad = std::min(gun->maxRad, gun->nowRad);});
 	}
 	else
 	{
-		setGetFunc([=](Gun* gun) {gun->maxCount = (int)(gun->maxCount * def.effect);
-		gun->nowCount = gun->maxCount;});
+		setGetFunc([=](Gun* gun) {gun->maxCount = round(gun->maxCount * def.effect);
+		gun->nowCount = std::min(gun->maxCount, gun->nowCount);});
 
-		setDelFunc([=](Gun* gun) {gun->maxCount = (int)(gun->maxCount / def.effect);
+		setDelFunc([=](Gun* gun) {gun->maxCount = round(gun->maxCount / def.effect);
 		gun->nowCount = std::min(gun->maxCount, gun->nowCount);});
 	}
 }
@@ -205,22 +205,24 @@ void Gun::ussing(Sprite* sp, float dist)
 	}
 }
 
-bool Gun::trySetImprove(Improve* improve)
+Improve* Gun::trySetImprove(Improve* improve)
 {
-	if (improvement[improve->type] != nullptr) return false;
+	auto temp = improvement[improve->type];
+	if (temp != nullptr) { temp->deleteImprove(this); }
 	improvement[improve->type] = improve;
 	improve->getImprove(this);
-	return true;
+	return temp;
 }
 
 Improve* Gun::deleteImprove(ImproveType type)
 {
-	auto temp = improvement.extract(type);
-	if (!temp.empty())
+	auto temp = improvement[type];
+	if (temp != nullptr)
 	{
-		temp.mapped()->deleteImprove(this);
+		temp->deleteImprove(this);
+		improvement.erase(type);
 	}
-	return temp.mapped();
+	return temp;
 }
 
 GunData Gun::getGunData()

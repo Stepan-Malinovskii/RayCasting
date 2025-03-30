@@ -117,12 +117,13 @@ public:
 
 	virtual void setAnimator(Animator<sf::Texture*>& anim);
 
+	float maxDist;
+protected:
+
 	virtual void startAnimation(int number);
 
 	virtual void ussing(Sprite* sp, float dist) = 0;
 
-	float maxDist;
-private:
 	Animator<sf::Texture*> weaponAnimator;
 	float timeBetwen, nowTime;
 };
@@ -137,7 +138,7 @@ public:
 		sf::SoundBuffer* reset = nullptr,
 		sf::SoundBuffer* cantShut = nullptr);
 
-	bool trySetImprove(Improve* improve);
+	Improve* trySetImprove(Improve* improve);
 
 	Improve* deleteImprove(ImproveType type);
 
@@ -157,9 +158,9 @@ public:
 	int damage;
 	float nowRad;
 	float maxRad;
+	std::map<ImproveType, Improve*> improvement;
 private:
 	float timeBetwenReset, nowTimeBetwenReset;
-	std::map<ImproveType, Improve*> improvement;
 	sf::Sound shutSound;
 	sf::Sound resetSound;
 	sf::Sound cantShutSound;
