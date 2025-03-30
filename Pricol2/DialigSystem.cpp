@@ -1,54 +1,86 @@
 #include "DialogSystem.h"
 
-Dialog::Dialog(sf::RenderWindow* _window, Data* _data, UIManager* _uiManager)
+Dialog::Dialog(sf::RenderWindow* _window, Data* _data, UIManager* _uiManager,
+	WeaponManager* _weaponManager) : window{ _window }, data{ _data },
+	uiManager{ _uiManager }, weaponManager{ _weaponManager }
 {
-	window = _window;
-	data = _data;
 	nowKey = 0;
+	startKey = 0;
 	isActive = false;
-	npc = nullptr;
-
-	uiManager = _uiManager;
+	isTrade = false;
 }
 
-void Dialog::setTrade(Trade* _trade)
-{
-	trade = _trade;
-}
+void Dialog::setPlayer(Player* _player) { player = _player; }
 
-void Dialog::start(Npc* _npc)
+void Dialog::start(int key, std::wstring _name)
 {
 	window->setMouseCursorVisible(true);
 	isActive = true;
-	npc = _npc;
-	nowKey = _npc->npcDefData.startKey;
-	check();
+	name = _name;
+	nowKey = key;
+	init();
 }
 
 void Dialog::stop()
 {
 	window->setMouseCursorVisible(false);
 	isActive = false;
-	npc = nullptr;
+	isTrade = false;
+	title.clear();
 	uiManager->deleteNow();
+}
+
+void Dialog::buy()
+{
+	if (choose != nullptr)
+	{
+		if (choose->cost <= player->money)
+		{
+			player->money -= choose->cost;
+
+			player->takeItem(choose);
+			init();
+		}
+		choose = nullptr;
+	}
 }
 
 void Dialog::check()
 {
-	if (trade->isActive) { return; }
-
-	if (nowKey == 0)
+	if (isTrade) 
 	{
-		stop();
-		return;
+		if (nowKey == -100)
+		{
+			stop();
+			return;
+		}
+		else if (nowKey == -200)
+		{
+			buy();
+		}
+		else
+		{
+			choose = title[nowKey];
+			return;
+		}
 	}
 	else
 	{
-		if (nowKey >= 400)
+		if (nowKey == 0)
 		{
-			trade->start(nowKey);
-			nowKey = 0;
+			stop();
 			return;
+		}
+		else
+		{
+			if (nowKey >= 400)
+			{
+				isTrade = true;
+				startKey = nowKey;
+				nowKey = 0;
+				start(startKey);
+				return;
+			}
 		}
 	}
 	init();
@@ -56,27 +88,50 @@ void Dialog::check()
 
 void Dialog::init()
 {
-	auto keys = data->getKeys(nowKey);
+	if (!isTrade)
+	{
+		auto keys = data->getKeys(nowKey);
 
-	std::map<int, std::wstring, std::greater<int>> variants;
-	for (int i = 0; i < keys.size(); i++) 
-	{ 
-		auto d = data->getText(keys[i]);
-		variants[d.second] = d.first; 
+		std::map<int, std::wstring, std::greater<int>> variants;
+		for (int i = 0; i < keys.size(); i++)
+		{
+			auto d = data->getText(keys[i]);
+			variants[d.second] = d.first;
+		}
+
+		uiManager->initDialog(variants, name);
 	}
+	else
+	{
+		if (startKey == 400)
+		{
+			auto item1 = weaponManager->getGuns();
+			int i = 3;
+			for (; i < item1.size(); i++)
+			{
+				title[i] = (Itemble*)item1[i];
+			}
+			auto item2 = weaponManager->getImprovs();
+			for (; i < item2.size() + item1.size(); i++)
+			{
+				title[i] = (Itemble*)item2[i - item1.size()];
+			}
+		}
+		else if (startKey == 401)
+		{
+			auto item = weaponManager->getItems();
+			for (int i = 0; i < item.size(); i++)
+			{
+				title[i] = (Itemble*)item[i];
+			}
+		}
 
-	uiManager->initDialog(variants, npc->spDef.name);
+		uiManager->initTrade(title, player);
+	}
 }
 
 void Dialog::update()
 {
-	if (trade->isActive)
-	{
-		trade->update();
-		check();
-		return;
-	}
-
 	if (window->hasFocus())
 	{
 		static bool flag = false;

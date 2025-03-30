@@ -8,7 +8,6 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <vector>
-
 #include "Map.h"
 #include "Resources.h"
 #include "Animation.h"
@@ -55,7 +54,6 @@ public:
 	sf::Vector2f getDeltaShake();
 	PlayerDef getPlayerDef();
 
-
 	Sprite* sprite;
 	Gun* kick;
 	float pitch, posZ, maxEnergy, nowEnergy;
@@ -64,7 +62,7 @@ public:
 	int money;
 	int details;
 	std::map<Itemble*, int> items;
-	Item* maxHeal;
+	Item* nowHeal;
 private:
 	bool isJump, jumpFlag;
 	Map* nowMap;

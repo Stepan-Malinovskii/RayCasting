@@ -16,8 +16,6 @@
 #include "SpriteManager.h"
 #include "GunManager.h"
 #include "UIManeger.h"
-#include "Trade.h"
-
 
 class Game
 {
@@ -42,7 +40,6 @@ private:
 	SpriteManager* spManager;
 	UIManager* uiManager;
 	WeaponManager* weaponManager;
-	Trade* trade;
 	Player* player;
 	Renderer* renderer;
 	Map* nowMap;

@@ -4,31 +4,37 @@
 
 #include "sfmlExtantion.h"
 #include <functional>
-#include"Sprite.h"
-#include "DataBase.h"
+#include "Player.h"
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "SFML/Window/Mouse.hpp"
-#include "Resources.h"
 #include "UIManeger.h"
-#include "Trade.h"
+#include "GunManager.h"
 
 class Dialog
 {
 public:
-	Dialog(sf::RenderWindow* _window, Data* data, UIManager* _uiManager);
-	void start(Npc* npc);
+	Dialog(sf::RenderWindow* _window, Data* _data, UIManager* _uiManager, 
+		WeaponManager* _weaponManager);
+	void setPlayer(Player* _player);
+	void start(int key, std::wstring name = L"");
 	void update();
 	void draw();
-	void setTrade(Trade* _trade);
 	bool isActive;
 private:
-	Npc* npc;
+	bool isTrade;
+	std::wstring name;
 	Data* data;
+	Player* player;
 	int nowKey;
+	int startKey;
 	UIManager* uiManager;
-	Trade* trade;
+	WeaponManager* weaponManager;
 	sf::RenderWindow* window;
 
+	Itemble* choose;
+	std::map<int, Itemble*> title;
+
+	void buy();
 	void check();
 	void init();
 	void stop();

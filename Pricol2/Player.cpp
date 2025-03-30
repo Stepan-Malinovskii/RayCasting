@@ -8,7 +8,7 @@ Player::Player(Sprite* _sprite, PlayerDef def, Map* _nowMap) :
 	defence{ def.defence}, nowStrenght{ def.nowStrenght }, maxStrenght{ def.maxStrenght }, 
 	patrons{ def.countpantrons }, nowMap{ _nowMap }, money{ def.money }, details{ def.details }
 {
-	maxHeal = nullptr;
+	nowHeal = nullptr;
 	kick = nullptr;
 	pitch = 0, shakeTime = 0, posZ = 0.0f;
 	isJump = false, jumpFlag = false;
@@ -138,9 +138,9 @@ void Player::takeMaxHeal()
 		{
 			if (t->type == Heal)
 			{
-				if (maxHeal == nullptr || t->id > maxHeal->id)
+				if (nowHeal == nullptr || t->id > nowHeal->id)
 				{
-					maxHeal = t;
+					nowHeal = t;
 				}
 			}
 		}
@@ -260,20 +260,20 @@ void Player::takeItem(Itemble* item, int cnt)
 
 void Player::heal()
 {
-	if (maxHeal != nullptr)
+	if (nowHeal != nullptr)
 	{
-		maxHeal->useFunc(this);
-		items[maxHeal]--;
+		nowHeal->useFunc(this);
+		items[nowHeal]--;
 
-		if (items[maxHeal] > 0)
+		if (items[nowHeal] > 0)
 		{
-			maxHeal = nullptr;
+			nowHeal = nullptr;
 			takeMaxHeal();
 		}
 		else
 		{
-			items.erase(maxHeal);
-			maxHeal = nullptr;
+			items.erase(nowHeal);
+			nowHeal = nullptr;
 		}
 	}
 }

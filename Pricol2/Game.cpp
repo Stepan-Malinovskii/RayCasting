@@ -8,12 +8,11 @@ Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
 	weaponManager = new WeaponManager(data);
 	renderer = new Renderer(window);
 	uiManager = new UIManager(window);
-	dialogSys = new Dialog(window, data, uiManager);
+	dialogSys = new Dialog(window, data, uiManager, weaponManager);
 	spManager = new SpriteManager(nowMap, data, dialogSys);
 	initPlayer();
 
-	trade = new Trade(uiManager, weaponManager, player, window);
-	dialogSys->setTrade(trade);
+	dialogSys->setPlayer(player);
 }
 
 Game::~Game()
@@ -23,18 +22,13 @@ Game::~Game()
 	delete spManager;
 	delete weaponManager;
 	delete uiManager;
-	delete trade;
 }
 
 void Game::initPlayer()
 {
 	player = spManager->getPlayer();
 	player->kick = weaponManager->getGun(0);
-
-	for (int i = 1; i < 8; i++)
-	{
-		player->setGun(weaponManager->getGun(i));
-	}
+	player->setGun(weaponManager->getGun(1));
 
 	PlayerDef plDef = data->getPlayerData();
 

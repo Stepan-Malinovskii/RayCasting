@@ -309,11 +309,11 @@ void UIManager::initPlayer()
 			window->draw(group3.shape);
 			window->draw(group3.text);
 
-			if (player->maxHeal != nullptr)
+			if (player->nowHeal != nullptr)
 			{
 				sf::RectangleShape rect({ ICON_SIZE, ICON_SIZE });
 				rect.setTexture(&Resources::itembleIcon);
-				rect.setTextureRect({ {player->maxHeal->id * ICON_SIZE, 0},{ICON_SIZE, ICON_SIZE} });
+				rect.setTextureRect({ {player->nowHeal->id * ICON_SIZE, 0},{ICON_SIZE, ICON_SIZE} });
 				auto b = rect.getLocalBounds();
 				rect.setOrigin({ b.width / 2, b.height / 2 });
 				if (weaponInfo.getString() != "")

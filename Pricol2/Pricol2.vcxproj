@@ -155,7 +155,6 @@
     <ClCompile Include="sfmlExtetion.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="SpriteManager.cpp" />
-    <ClCompile Include="Trade.cpp" />
     <ClCompile Include="UIManager.cpp" />
     <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
@@ -175,7 +174,6 @@
     <ClInclude Include="sfmlExtantion.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="SpriteManager.h" />
-    <ClInclude Include="Trade.h" />
     <ClInclude Include="UIManeger.h" />
     <ClInclude Include="Weapon.h" />
   </ItemGroup>

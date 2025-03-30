@@ -129,5 +129,5 @@ Npc::Npc(SpriteDef _spDef, MapSprite _spMap, int _id, int npcDefId, Dialog* _dia
 
 void Npc::use()
 {
-	dialog->start(this);
+	dialog->start(npcDefData.startKey, spDef.name);
 }
