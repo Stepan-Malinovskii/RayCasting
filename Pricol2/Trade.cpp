@@ -31,12 +31,12 @@ void Trade::stop()
 
 void Trade::check()
 {
-	if (nowKey == -1)
+	if (nowKey == -100)
 	{
 		stop();
 		return;
 	}
-	else if (nowKey == -2)
+	else if (nowKey == -200)
 	{
 		buy();
 	}
@@ -102,8 +102,12 @@ void Trade::update()
 			sf::Vector2i worldPos = (sf::Vector2i)window->mapPixelToCoords(mousePos);
 
 			flag = true;
-			nowKey = uiManager->checkButton(worldPos);
-			check();
+			int key = uiManager->checkButton(worldPos);
+			if (key != -1)
+			{
+				nowKey = key;
+				check();
+			}
 		}
 		if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{

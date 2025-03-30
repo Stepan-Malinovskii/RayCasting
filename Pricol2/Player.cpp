@@ -138,7 +138,7 @@ void Player::takeMaxHeal()
 		{
 			if (t->type == Heal)
 			{
-				if (maxHeal == nullptr || t->id < maxHeal->id)
+				if (maxHeal == nullptr || t->id > maxHeal->id)
 				{
 					maxHeal = t;
 				}
@@ -263,7 +263,17 @@ void Player::heal()
 	if (maxHeal != nullptr)
 	{
 		maxHeal->useFunc(this);
-		maxHeal = nullptr;
-		takeMaxHeal();
+		items[maxHeal]--;
+
+		if (items[maxHeal] > 0)
+		{
+			maxHeal = nullptr;
+			takeMaxHeal();
+		}
+		else
+		{
+			items.erase(maxHeal);
+			maxHeal = nullptr;
+		}
 	}
 }

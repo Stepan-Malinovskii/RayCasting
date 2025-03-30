@@ -7,7 +7,7 @@ sf::Texture Resources::spriteIcon{};
 std::vector<sf::Texture> Resources::spritesTextures{};
 sf::Texture Resources::skyTextures{};
 
-std::vector<sf::Texture> Resources::gunIcons{};
+sf::Texture Resources::itembleIcon{};
 sf::SoundBuffer Resources::gunCantShoutSound{};
 std::vector<std::vector<sf::Texture>> Resources::gunsResetAnim = std::vector<std::vector<sf::Texture>>(8);
 std::vector<std::vector<sf::Texture>> Resources::gunsFireAnim = std::vector<std::vector<sf::Texture>>(8);
@@ -54,7 +54,7 @@ void Resources::initResources()
 	loadFor("Texture/enemy", &spritesTextures);
 	skyTextures.setRepeated(true);
 
-	loadFor("Texture/gunIconTexure", &gunIcons);
+	if (!itembleIcon.loadFromFile("Texture/itemIcon.png")) throw "TextureLoadError";
 	if (!gunCantShoutSound.loadFromFile("Sound/gunCantShutSound.mp3")) throw "TextureLoadError";
 
 	for (int i = 0; i < 8; i++)

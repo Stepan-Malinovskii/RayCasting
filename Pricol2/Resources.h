@@ -23,7 +23,7 @@ public:
 	static sf::Texture spriteIcon;
 	static std::vector<sf::Texture> spritesTextures;
 
-	static std::vector<sf::Texture> gunIcons;
+	static sf::Texture itembleIcon;
 	static sf::SoundBuffer gunCantShoutSound;
 
 	static std::vector<std::vector<sf::Texture>> gunsResetAnim;

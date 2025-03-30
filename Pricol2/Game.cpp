@@ -63,6 +63,14 @@ void Game::getInput(sf::Event event, float deltaTime)
 		bool flag = event.mouseWheelScroll.delta > 0 ? true : false;
 		player->swapGun(flag);
 	}
+
+	if (event.type == sf::Event::KeyPressed)
+	{
+		if (event.key.code == sf::Keyboard::H)
+		{
+			player->heal();
+		}
+	}
 }
 
 void Game::getInput(float deltaTime)
@@ -118,10 +126,6 @@ void Game::getInput(float deltaTime)
 					npc->use();
 				}
 			}
-		}
-		if (GetAsyncKeyState('H'))
-		{
-			player->heal();
 		}
 
 		sf::Vector2i mousePos = sf::Mouse::getPosition(*window);

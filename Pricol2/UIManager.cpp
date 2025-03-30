@@ -121,9 +121,17 @@ void UIManager::initTrade(std::map<int, Itemble*> variants, Player* player)
 		maxCost = std::fmaxf(text.getLocalBounds().width, maxCost);
 	}
 	
-	sf::Vector2f pos(SCREEN_W / 2, INTERVAL);
+	sf::Vector2f pos(SCREEN_W / 2, size + interval * 2);
+	sf::Vector2f textPos((SCREEN_W - DIALOG_W) / 2 - ICON_SIZE / 2, size + interval * 2);
 
 	sf::RectangleShape rect({ DIALOG_W, size });
+	sf::RectangleShape texture({ ICON_SIZE, ICON_SIZE });
+	sf::RectangleShape texture1({ ICON_SIZE, size });
+	Button b5({texture, {}});
+	Button b6({texture1, {}});
+	b5.setTexture(&Resources::itembleIcon);
+	b6.setFillColor(sf::Color(70,70,70));
+
 	rect.setFillColor(sf::Color(50, 50, 50));
 	Group g2(rect, text);
 
@@ -138,28 +146,42 @@ void UIManager::initTrade(std::map<int, Itemble*> variants, Player* player)
 		g2.setString(line);
 		g2.setPosition(pos);
 
+		b6.setPosition(textPos);
+		b5.setPosition(textPos);
+		b5.setTextureRect({ {ICON_SIZE * var.second->id, 0}, {ICON_SIZE, ICON_SIZE} });
+
 		buttons.push_back(Button(g2));
 		buttons.back().setFunc([=]() { keyButton = var.first;});
+		buttons.push_back(b6);
+		buttons.push_back(b5);
 
 		pos.y += interval + g2.shape.getSize().y;
+		textPos.y = pos.y;
 	}
+
+	sf::RectangleShape rect2(rect);
+	rect2.setSize({ DIALOG_W, size - 20 });
+	Group g9(rect2, text);
+	g9.setString(L"Áàëàíñ: " + std::to_wstring(player->money) + L" | Çàï÷àñòè: " + std::to_wstring(player->details));
+	g9.setPosition({SCREEN_W / 2, g9.getSize().y / 2 + interval});
+	buttons.push_back(Button(g9));
 
 	sf::Text text1(text);
 	text1.setString(L"Ê\nÓ\nÏ\nÈ\nÒ\nÜ");
 	text1.setCharacterSize(50);
-	sf::RectangleShape rect1({ size, DIALOG_H });
-	rect1.setFillColor(sf::Color(50, 50, 50));
+	sf::RectangleShape rect1({ size + 10, 350 });
+	rect1.setFillColor(sf::Color(70, 70, 70));
 	Group g3(rect1, text1);
-	g3.setPosition({ (SCREEN_W - DIALOG_W) / 2 - g3.getSize().x, SCREEN_H / 2});
+	g3.setPosition({ (SCREEN_W + DIALOG_W) / 2 + g3.getSize().x, g3.getSize().y / 2 + 5});
 
 	buttons.push_back(Button(g3));
-	buttons.back().setFunc([=]() { keyButton = -2; });
+	buttons.back().setFunc([=]() { keyButton = -200; });
 
 	g3.setString(L"Â\nÛ\nÕ\nÎ\nÄ");
-	g3.setPosition({ (SCREEN_W + DIALOG_W) / 2 + g3.getSize().x , SCREEN_H / 2});
+	g3.setPosition({ (SCREEN_W + DIALOG_W) / 2 + g3.getSize().x , SCREEN_H - g3.getSize().y/2 - 5});
 	
 	buttons.push_back(Button(g3));
-	buttons.back().setFunc([=]() { keyButton = -1; });
+	buttons.back().setFunc([=]() { keyButton = -100; });
 }
 
 void UIManager::deleteNow() 
@@ -200,6 +222,8 @@ void UIManager::initPlayer()
 {
 	playerUI = [&](Player* player)
 		{
+			sf::Text weaponInfo;
+
 			if (!player->kick->isCanUsed())
 			{
 				player->kick->drawWeapon(window, { 0,0 });
@@ -211,18 +235,19 @@ void UIManager::initPlayer()
 
 				if (gun->isReset)
 				{
-					sf::Text weaponInfo(std::to_string(gun->nowCount) + " / " + std::to_string(gun->maxCount), Resources::UIFont, 50);
+					weaponInfo = sf::Text(std::to_string(player->patrons), Resources::UIFont, 30);
 					auto b = weaponInfo.getLocalBounds();
 					weaponInfo.setOrigin({ b.width / 2, b.height / 2 });
 					weaponInfo.setPosition({ SCREEN_W / 2, SCREEN_H / 2 - weaponInfo.getCharacterSize() / 4 });
-					weaponInfo.setPosition({ SCREEN_W - b.width / 2 - 20, SCREEN_H - 100 });
+					weaponInfo.setPosition({ SCREEN_W - b.width / 2 - 20, SCREEN_H - 30 });
 					weaponInfo.setFillColor({ 0, 0, 0 });
 					window->draw(weaponInfo);
-					weaponInfo.setString(std::to_string(player->patrons));
+
+					weaponInfo.setString(std::to_string(gun->nowCount) + " / " + std::to_string(gun->maxCount));
 					b = weaponInfo.getLocalBounds();
 					weaponInfo.setOrigin({ b.width / 2, b.height / 2 });
 					weaponInfo.setPosition({ SCREEN_W / 2, SCREEN_H / 2 - weaponInfo.getCharacterSize() / 4 });
-					weaponInfo.setPosition({ SCREEN_W - b.width / 2 - 20, SCREEN_H - 45 });
+					weaponInfo.setPosition({ SCREEN_W - b.width / 2 - 20, SCREEN_H - 60 });
 					window->draw(weaponInfo);
 				}
 			}
@@ -230,7 +255,7 @@ void UIManager::initPlayer()
 			sf::RectangleShape baseShape({ baseX, 40 });
 			baseShape.setFillColor({ 128, 128, 128 });
 			sf::Text text("", Resources::UIFont, 30);
-			Group group1({baseShape, text});
+			Group group1(baseShape, text);
 			group1.setPosition({ 170, SCREEN_H - 120 });
 			window->draw(group1.shape);
 
@@ -283,17 +308,24 @@ void UIManager::initPlayer()
 			group3.setString(str);
 			window->draw(group3.shape);
 			window->draw(group3.text);
-			
-			sf::RectangleShape rect;
-			text.setFillColor(sf::Color::Black);
-			Group g4(rect, text);
-			g4.setString(L"Money: " + std::to_wstring(player->money));
-			g4.setPosition({ SCREEN_W - g4.text.getLocalBounds().width / 2 - 20, 50});
-			window->draw(g4.text);
 
-			g4.setString(L"Details: " + std::to_wstring(player->details));
-			g4.setPosition({ SCREEN_W - g4.text.getLocalBounds().width / 2 - 20, 50 + INTERVAL });
-			window->draw(g4.text);
+			if (player->maxHeal != nullptr)
+			{
+				sf::RectangleShape rect({ ICON_SIZE, ICON_SIZE });
+				rect.setTexture(&Resources::itembleIcon);
+				rect.setTextureRect({ {player->maxHeal->id * ICON_SIZE, 0},{ICON_SIZE, ICON_SIZE} });
+				auto b = rect.getLocalBounds();
+				rect.setOrigin({ b.width / 2, b.height / 2 });
+				if (weaponInfo.getString() != "")
+				{
+					rect.setPosition({  SCREEN_W - ICON_SIZE - weaponInfo.getLocalBounds().width,  SCREEN_H - ICON_SIZE / 2});
+				}
+				else
+				{
+					rect.setPosition({ SCREEN_W - b.width / 2 - 20, SCREEN_H - ICON_SIZE / 2 });
+				}
+				window->draw(rect);
+			}
 
 			sf::CircleShape aim(player->getGun()->nowRad, 16);
 			aim.setOrigin({ aim.getRadius(), aim.getRadius()});

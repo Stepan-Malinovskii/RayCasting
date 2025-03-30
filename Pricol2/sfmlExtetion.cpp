@@ -23,6 +23,8 @@ void Button::setPosition(sf::Vector2f pos) { group.setPosition(pos); }
 
 bool Button::isClicked(sf::Vector2i& mousePos)
 {
+	if (fn == NULL) return false;
+
 	sf::Vector2f pos = group.getPosition();
 	sf::Vector2f size = { group.getSize().x * group.shape.getScale().x, group.getSize().y * group.shape.getScale().y };
 	float x0 = pos.x - size.x / 2, x1 = pos.x + size.x / 2;

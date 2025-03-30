@@ -64,10 +64,10 @@ public:
 	int money;
 	int details;
 	std::map<Itemble*, int> items;
+	Item* maxHeal;
 private:
 	bool isJump, jumpFlag;
 	Map* nowMap;
-	Item* maxHeal;
 	sf::Vector2f shakeDelta;
 	int nowGun;
 	std::vector<Gun*> guns;

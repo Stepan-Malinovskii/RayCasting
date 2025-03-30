@@ -10,14 +10,13 @@
 #include <SFML/Graphics/Text.hpp>
 #include <functional>
 
-
 struct Group
 {
 	Group(sf::RectangleShape _shape, sf::Text _text) : shape{ _shape }, text{ _text }
 	{
-		shape.setOrigin({ shape.getSize().x / 2, shape.getSize().y / 2 });
+		shape.setOrigin({ shape.getLocalBounds().width / 2, shape.getLocalBounds().height / 2 });
 		text.setOrigin({ text.getLocalBounds().width / 2, text.getLocalBounds().height / 2 });
-		text.setPosition({ shape.getPosition().x, shape.getPosition().y });
+		text.setPosition({ shape.getPosition().x, shape.getPosition().y - text.getCharacterSize() / 4});
 	}
 
 	Group() = default;
@@ -26,7 +25,7 @@ struct Group
 	{
 		text.setString(data);
 		text.setOrigin({ text.getLocalBounds().width / 2, text.getLocalBounds().height / 2 });
-		text.setPosition({ shape.getPosition().x, shape.getPosition().y });
+		text.setPosition({ shape.getPosition().x, shape.getPosition().y - text.getCharacterSize() / 4 });
 	}
 
 	void setPosition(sf::Vector2f position)

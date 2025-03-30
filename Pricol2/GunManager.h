@@ -26,9 +26,9 @@ private:
 };
 
 static std::vector<ItemsDef> itemsDefs{
-	{ItemType::Heal, L"Большая аптечка", 100, 1, 30, L"Востанавливает 100 HP"},
-	{ItemType::Heal, L"Средняя аптечка", 50, 1, 20, L"Востанавливает 50 HP"},
 	{ItemType::Heal, L"Малая аптечка", 20, 1, 10, L"Востанавливает 20 HP"},
+	{ItemType::Heal, L"Средняя аптечка", 50, 1, 20, L"Востанавливает 50 HP"},
+	{ItemType::Heal, L"Большая аптечка", 100, 1, 30, L"Востанавливает 100 HP"},
 	{ItemType::MaxHeal, L"Эксперементальное снадобье 1", 20, 1, 300, L"80% - +20 к maxHP, 20% - -10 maxHP"},
 	{ItemType::MaxEnergy, L"Эксперементальное снадобье 2", 20, 1, 300, L"80% - +20 к maxEnergy, 20% - -10 maxEnergy"},
 	{ItemType::Armor, L"Железная пластина", 10, 50, 50, L"-10% получаемого урона, 50 использований"},
@@ -53,9 +53,9 @@ static std::vector<ImproveDef> improveDefs{
 	{ImproveType::Magazin, L"Средний магазин", 1.3f, 300, L"+30% к объему магазина"},
 	{ImproveType::Magazin, L"Большой магазин", 1.4f, 400, L"+40% к объему магазина"},
 	{ImproveType::Spread,  L"Лазерный прицел", 1.3f, 150, L"-30% к разбросу"},
-	{ImproveType::Spread,  L"Голографический  прицел", 1.45f, 250, L"-45% к разбросу"},
+	{ImproveType::Spread,  L"Голографический прицел", 1.45f, 250, L"-45% к разбросу"},
 	{ImproveType::Spread,  L"Оптический прицел", 1.6f, 350, L"-60% к разбросу"},
-	{ImproveType::Damage,  L"Пламя гаситель", 1.3f, 250, L"+30% к урону"},
+	{ImproveType::Damage,  L"Пламягаситель", 1.3f, 250, L"+30% к урону"},
 	{ImproveType::Damage,  L"Упор", 1.4f, 350, L"+40% к урону"},
 	{ImproveType::Damage,  L"Приклад", 1.5f, 450, L"+50% к урону"}
 };
