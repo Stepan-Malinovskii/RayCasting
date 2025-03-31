@@ -105,6 +105,10 @@ type{ def.type }, maxUsing{ def.maxUSing }
 		setFunc([=](Player* pl) {pl->defence = def.effect;
 		pl->maxStrenght = def.maxUSing; pl->nowStrenght = def.maxUSing;});
 	}
+	else if (def.type == Patrons)
+	{
+		setFunc([=](Player* pl) {pl->patrons += def.effect;});
+	}
 }
 
 void Item::setFunc(std::function<void(Player* sprite)> _useFunc) { useFunc = _useFunc; }

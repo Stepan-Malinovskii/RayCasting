@@ -54,7 +54,7 @@ struct ImproveDef
 
 enum ItemType
 {
-	MaxEnergy, MaxHeal, Heal, Armor
+	MaxEnergy, MaxHeal, Heal, Armor, Patrons
 };
 
 struct ItemsDef

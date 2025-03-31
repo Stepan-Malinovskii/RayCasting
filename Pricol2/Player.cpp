@@ -28,7 +28,11 @@ Gun* Player::getGun(int pos)
 	return guns[pos];
 }
 
-void Player::setInventory(Inventory* _invent) { invent = _invent; }
+void Player::setInventory(Inventory* _invent) 
+{ 
+	invent = _invent; 
+	nowHeal = invent->takeMaxHeal();
+}
 
 void Player::updateMouseData(sf::Vector2f mousePos, float deltaTime)
 {

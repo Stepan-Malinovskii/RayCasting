@@ -166,11 +166,12 @@ void Game::getInput(float deltaTime)
 
 void Game::resetMap()
 {
+	data->savePlayerData(player);
 	spManager->resetMap(mapManager->getNowMap());
 	initPlayer();
 	dialogSys->setPlayer(player);
-	player->setInventory(invent);
 	invent->player = player;
+	player->setInventory(invent);
 }
 
 void Game::update(float deltaTime)
