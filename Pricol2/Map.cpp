@@ -43,8 +43,8 @@ bool Map::isCellEmpty(sf::Vector2i pos)
 void Map::setupBlockmap(Sprite* sp)
 {
 	sf::Vector2f halfSize = { sp->spDef.size / 2.f, sp->spDef.size / 2.f };
-	sf::Vector2i start = static_cast<sf::Vector2i>(sp->spMap.position - halfSize);
-	sf::Vector2i end = static_cast<sf::Vector2i>(sp->spMap.position + halfSize);
+	sf::Vector2i start = (sf::Vector2i)(sp->spMap.position - halfSize);
+	sf::Vector2i end = (sf::Vector2i)(sp->spMap.position + halfSize);
 
 	std::set<std::tuple<int, int>> coords;
 	for (int y = start.y; y <= end.y; y++) {
@@ -62,8 +62,8 @@ void Map::setupBlockmap(Sprite* sp)
 		blockmap_coords.end(),
 		std::inserter(to_insert, to_insert.end()));
 
-	for (const auto& [x, y] : to_remove) { removeInBlockMap({ y, x }, sp); }
-	for (const auto& [x, y] : to_insert) { insertInBlockMap({ y, x }, sp); }
+	for (const auto& [x, y] : to_remove) { removeInBlockMap({ x, y }, sp); }
+	for (const auto& [x, y] : to_insert) { insertInBlockMap({ x, y }, sp); }
 
 	sp->blockmap_coords = coords;
 }

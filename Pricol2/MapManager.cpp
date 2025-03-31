@@ -139,4 +139,143 @@ void MapManager::drawMap(int layerNumber)
 	}
 }
 
+std::pair<sf::Vector2f, sf::Vector2f> MapManager::generate()
+{
+	Leaf* root = new Leaf({ 0,0 }, { SPACE_SIZE_W, SPACE_SIZE_H });
+	std::vector<Leaf*> tempLeaf;
+	tempLeaf.push_back(root);
+
+	bool didSplit = true;
+	while (didSplit)
+	{
+		didSplit = false;
+		for (int i = 0; i < tempLeaf.size(); i++)
+		{
+			if (tempLeaf[i]->leftChild == nullptr && tempLeaf[i]->rightChild == nullptr)
+			{
+				if (tempLeaf[i]->leafData.width > MAX_LEAF_SIZE || tempLeaf[i]->leafData.height > MAX_LEAF_SIZE || Random::bitRandom() > 0.25)
+				{
+					if (tempLeaf[i]->split())
+					{
+						tempLeaf.push_back(tempLeaf[i]->leftChild);
+						tempLeaf.push_back(tempLeaf[i]->rightChild);
+						didSplit = true;
+					}
+				}
+			}
+		}
+	}
+
+	root->creatRooms();
+
+	std::vector<Leaf*> leafs;
+	std::vector<sf::IntRect> rooms;
+	std::vector<sf::IntRect> halls;
+
+	for (auto l : tempLeaf)
+	{
+		if (l->isRoom)
+		{
+			leafs.push_back(l);
+			rooms.push_back(l->leafData);
+		}
+
+		for (auto h : l->halls)
+		{
+			halls.push_back(h);
+		}
+	}
+
+	auto stEnd = findStEnd(leafs);
+	delete root;
+	delete nowMap;
+
+	nowMap = new Map();
+	nowMap->grid = std::vector(SPACE_SIZE_H, std::vector(SPACE_SIZE_W, std::array<int, LAYER_COUNT>()));
+	nowMap->blockMap = std::vector(SPACE_SIZE_H, std::vector(SPACE_SIZE_W, std::set<Sprite*>()));
+	
+	for (auto rect : rooms)
+	{
+		for (auto i : std::vector<std::pair<int, int>>{ {FLOOR_LAYER, 1}, {CELL_LAYER, 2} })
+		{
+			writeRoom(rect, i.first, Random::intRandom(1, TEXTURE_COUNT) + TEXTURE_COUNT * i.second);
+		}
+
+		sf::IntRect smalRect({ rect.left + 1, rect.top + 1 }, { rect.width - 2, rect.height - 2 });
+		writeRoom(rect, 1, Random::intRandom(2, TEXTURE_COUNT));
+		writeRoom(smalRect, 1, 0);
+	}
+
+	for (int y = 0; y < nowMap->grid.size(); y++)
+	{
+		for (int x = 0; x < nowMap->grid[0].size(); x++)
+		{
+			if (nowMap->grid[y][x][1] > 1)
+			{
+				if (Random::bitRandom() > 0.9f)
+				{
+					nowMap->grid[y][x][1] = Random::intRandom(1, TEXTURE_COUNT) + TEXTURE_COUNT * 3;
+				}
+			}
+		}
+	}
+
+	for (auto h : halls)
+	{
+		writeRoom(h, 1, 0);
+		if (h.width > h.height)
+		{
+			nowMap->grid[h.top][h.left + 1][1] = 1;
+		}
+		else
+		{
+			nowMap->grid[h.top + 1][h.left][1] = 1;
+		}
+	}
+
+	return stEnd;
+}
+
+std::pair<sf::Vector2f, sf::Vector2f> MapManager::findStEnd(std::vector<Leaf*> leafs)
+{
+	std::vector<sf::Vector2f> midPoint;
+	for (auto l : leafs)
+	{
+		auto p = l->leafData;
+		midPoint.push_back({ p.left + p.width / 2.0f,
+							p.top + p.height / 2.0f });
+	}
+
+	auto getDist = [](sf::Vector2f p1, sf::Vector2f p2)
+		{ return pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2); };
+
+	float maxDist = 0;
+	std::pair<sf::Vector2f, sf::Vector2f> result;
+	for (int i = 0; i < midPoint.size(); i++)
+	{
+		for (int j = i + 1; j < midPoint.size(); j++)
+		{
+			auto dist = getDist(midPoint[i], midPoint[j]);
+			if (maxDist < dist)
+			{
+				maxDist = dist;
+				result.first = midPoint[i];
+				result.second = midPoint[j];
+			}
+		}
+	}
+	return result;
+}
+
+void MapManager::writeRoom(sf::IntRect rect, int layer, int value)
+{
+	for (int y = rect.top; y < rect.top + rect.height; y++)
+	{
+		for (int x = rect.left; x < rect.left + rect.width; x++)
+		{
+			nowMap->grid[y][x][layer] = value;
+		}
+	}
+}
+
 Map* MapManager::getNowMap() { return nowMap; }

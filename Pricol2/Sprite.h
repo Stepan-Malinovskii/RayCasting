@@ -90,7 +90,7 @@ public:
 
 private:
 	float timeAtecked;
-	bool checkCollision(const Map& map, sf::Vector2f newPos, bool xAxis);
+	bool checkCollision(Map* map, sf::Vector2f newPos, bool xAxis);
 };
 
 class Npc : public Sprite

@@ -31,11 +31,11 @@ void Sprite::move(Map* map, sf::Vector2f move)
 
 	float xOffset = move.x > 0 ? spDef.size / 2.0f : -spDef.size / 2.0f;
 	float yOffset = move.y > 0 ? spDef.size / 2.0f : -spDef.size / 2.0f;
-	if (!checkCollision(*map, { spMap.position.x + move.x + xOffset, spMap.position.y }, true))
+	if (!checkCollision(map, { spMap.position.x + move.x + xOffset, spMap.position.y }, true))
 	{
 		spMap.position.x += move.x;
 	}
-	if (!checkCollision(*map, { spMap.position.x, spMap.position.y + move.y + yOffset }, false))
+	if (!checkCollision(map, { spMap.position.x, spMap.position.y + move.y + yOffset }, false))
 	{
 		spMap.position.y += move.y;
 	}
@@ -62,16 +62,16 @@ void Sprite::takeDamage(float damage)
 	timeAtecked = 0;
 }
 
-bool Sprite::checkCollision(const Map& map, sf::Vector2f newPos, bool xAxis)
+bool Sprite::checkCollision(Map* map, sf::Vector2f newPos, bool xAxis)
 {
 	sf::Vector2f thisSize{ spDef.size / 2.0f, spDef.size / 2.0f };
 	sf::Vector2f thisStart = newPos - thisSize;
 	sf::Vector2f thisEnd = newPos + thisSize;
 
 	if (xAxis) {
-		if (map.GetOnGrid(newPos.x, newPos.y, WALL_LAYER)) { return true; }
+		if (map->GetOnGrid(newPos.x, newPos.y, WALL_LAYER)) { return true; }
 
-		auto curSp = map.getBlockMap((sf::Vector2i)newPos);
+		auto curSp = map->getBlockMap((sf::Vector2i)newPos);
 		for (auto sp : curSp) {
 			if (sp->spDef.size == 0.f || sp == this) continue;
 
@@ -94,9 +94,9 @@ bool Sprite::checkCollision(const Map& map, sf::Vector2f newPos, bool xAxis)
 		}
 	}
 	else {
-		if (map.GetOnGrid(newPos.x, newPos.y, WALL_LAYER)) { return true; }
+		if (map->GetOnGrid(newPos.x, newPos.y, WALL_LAYER)) { return true; }
 
-		const auto& set = map.getBlockMap({ (int)newPos.x, (int)newPos.y });
+		const auto& set = map->getBlockMap({ (int)newPos.x, (int)newPos.y });
 		for (const auto& thing : set) {
 			if (thing->spDef.size == 0.f || thing == this) { continue; }
 

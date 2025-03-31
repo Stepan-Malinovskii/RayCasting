@@ -21,6 +21,7 @@ public:
 	void drawInvent();
 
 	bool isOpen;
+	Player* player;
 private:
 	void initInv();
 	void checkChose();
@@ -29,7 +30,6 @@ private:
 	std::map<Itemble*, int> items;
 	UIManager* uiManager;
 	sf::RenderWindow* window;
-	Player* player;
 };
 
 #endif // !INVENT

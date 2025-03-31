@@ -2,14 +2,9 @@
 #ifndef MAPM
 #define MAPM
 #include "Map.h"
+#include "Leaf.h"
 #include "Resources.h"
 #include <SFML/Graphics/RenderWindow.hpp>
-
-struct LoadData
-{
-	int trigerNumber;
-	std::string pathName;
-};
 
 class MapManager
 {
@@ -19,16 +14,15 @@ public:
 
 	void save();
 	void load();
+	std::pair<sf::Vector2f, sf::Vector2f> generate();
 	void rewriteSprites(std::vector<std::shared_ptr<Sprite>> sprs);
 	void drawMap(int layer);
 	Map* getNowMap();
 private:
 	Map* nowMap;
 	sf::RenderWindow* window;
-};
 
-static std::vector<LoadData> loadData{
-	{0, "test.map"},
-	{1, ""},
-	{5, ""}};
+	std::pair<sf::Vector2f, sf::Vector2f> findStEnd(std::vector<Leaf*> leafs);
+	void writeRoom(sf::IntRect rect, int layer, int value);
+};
 #endif // !MAPM

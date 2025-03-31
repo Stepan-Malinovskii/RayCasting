@@ -88,6 +88,13 @@ void Game::getInput(sf::Event event, float deltaTime)
 		{
 			player->heal();
 		}
+
+		if (event.key.code == sf::Keyboard::P)
+		{
+			auto pair = mapManager->generate();
+			resetMap();
+			player->sprite->spMap.position = pair.second;
+		}
 	}
 }
 
@@ -159,8 +166,11 @@ void Game::getInput(float deltaTime)
 
 void Game::resetMap()
 {
-	/*player = spManager->resetMap(newMap);
-	initPlayer();*/
+	spManager->resetMap(mapManager->getNowMap());
+	initPlayer();
+	dialogSys->setPlayer(player);
+	player->setInventory(invent);
+	invent->player = player;
 }
 
 void Game::update(float deltaTime)

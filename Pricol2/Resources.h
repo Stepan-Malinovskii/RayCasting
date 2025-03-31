@@ -10,6 +10,7 @@
 
 const int TEXTURE_SIZE = 128, GUN_SIZE = 1, ICON_SIZE = 64, TEXTURE_COUNT = 15;
 constexpr float SCREEN_W = 1280.0f, SCREEN_H = 720.0f;
+constexpr int SPACE_SIZE_W = 40, SPACE_SIZE_H = 40;
 
 class Resources
 {
