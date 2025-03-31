@@ -27,14 +27,8 @@ constexpr int SPRITE_LAYER = 3;
 class Map
 {
 public:
-	void Draw(sf::RenderTarget& window, int layerNumber);
-
 	void SetNewOnGrid(int x, int y, int layerNumber, int value);
 	int const GetOnGrid(int x, int y, int layerNumber) const;
-
-	void LoadGrid(const std::string& path);
-	void SaveGrid(const std::string& path);
-	void writeMapSprite(std::vector<std::shared_ptr<Sprite>> sprs);
 
 	bool isCellEmpty(sf::Vector2i pos);
 	void setupBlockmap(Sprite* sp);
@@ -46,14 +40,14 @@ public:
 	std::vector<MapSprite>& getMapSprites();
 
 	void deleteSprite(sf::Vector2i mapPos);
-private:
-	bool insertInBlockMap(sf::Vector2i pos, Sprite* sprite);
-	void removeInBlockMap(sf::Vector2i pos, Sprite* sprite);
 
 	std::vector<std::vector<std::array<int, LAYER_COUNT>>> grid;
 	std::vector<std::vector<std::set<Sprite*>>> blockMap;
 
 	std::vector<MapSprite> sprites;
+private:
+	bool insertInBlockMap(sf::Vector2i pos, Sprite* sprite);
+	void removeInBlockMap(sf::Vector2i pos, Sprite* sprite);
 };
 
 #endif // !MAP_H

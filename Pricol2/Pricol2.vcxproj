@@ -147,6 +147,7 @@
     <ClCompile Include="GunManager.cpp" />
     <ClCompile Include="Inventory.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="MapManager.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Pricol2.cpp" />
     <ClCompile Include="Randomizer.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="GunManager.h" />
     <ClInclude Include="Inventory.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="MapManager.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Randomizer.h" />
     <ClInclude Include="Raycast.h" />

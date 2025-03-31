@@ -1,7 +1,7 @@
 #include "Game.h"
 
-Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
-	window{ _window }, nowMap{ _nowMap }
+Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
+	window{ _window }, mapManager{ _mapManager }
 {
 	screenMidlePos = { (int)(SCREEN_W / 2), (int)(SCREEN_H / 2) };
 	data = new Data();
@@ -9,7 +9,7 @@ Game::Game(sf::RenderWindow* _window, Map* _nowMap) :
 	renderer = new Renderer(window);
 	uiManager = new UIManager(window);
 	dialogSys = new Dialog(window, data, uiManager, weaponManager);
-	spManager = new SpriteManager(nowMap, data, dialogSys);
+	spManager = new SpriteManager(mapManager->getNowMap(), data, dialogSys);
 	initPlayer();
 
 	invent = new Inventory(window, player, uiManager);
@@ -51,10 +51,11 @@ void Game::initPlayer()
 
 void Game::save()
 {
-	spManager->saveSprite();
+	mapManager->rewriteSprites(spManager->getSprites());
 	weaponManager->saveGun();
 	data->savePlayerData(player);
 	data->saveInvent(invent->getInventToSave());
+	mapManager->save();
 }
 
 void Game::getInput(sf::Event event, float deltaTime)
@@ -156,13 +157,10 @@ void Game::getInput(float deltaTime)
 	player->updateMouseData({ deltaX, deltaY }, deltaTime);
 }
 
-void Game::resetMap(Map* newMap)
+void Game::resetMap()
 {
-	nowMap = newMap;
-	player = spManager->resetMap(newMap);
-	player->kick = weaponManager->getGunById(0);
-	initPlayer();
-	player->setInventory(invent);
+	/*player = spManager->resetMap(newMap);
+	initPlayer();*/
 }
 
 void Game::update(float deltaTime)
@@ -200,6 +198,6 @@ void Game::makeCycle(float deltaTime)
 
 void Game::render()
 {
-	renderer->Draw3DView(player, nowMap, spManager->getSprites());
+	renderer->Draw3DView(player, mapManager->getNowMap(), spManager->getSprites());
 	uiManager->drawPlayerUI(player);
 }

@@ -10,22 +10,22 @@
 #include "Sprite.h"
 #include "DataBase.h"
 #include "DialogSystem.h"
-#include "Map.h"
 #include "Player.h"
 #include "Renderer.h"
 #include "SpriteManager.h"
 #include "GunManager.h"
 #include "UIManeger.h"
 #include "Inventory.h"
+#include "MapManager.h"
 
 class Game
 {
 public:
 public:
-	Game(sf::RenderWindow* window, Map* nowMap);
+	Game(sf::RenderWindow* window, MapManager* mapManager);
 	~Game();
 	void getInput(sf::Event event, float deltaTime);
-	void resetMap(Map* newMap);
+	void resetMap();
 	void makeCycle(float deltaTime);
 	void save();
 private:
@@ -43,7 +43,7 @@ private:
 	WeaponManager* weaponManager;
 	Player* player;
 	Renderer* renderer;
-	Map* nowMap;
+	MapManager* mapManager;
 	sf::RenderWindow* window;
 };
 

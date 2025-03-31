@@ -24,7 +24,6 @@ void SpriteManager::init()
 		{
 			def.maxHealpoint = plDef.maxHp;
 			sp.nowHealPoint = plDef.nowHp;
-			sp.position = { 3,3 };
 
 			sprite = std::make_shared<Sprite>(def, sp, id);
 			player = std::make_unique<Player>(Player(sprite.get(), plDef, nowMap));
@@ -76,7 +75,7 @@ Player* SpriteManager::resetMap(Map* newMap)
 
 Player* SpriteManager::getPlayer() { return player.get(); }
 
-std::vector<std::shared_ptr<Sprite>>& SpriteManager::getSprites() { return sprites;  }
+std::vector<std::shared_ptr<Sprite>> SpriteManager::getSprites() { return sprites;  }
 
 void SpriteManager::update(float deltaTime)
 {
@@ -113,11 +112,6 @@ void SpriteManager::deleteSprite(std::shared_ptr<Sprite> sp)
 			break;
 		}
 	}
-}
-
-void SpriteManager::saveSprite()
-{
-	nowMap->writeMapSprite(sprites);
 }
 
 SpriteManager::~SpriteManager() {}

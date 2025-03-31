@@ -26,7 +26,7 @@ public:
 
 	void Init();
 
-	void Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<Sprite>>& sprites);
+	void Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<Sprite>> sprites);
 private:
 	sf::RenderWindow* window;
 	sf::Texture floorTexture;

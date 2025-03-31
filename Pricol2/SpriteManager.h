@@ -13,12 +13,11 @@ class SpriteManager
 public:
 	SpriteManager(Map* _nowMap, Data* _data, Dialog* _dialogSys);
 	~SpriteManager();
-	void saveSprite();
 	void update(float deltaTime);
 	Player* resetMap(Map* newMap);
 	Player* getPlayer();
 	Npc getNpc(MapSprite* mSp);
-	std::vector<std::shared_ptr<Sprite>>& getSprites();
+	std::vector<std::shared_ptr<Sprite>> getSprites();
 private:
 	int id;
 	void deleteSprite(std::shared_ptr<Sprite> sp);

@@ -3,13 +3,15 @@
 #include <SFML/Window/Event.hpp>
 #include "SpriteManager.h"
 
-void Editor::init(sf::RenderWindow& window, sf::RenderWindow& editorWindow, Map* map)
+void Editor::init(sf::RenderWindow* _window, sf::RenderWindow* _editorWindow, MapManager* _mapMn)
 {
-	nowMap = map;
+	mapManager = _mapMn;
+	window = _window;
+	editorWindow = _editorWindow;
 	nowValue = 1;
 	nowLayer = WALL_LAYER;
-	windowView = window.getView();
-	editorView = editorWindow.getView();
+	windowView = window->getView();
+	editorView = editorWindow->getView();
 
 	initButton();
 }
@@ -50,13 +52,13 @@ void Editor::initButton()
 	}
 }
 
-void Editor::takeEditInput(sf::RenderWindow& editorWindow, sf::Event event)
+void Editor::takeEditInput(sf::Event event)
 {
-	editorMousePos = sf::Mouse::getPosition(editorWindow);
+	editorMousePos = sf::Mouse::getPosition(*editorWindow);
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{
-		editorWindowStateLeftClick(editorWindow);
+		editorWindowStateLeftClick();
 	}
 
 	if (event.type == sf::Event::MouseWheelScrolled)
@@ -65,20 +67,20 @@ void Editor::takeEditInput(sf::RenderWindow& editorWindow, sf::Event event)
 		editorView.move({ 0, deltaScrol });
 	}
 
-	editorWindow.setView(editorView);
+	editorWindow->setView(editorView);
 }
 
-void Editor::takeWindowInput(sf::RenderWindow& window, sf::Event event)
+void Editor::takeWindowInput(sf::Event event)
 {
-	windowMousePos = sf::Mouse::getPosition(window);
+	windowMousePos = sf::Mouse::getPosition(*window);
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
 	{
-		windowStateRightClick(window);
+		windowStateRightClick();
 	}
 	else
 	{
-		windowStateNoRightClick(window);
+		windowStateNoRightClick();
 	}
 
 
@@ -86,7 +88,7 @@ void Editor::takeWindowInput(sf::RenderWindow& window, sf::Event event)
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !da)
 	{
 		da = true;
-		windowStateLeftClick(window);
+		windowStateLeftClick();
 	}
 	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{
@@ -108,12 +110,12 @@ void Editor::takeWindowInput(sf::RenderWindow& window, sf::Event event)
 		}
 	}
 
-	window.setView(windowView);
+	window->setView(windowView);
 }
 
-void Editor::windowStateRightClick(sf::RenderWindow& window)
+void Editor::windowStateRightClick()
 {
-	if (window.hasFocus())
+	if (window->hasFocus())
 	{
 		if (isFirstMouse)
 		{
@@ -126,52 +128,52 @@ void Editor::windowStateRightClick(sf::RenderWindow& window)
 
 			windowView.setCenter(windowView.getCenter() - (sf::Vector2f)deltaMouse);
 
-			sf::Mouse::setPosition(lastMousePos, window);
+			sf::Mouse::setPosition(lastMousePos, *window);
 		}
-		window.setMouseCursorVisible(false);
+		window->setMouseCursorVisible(false);
 	}
 }
 
-void Editor::windowStateNoRightClick(sf::RenderWindow& window)
+void Editor::windowStateNoRightClick()
 {
-	if (window.hasFocus())
+	if (window->hasFocus())
 	{
 		isFirstMouse = true;
-		window.setMouseCursorVisible(true);
+		window->setMouseCursorVisible(true);
 	}
 }
 
-void Editor::windowStateLeftClick(sf::RenderWindow& window)
+void Editor::windowStateLeftClick()
 {
-	if (window.hasFocus())
+	if (window->hasFocus())
 	{
-		sf::Vector2f worldPos = window.mapPixelToCoords(windowMousePos);
+		sf::Vector2f worldPos = window->mapPixelToCoords(windowMousePos);
 		sf::Vector2i mapPos = sf::Vector2i((int)floor(worldPos.x - 0.1f) / TEXTURE_SIZE,
 			(int)floor(worldPos.y - 0.1f) / TEXTURE_SIZE);
 		if (nowLayer != SPRITE_LAYER)
 		{
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
 			{
-				nowMap->SetNewOnGrid(mapPos.x, mapPos.y, nowLayer, 0);
+				mapManager->getNowMap()->SetNewOnGrid(mapPos.x, mapPos.y, nowLayer, 0);
 			}
 			else
 			{
-				nowMap->SetNewOnGrid(mapPos.x, mapPos.y, nowLayer, nowValue);
+				mapManager->getNowMap()->SetNewOnGrid(mapPos.x, mapPos.y, nowLayer, nowValue);
 			}
 		}
 		else
 		{
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
 			{
-				nowMap->deleteMapSprite(mapPos);
+				mapManager->getNowMap()->deleteMapSprite(mapPos);
 			}
 			else
 			{
 				if (nowSpriteDef.texture != -1)
 				{
-					if (nowMap->isCellEmpty(mapPos))
+					if (mapManager->getNowMap()->isCellEmpty(mapPos))
 					{
-						nowMap->setMapSprite({ nowSpriteDef.texture + 1, { mapPos.x + 0.5f, mapPos.y + 0.5f }, -90.0f, nowSpriteDef.maxHealpoint });
+						mapManager->getNowMap()->setMapSprite({ nowSpriteDef.texture + 1, { mapPos.x + 0.5f, mapPos.y + 0.5f }, -90.0f, nowSpriteDef.maxHealpoint });
 					}
 				}
 			}
@@ -179,11 +181,11 @@ void Editor::windowStateLeftClick(sf::RenderWindow& window)
 	}
 }
 
-void Editor::editorWindowStateLeftClick(sf::RenderWindow& editorWindow)
+void Editor::editorWindowStateLeftClick()
 {
-	if (editorWindow.hasFocus())
+	if (editorWindow->hasFocus())
 	{
-		sf::Vector2i worldPos = (sf::Vector2i)editorWindow.mapPixelToCoords(editorMousePos);
+		sf::Vector2i worldPos = (sf::Vector2i)editorWindow->mapPixelToCoords(editorMousePos);
 		sf::Vector2i mapPos = sf::Vector2i((int)floor(worldPos.x - 0.1f) / TEXTURE_SIZE,
 			(int)floor(worldPos.y - 0.1f) / TEXTURE_SIZE);
 
@@ -197,11 +199,11 @@ void Editor::editorWindowStateLeftClick(sf::RenderWindow& editorWindow)
 	}
 }
 
-void Editor::drawEditor(sf::RenderWindow& editorWindow)
+void Editor::drawEditor()
 {
 	for (auto b : buttons)
 	{
-		editorWindow.draw(*b.get());
+		editorWindow->draw(*b.get());
 	}
 }
 

@@ -8,8 +8,10 @@
 #include "Resources.h"
 #include "Game.h"
 #include "SpriteManager.h"
+#include "MapManager.h"
 
 enum class State{Editor, Game};
+
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H), "Game");
@@ -24,11 +26,12 @@ int main()
 	State state = State::Game;
 	
 	Resources::initResources();
-	std::unique_ptr<Map> map = std::make_unique<Map>();
-	map->LoadGrid("Texture/test.map");
+	std::unique_ptr<MapManager> mapManager = std::make_unique<MapManager>(&window);
+	mapManager->load();
+
 	Editor editor{};
-	editor.init(window, editorWindow, map.get());
-	Game game(&window, map.get());
+	editor.init(&window, &editorWindow, mapManager.get());
+	Game game(&window, mapManager.get());
 
 	sf::Clock gameClock;
 
@@ -41,7 +44,7 @@ int main()
 		{
 			if (state == State::Editor)
 			{
-				editor.takeWindowInput(window, event);
+				editor.takeWindowInput(event);
 			}
 			if (event.type == sf::Event::Closed)
 			{
@@ -54,7 +57,7 @@ int main()
 					if (state == State::Editor)
 					{
 						state = State::Game;
-						game.resetMap(map.get());
+						game.resetMap();
 						window.setMouseCursorVisible(false);
 						window.setView(window.getDefaultView());
 
@@ -85,7 +88,7 @@ int main()
 				{
 					editorWindow.close();
 				}
-				editor.takeEditInput(editorWindow, event);
+				editor.takeEditInput(event);
 			}
 		}
 
@@ -99,8 +102,8 @@ int main()
 		{	
 			editorWindow.clear();
 
-			map->Draw(window, editor.drawerLayer());
-			editor.drawEditor(editorWindow);
+			mapManager->drawMap(editor.drawerLayer());
+			editor.drawEditor();
 			
 			editorWindow.display();
 		}
@@ -111,6 +114,5 @@ int main()
 		gameClock.restart();
 	}
 	game.save();
-	map->SaveGrid("Texture/test.map");
 	return 0;
 }

@@ -22,7 +22,7 @@ void Renderer::Init()
 	floorSprite.setTexture(floorTexture);
 }
 
-void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<Sprite>>& sprites)
+void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<Sprite>> sprites)
 {
 	//StaticCalculations
 	float pRadians = player->sprite->spMap.angle * PI / 180.0f;
