@@ -54,11 +54,11 @@ type{ def.type }
 	}
 	else if (type == Spread)
 	{
-		setGetFunc([=](Gun* gun) {gun->maxRad = round(gun->maxRad / def.effect);
-		gun->nowRad = std::min(gun->maxRad, gun->nowRad);});
+		setGetFunc([=](Gun* gun) {gun->maxImpRad = round(gun->maxImpRad / def.effect);
+		gun->nowRad = std::min(gun->maxImpRad, gun->nowRad);});
 
-		setDelFunc([=](Gun* gun) {gun->maxRad = round(gun->maxRad * def.effect);
-		gun->nowRad = std::min(gun->maxRad, gun->nowRad);});
+		setDelFunc([=](Gun* gun) {gun->maxImpRad = round(gun->maxImpRad * def.effect);
+		gun->nowRad = std::min(gun->maxImpRad, gun->nowRad);});
 	}
 	else
 	{
@@ -117,6 +117,7 @@ damage{ def.damage }, maxCount{ def.maxCount }, nowCount{ def.nowCount },
 nowTimeBetwenReset{ def.resetTime }, timeBetwenReset{ def.resetTime }, isReset{ _isReset }
 {
 	nowRad = 1;
+	maxImpRad = 30;
 	maxRad = 30;
 }
 
@@ -141,9 +142,9 @@ void Gun::updateRad(bool isRun, float deltaTime)
 {
 	if (isRun)
 	{
-		if (nowRad < maxRad)
+		if (nowRad < maxImpRad)
 			nowRad += maxRad * deltaTime * 2;
-		else nowRad = maxRad;
+		else nowRad = maxImpRad;
 	}
 	else
 	{
@@ -193,7 +194,7 @@ void Gun::ussing(Sprite* sp, float dist)
 	{
 		if (sp != nullptr)
 		{
-			if (Random::bitRandom() > (nowRad - 0.05f) / maxRad - 0.35f || nowRad == 1)
+			if (Random::bitRandom() > (nowRad - 0.05f) /  maxRad - 0.35f || nowRad == 1)
 			{
 				sp->takeDamage(damage * (dist < maxDist ? 1 : 0));
 			}

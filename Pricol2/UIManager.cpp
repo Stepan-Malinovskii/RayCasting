@@ -250,8 +250,6 @@ void UIManager::initInvent(std::map<Itemble*, int> items, Itemble* choose)
 		float oldSize = dataGroup1.getSize().y;
 		dataGroup1.setSize({ dataGroup1.getSize().x, dataGroup1.getSize().y * 2 });
 		dataGroup1.move({ 0, oldSize / 2 + dataGroup1.getSize().y / 2 + 5 });
-		dataGroup1.setString(splitText(choose->disc, dataGroup1.getSize().x, dataGroup1.text.getCharacterSize()));
-		buttons.push_back(dataGroup1);
 
 		auto test = dynamic_cast<Item*>(choose);
 		if (test == nullptr || test->type != Heal)
@@ -266,6 +264,7 @@ void UIManager::initInvent(std::map<Itemble*, int> items, Itemble* choose)
 			pos.y -= dataGroup.getSize().y / 2 - 5 - makeGroup.getSize().y / 2;
 			makeGroup.setPosition(pos);
 
+			std::wostringstream oss;
 			if (dynamic_cast<Item*>(choose) != nullptr)
 			{
 				auto item = dynamic_cast<Item*>(choose);
@@ -275,6 +274,8 @@ void UIManager::initInvent(std::map<Itemble*, int> items, Itemble* choose)
 					buttons.push_back(Button(makeGroup));
 					buttons.back().setFunc([&]() { keyButton = 100;});
 				}
+
+				oss << choose->disc;
 			}
 			else if (dynamic_cast<Gun*>(choose) != nullptr)
 			{
@@ -297,6 +298,12 @@ void UIManager::initInvent(std::map<Itemble*, int> items, Itemble* choose)
 					buttons.back().setFunc([=]() { keyButton = i;});
 					i++;
 				}
+
+				oss << L"Урон: " << std::fixed << std::setprecision(2) << gun->damage;
+				oss << " | ";
+				oss << L"Обойма: " << std::fixed << std::setprecision(2) << gun->maxCount;
+				oss << " | ";
+				oss << L"Разброс: " << std::fixed << std::setprecision(2) << gun->maxImpRad;
 			}
 			else
 			{
@@ -311,42 +318,12 @@ void UIManager::initInvent(std::map<Itemble*, int> items, Itemble* choose)
 				makeGroup.setString(L"Надеть на 2-ое");
 				buttons.push_back(Button(makeGroup));
 				buttons.back().setFunc([&]() { keyButton = 101;});
+
+				oss << choose->disc;
 			}
+			dataGroup1.setString(splitText(oss.str(), dataGroup1.getSize().x, dataGroup1.text.getCharacterSize()));
+			buttons.push_back(dataGroup1);
 		}
-	}
-}
-
-void UIManager::deleteNow() 
-{ 
-	buttons.clear();
-	choseBut = nullptr;
-}
-
-int UIManager::checkButton(sf::Vector2i mousePos)
-{
-	for (int i = 0; i < buttons.size(); i++)
-	{
-		if (buttons[i].isClicked(mousePos))
-		{
-			if (choseBut != nullptr) choseBut->setFillColor(sf::Color(50, 50, 50));
-			choseBut = &buttons[i];
-			choseBut->setFillColor(sf::Color(223, 154, 51));
-			buttons[i].use();
-			return keyButton;
-		}
-	}
-	return -1;
-}
-
-void UIManager::drawNow()
-{
-	sf::Sprite back(Resources::dialogBackround);
-	back.setScale({ SCREEN_W / Resources::dialogBackround.getSize().x,
-		SCREEN_H / Resources::dialogBackround.getSize().y });
-	window->draw(back);
-	for (auto b : buttons)
-	{
-		window->draw(b);
 	}
 }
 
@@ -396,7 +373,7 @@ void UIManager::initPlayer()
 			window->draw(group2.shape);
 
 			Group group3(group1);
-			group3.setPosition({ group3.getPosition().x, group3.getPosition().y + 80});
+			group3.setPosition({ group3.getPosition().x, group3.getPosition().y + 80 });
 			window->draw(group3.shape);
 
 			std::wostringstream oss;
@@ -404,7 +381,7 @@ void UIManager::initPlayer()
 			oss << " / ";
 			oss << std::fixed << std::setprecision(2) << player->sprite->spDef.maxHealpoint;
 			std::wstring str = oss.str();
-			
+
 			group1.shape.setFillColor({ 255, 23, 23 });
 			float newXH = baseX * (player->sprite->spMap.nowHealPoint <= 0 ? 0 :
 				player->sprite->spMap.nowHealPoint) / player->sprite->spDef.maxHealpoint;
@@ -450,7 +427,7 @@ void UIManager::initPlayer()
 				rect.setOrigin({ b.width / 2, b.height / 2 });
 				if (weaponInfo.getString() != "")
 				{
-					rect.setPosition({  SCREEN_W - ICON_SIZE - weaponInfo.getLocalBounds().width,  SCREEN_H - ICON_SIZE / 2});
+					rect.setPosition({ SCREEN_W - ICON_SIZE - weaponInfo.getLocalBounds().width,  SCREEN_H - ICON_SIZE / 2 });
 				}
 				else
 				{
@@ -460,13 +437,47 @@ void UIManager::initPlayer()
 			}
 
 			sf::CircleShape aim(player->getNowGun()->nowRad, 16);
-			aim.setOrigin({ aim.getRadius(), aim.getRadius()});
-			aim.setFillColor(sf::Color(0,0,0,0));
+			aim.setOrigin({ aim.getRadius(), aim.getRadius() });
+			aim.setFillColor(sf::Color(0, 0, 0, 0));
 			aim.setOutlineColor(sf::Color::Black);
 			aim.setOutlineThickness(1.5f);
 			aim.setPosition({ SCREEN_W / 2, SCREEN_H / 2 });
 			window->draw(aim);
 		};
+}
+
+void UIManager::deleteNow() 
+{ 
+	buttons.clear();
+	choseBut = nullptr;
+}
+
+int UIManager::checkButton(sf::Vector2i mousePos)
+{
+	for (int i = 0; i < buttons.size(); i++)
+	{
+		if (buttons[i].isClicked(mousePos))
+		{
+			if (choseBut != nullptr) choseBut->setFillColor(sf::Color(50, 50, 50));
+			choseBut = &buttons[i];
+			choseBut->setFillColor(sf::Color(223, 154, 51));
+			buttons[i].use();
+			return keyButton;
+		}
+	}
+	return -1;
+}
+
+void UIManager::drawNow()
+{
+	sf::Sprite back(Resources::dialogBackround);
+	back.setScale({ SCREEN_W / Resources::dialogBackround.getSize().x,
+		SCREEN_H / Resources::dialogBackround.getSize().y });
+	window->draw(back);
+	for (auto b : buttons)
+	{
+		window->draw(b);
+	}
 }
 
 void UIManager::drawPlayerUI(Player* player)

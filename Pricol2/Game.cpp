@@ -59,6 +59,8 @@ void Game::save()
 
 void Game::getInput(sf::Event event, float deltaTime)
 {
+	if (dialogSys->isActive) return;
+
 	if (event.type == sf::Event::KeyPressed)
 	{
 		if (event.key.code == sf::Keyboard::Q)
@@ -67,7 +69,7 @@ void Game::getInput(sf::Event event, float deltaTime)
 		}
 	}
 
-	if (dialogSys->isActive || invent->isOpen) { return; }
+	if (invent->isOpen) { return; }
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{			
@@ -173,7 +175,7 @@ void Game::makeCycle(float deltaTime)
 #if !_DEBUG
 	if (deltaTime > 1/50.0f)
 	{
-		deltaTime = 0;
+		deltaTime = 0.005f;
 	}
 #endif //_DEBUG
 	if (invent->isOpen)

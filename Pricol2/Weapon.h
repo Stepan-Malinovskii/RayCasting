@@ -157,9 +157,10 @@ public:
 	int maxCount;
 	int damage;
 	float nowRad;
-	float maxRad;
+	float maxImpRad;
 	std::map<ImproveType, Improve*> improvement;
 private:
+	float maxRad;
 	float timeBetwenReset, nowTimeBetwenReset;
 	sf::Sound shutSound;
 	sf::Sound resetSound;
