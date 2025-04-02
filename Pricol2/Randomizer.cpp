@@ -1,5 +1,4 @@
 #include "Randomizer.h"
-#include <exception>
 
 float Random::bitRandom()
 {
@@ -13,4 +12,17 @@ int Random::intRandom(int a, int b)
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<> distr(a, b);
 	return distr(gen);
+}
+
+std::set<sf::Vector2i, Vector2iCompare> Random::uniquePoints(sf::IntRect zone, int count)
+{
+	std::set<sf::Vector2i, Vector2iCompare> points;
+
+	while (points.size() < count)
+	{
+		points.insert({ intRandom(zone.left, (zone.left + zone.width)),
+						intRandom(zone.top, (zone.top + zone.height))});
+	}
+
+	return points;
 }

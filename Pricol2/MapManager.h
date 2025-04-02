@@ -6,6 +6,8 @@
 #include "Resources.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 
+constexpr int ENEMY_LEVEL_COUNT = 40;
+
 class MapManager
 {
 public:
@@ -24,5 +26,6 @@ private:
 
 	std::pair<sf::Vector2f, sf::Vector2f> findStEnd(std::vector<Leaf*> leafs);
 	void writeRoom(sf::IntRect rect, int layer, int value);
+	void writeEnemy(std::vector<sf::IntRect> rooms);
 };
 #endif // !MAPM

@@ -23,7 +23,7 @@ void Editor::initButton()
 	Button b({ shape, {} });
 	b.setTexture(&Resources::textures);
 	int x = 0, y = 0, h = 0;
-	for (; x < Resources::textures.getSize().x / TEXTURE_SIZE * 4; x++, y++)
+	for (; x < Resources::textures.getSize().x / TEXTURE_SIZE * 5; x++, y++)
 	{
 		b.setPosition({ (x % COUNT_ROW_TEXT) * (float)ICON_SIZE + ICON_SIZE / 2, (y / COUNT_ROW_TEXT) * (float)ICON_SIZE });
 		b.setTextureRect({ {(int)(x % TEXTURE_COUNT * TEXTURE_SIZE), (int)(x / TEXTURE_COUNT * TEXTURE_SIZE)},{TEXTURE_SIZE, TEXTURE_SIZE} });

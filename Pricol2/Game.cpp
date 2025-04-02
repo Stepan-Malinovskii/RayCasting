@@ -93,7 +93,7 @@ void Game::getInput(sf::Event event, float deltaTime)
 		{
 			auto pair = mapManager->generate();
 			resetMap();
-			player->sprite->spMap.position = pair.second;
+			player->sprite->spMap.position = pair.first;
 		}
 	}
 }

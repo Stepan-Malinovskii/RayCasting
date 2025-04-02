@@ -194,6 +194,19 @@ std::pair<sf::Vector2f, sf::Vector2f> MapManager::generate()
 	nowMap->grid = std::vector(SPACE_SIZE_H, std::vector(SPACE_SIZE_W, std::array<int, LAYER_COUNT>()));
 	nowMap->blockMap = std::vector(SPACE_SIZE_H, std::vector(SPACE_SIZE_W, std::set<Sprite*>()));
 	
+	std::vector<sf::IntRect> enemyRooms = rooms;
+
+	for (int i = 0; i < enemyRooms.size(); i++)
+	{
+		if (enemyRooms[i].contains((sf::Vector2i)stEnd.first))
+		{
+			enemyRooms.erase(enemyRooms.begin() + i);
+			break;
+		}
+	}
+
+	writeEnemy(enemyRooms);
+
 	for (auto rect : rooms)
 	{
 		for (auto i : std::vector<std::pair<int, int>>{ {FLOOR_LAYER, 1}, {CELL_LAYER, 2} })
@@ -232,6 +245,7 @@ std::pair<sf::Vector2f, sf::Vector2f> MapManager::generate()
 			nowMap->grid[h.top + 1][h.left][1] = 1;
 		}
 	}
+
 
 	return stEnd;
 }
@@ -276,6 +290,27 @@ void MapManager::writeRoom(sf::IntRect rect, int layer, int value)
 			nowMap->grid[y][x][layer] = value;
 		}
 	}
+}
+
+void MapManager::writeEnemy(std::vector<sf::IntRect> rooms)
+{
+	int midleRoomCount = ENEMY_LEVEL_COUNT / rooms.size();
+
+	for (auto r : rooms)
+	{
+		r.top += 2;
+		r.left += 2;
+		r.height -= 4;
+		r.width -= 4;
+		auto points = Random::uniquePoints(r, Random::intRandom(midleRoomCount * 0.8f, 
+																midleRoomCount * 1.2f));
+		for (auto p : points)
+		{
+			auto def = spriteDef[Random::intRandom(1, ENEMY_COUNT - 2)];
+			nowMap->setMapSprite({def.texture + 1, (sf::Vector2f)p, (float)Random::intRandom(0,180), def.maxHealpoint});
+		}
+	}
+	
 }
 
 Map* MapManager::getNowMap() { return nowMap; }

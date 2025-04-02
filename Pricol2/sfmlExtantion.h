@@ -10,6 +10,14 @@
 #include <SFML/Graphics/Text.hpp>
 #include <functional>
 
+struct Vector2iCompare
+{
+	bool operator()(const sf::Vector2i& a, const sf::Vector2i& b) const
+	{
+		return pow(a.x, 2) + pow(a.y, 2) < pow(b.x, 2) + pow(b.y, 2);
+	}
+};
+
 struct Group
 {
 public:
