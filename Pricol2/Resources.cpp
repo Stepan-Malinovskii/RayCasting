@@ -68,8 +68,8 @@ void Resources::initResources()
 	if (!skyTextures.loadFromFile("Texture/sky_texture.png")) throw "TextureLoadError!";
 	if (!spriteIcon.loadFromFile("Texture/enemysIcon.png")) throw "TextureLoadError!";
 	loadFor("Texture/enemy", ".png", & spritesTextures);
-	loadFor("Sound/background", ".wav", &backgroundSound);
-	if (!takeDamage.loadFromFile("Sound/takeDamage.wav")) throw "TextureLoadError!";
+	loadFor("Sound/background", ".ogg", &backgroundSound);
+	if (!takeDamage.loadFromFile("Sound/takeDamage.ogg")) throw "TextureLoadError!";
 	if (!buttonClick.loadFromFile("Sound/buttonClick.mp3")) throw "TextureLoadError!";
 	skyTextures.setRepeated(true);
 
