@@ -7,6 +7,8 @@ sf::Texture Resources::spriteIcon{};
 std::vector<sf::Texture> Resources::spritesTextures{};
 sf::Texture Resources::skyTextures{};
 std::vector<sf::SoundBuffer> Resources::backgroundSound{};
+sf::SoundBuffer Resources::buttonClick{};
+sf::SoundBuffer Resources::takeDamage{};
 
 sf::Texture Resources::itembleIcon{};
 sf::SoundBuffer Resources::gunCantShoutSound{};
@@ -66,7 +68,9 @@ void Resources::initResources()
 	if (!skyTextures.loadFromFile("Texture/sky_texture.png")) throw "TextureLoadError!";
 	if (!spriteIcon.loadFromFile("Texture/enemysIcon.png")) throw "TextureLoadError!";
 	loadFor("Texture/enemy", ".png", & spritesTextures);
-	loadFor("Sound/backgroung", ".mp3", &backgroundSound);
+	loadFor("Sound/background", ".wav", &backgroundSound);
+	if (!takeDamage.loadFromFile("Sound/takeDamage.wav")) throw "TextureLoadError!";
+	if (!buttonClick.loadFromFile("Sound/buttonClick.mp3")) throw "TextureLoadError!";
 	skyTextures.setRepeated(true);
 
 	if (!itembleIcon.loadFromFile("Texture/itemIcon.png")) throw "TextureLoadError";

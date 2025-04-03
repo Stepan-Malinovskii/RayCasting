@@ -72,6 +72,8 @@ void MapManager::load()
 		in.read(reinterpret_cast<char*>(&nowMap->sprites[i]), sizeof(nowMap->sprites[i]));
 
 	in.close();
+
+	//SoundManager::playSound(Resources::backgroundSound[0], 20, {nowMap->grid[0].size() / 2.0f, nowMap->grid.size() / 2.0f }, true, true);
 }
 
 void MapManager::rewriteSprites(std::vector<std::shared_ptr<Sprite>> sprs)

@@ -44,11 +44,8 @@ WeaponManager::WeaponManager(Data* _data)
 		auto def = gunsDef[i];
 		def.nowCount = gunsData[i].nowCount;
 
-		guns.push_back(std::make_unique<Gun>(def, i > 1, id));
+		guns.push_back(std::make_unique<Gun>(def, i > 1, id, i));
 		guns.back()->setAnimator(animr);
-		guns.back()->setSound(&Resources::gunsShutSound[i],
-			&Resources::gunsResetSound[i],
-			&Resources::gunCantShoutSound);
 		itemble[id] = guns.back().get();
 		for (auto im : gunsData[i].improveId)
 		{

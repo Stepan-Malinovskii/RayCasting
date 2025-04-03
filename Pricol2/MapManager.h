@@ -4,6 +4,7 @@
 #include "Map.h"
 #include "Leaf.h"
 #include "Resources.h"
+#include "SoundManager.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 
 constexpr int ENEMY_LEVEL_COUNT = 40;

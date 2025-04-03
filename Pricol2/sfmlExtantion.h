@@ -9,6 +9,8 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <functional>
+#include "Resources.h"
+#include "SoundManager.h"
 
 struct Vector2iCompare
 {

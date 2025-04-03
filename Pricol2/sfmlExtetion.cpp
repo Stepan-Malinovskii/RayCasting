@@ -6,7 +6,7 @@ Button::Button(sf::RectangleShape _shape, sf::Text& _text)
 	group.text = _text;
 }
 
-Button::Button(Group _group) { group = _group; }
+Button::Button(Group _group) : group{ _group } {}
 
 sf::Vector2f Button::getPosition() { return group.getPosition(); }
 
@@ -54,7 +54,11 @@ void Button::setTextureRect(sf::IntRect rect)
 
 void Button::use()
 {
-	if (fn != NULL) fn();
+	if (fn != NULL)
+	{
+		fn();
+		SoundManager::playSound(Resources::buttonClick);
+	}
 }
 
 void Button::draw(sf::RenderTarget& target, sf::RenderStates states) const

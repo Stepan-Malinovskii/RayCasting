@@ -17,6 +17,7 @@
 #include "UIManeger.h"
 #include "Inventory.h"
 #include "MapManager.h"
+#include "SoundManager.h"
 
 class Game
 {

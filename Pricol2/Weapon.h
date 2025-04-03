@@ -14,6 +14,7 @@
 #include "Sprite.h"
 #include "Animation.h"
 #include "Randomizer.h"
+#include "SoundManager.h"
 
 class Gun;
 class Player;
@@ -131,12 +132,8 @@ protected:
 class Gun : public Weapon, public Itemble
 {
 public:
-	Gun(GunDef def, bool isReset, int id);
+	Gun(GunDef def, bool isReset, int id, int dunId);
 	Gun() = default;
-
-	void setSound(sf::SoundBuffer* shut = nullptr,
-		sf::SoundBuffer* reset = nullptr,
-		sf::SoundBuffer* cantShut = nullptr);
 
 	Improve* trySetImprove(Improve* improve);
 
@@ -160,11 +157,9 @@ public:
 	float maxImpRad;
 	std::map<ImproveType, Improve*> improvement;
 private:
+	int gunId;
 	float maxRad;
 	float timeBetwenReset, nowTimeBetwenReset;
-	sf::Sound shutSound;
-	sf::Sound resetSound;
-	sf::Sound cantShutSound;
 };
 
 #endif // !WEAPON
