@@ -72,6 +72,8 @@ void Editor::takeEditInput(sf::Event event)
 
 void Editor::takeWindowInput(sf::Event event)
 {
+	if (!window->hasFocus()) return;
+
 	windowMousePos = sf::Mouse::getPosition(*window);
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
@@ -80,25 +82,25 @@ void Editor::takeWindowInput(sf::Event event)
 	}
 	else
 	{
-		windowStateNoRightClick();
+		windowStateNoRightClick();	
 	}
 
 
-	static bool da = false;
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !da)
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{
-		da = true;
 		windowStateLeftClick();
-	}
-	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
-	{
-		da = false;
 	}
 
 	if (event.type == sf::Event::MouseWheelScrolled)
 	{
-		float zoom = 1.0f - 0.1f * event.mouseWheelScroll.delta;
-		windowView.zoom(zoom);
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
+		{
+			scrollAndCntr(0.1f * event.mouseWheelScroll.delta);
+		}
+		else
+		{
+			windowView.zoom(1.0f - 0.1f * event.mouseWheelScroll.delta);
+		}
 	}
 
 	if (event.type == sf::Event::KeyPressed)
@@ -134,6 +136,18 @@ void Editor::windowStateRightClick()
 	}
 }
 
+void Editor::scrollAndCntr(float delta)
+{
+	if (!(nowLayer == SPRITE_LAYER)) return;
+
+	sf::Vector2f worldPos = window->mapPixelToCoords(windowMousePos);
+	sf::Vector2i mapPos = sf::Vector2i((int)floor(worldPos.x - 0.1f) / TEXTURE_SIZE,
+		(int)floor(worldPos.y - 0.1f) / TEXTURE_SIZE);
+
+	if (mapManager->getNowMap()->isCellEmpty(mapPos)) return;
+	mapManager->getNowMap()->rotateSprite(mapPos, delta * 10);
+}
+
 void Editor::windowStateNoRightClick()
 {
 	if (window->hasFocus())
@@ -145,36 +159,33 @@ void Editor::windowStateNoRightClick()
 
 void Editor::windowStateLeftClick()
 {
-	if (window->hasFocus())
+	sf::Vector2f worldPos = window->mapPixelToCoords(windowMousePos);
+	sf::Vector2i mapPos = sf::Vector2i((int)floor(worldPos.x - 0.1f) / TEXTURE_SIZE,
+		(int)floor(worldPos.y - 0.1f) / TEXTURE_SIZE);
+	if (nowLayer != SPRITE_LAYER)
 	{
-		sf::Vector2f worldPos = window->mapPixelToCoords(windowMousePos);
-		sf::Vector2i mapPos = sf::Vector2i((int)floor(worldPos.x - 0.1f) / TEXTURE_SIZE,
-			(int)floor(worldPos.y - 0.1f) / TEXTURE_SIZE);
-		if (nowLayer != SPRITE_LAYER)
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
 		{
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
-			{
-				mapManager->getNowMap()->SetNewOnGrid(mapPos.x, mapPos.y, nowLayer, 0);
-			}
-			else
-			{
-				mapManager->getNowMap()->SetNewOnGrid(mapPos.x, mapPos.y, nowLayer, nowValue);
-			}
+			mapManager->getNowMap()->SetNewOnGrid(mapPos.x, mapPos.y, nowLayer, 0);
 		}
 		else
 		{
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
+			mapManager->getNowMap()->SetNewOnGrid(mapPos.x, mapPos.y, nowLayer, nowValue);
+		}
+	}
+	else
+	{
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
+		{
+			mapManager->getNowMap()->deleteMapSprite(mapPos);
+		}
+		else
+		{
+			if (nowSpriteDef.texture != -1)
 			{
-				mapManager->getNowMap()->deleteMapSprite(mapPos);
-			}
-			else
-			{
-				if (nowSpriteDef.texture != -1)
+				if (mapManager->getNowMap()->isCellEmpty(mapPos))
 				{
-					if (mapManager->getNowMap()->isCellEmpty(mapPos))
-					{
-						mapManager->getNowMap()->setMapSprite({ nowSpriteDef.texture + 1, { mapPos.x + 0.5f, mapPos.y + 0.5f }, -90.0f, nowSpriteDef.maxHealpoint });
-					}
+					mapManager->getNowMap()->setMapSprite({ nowSpriteDef.texture + 1, { mapPos.x + 0.5f, mapPos.y + 0.5f }, -90.0f, nowSpriteDef.maxHealpoint });
 				}
 			}
 		}

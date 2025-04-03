@@ -13,24 +13,6 @@ int const Map::GetOnGrid(int x, int y, int layerNumber) const
 	return 0;
 }
 
-bool Map::insertInBlockMap(sf::Vector2i pos, Sprite* sprite)
-{
-	if (pos.x >= 0 && pos.y >= 0 && pos.y < blockMap.size() && pos.x < blockMap[pos.y].size())
-	{
-		blockMap[pos.y][pos.x].insert(sprite);
-		return true;
-	}
-	return false;
-}
-
-void Map::removeInBlockMap(sf::Vector2i pos, Sprite* sprite)
-{
-	if (pos.x >= 0 && pos.y >= 0 && pos.y < blockMap.size() && pos.x < blockMap[pos.y].size())
-	{
-		blockMap[pos.y][pos.x].erase(sprite);
-	}
-}
-
 bool Map::isCellEmpty(sf::Vector2i pos)
 {
 	if (pos.x >= 0 && pos.y >= 0 && pos.y < blockMap.size() && pos.x < blockMap[pos.y].size())
@@ -38,6 +20,21 @@ bool Map::isCellEmpty(sf::Vector2i pos)
 		return blockMap[pos.y][pos.x].empty();
 	}
 	return false;
+}
+
+void Map::rotateSprite(sf::Vector2i pos, float angle)
+{
+	if (pos.x >= 0 && pos.y >= 0 && pos.y < blockMap.size() && pos.x < blockMap[pos.y].size())
+	{
+		for (int i = 0; i < sprites.size(); i++)
+		{
+			if ((sf::Vector2i)sprites[i].position == pos)
+			{
+				sprites[i].angle += angle;
+				break;
+			}
+		}
+	}
 }
 
 void Map::setupBlockmap(Sprite* sp)
@@ -92,6 +89,11 @@ std::vector<MapSprite>& Map::getMapSprites()
 
 void Map::setMapSprite(MapSprite sp)
 {
+	for (auto s : sprites)
+	{
+		if (s.position == sp.position && s.spriteDefId == sp.spriteDefId)
+			return;
+	}
 	sprites.push_back(sp);
 }
 
@@ -107,29 +109,20 @@ void Map::deleteMapSprite(sf::Vector2i pos)
 	}
 }
 
-void Map::deleteSprite(sf::Vector2i mapPos)
+bool Map::insertInBlockMap(sf::Vector2i pos, Sprite* sprite)
 {
-	if (mapPos.x >= 0 && mapPos.y >= 0 && mapPos.y < blockMap.size() && mapPos.x < blockMap[mapPos.y].size())
+	if (pos.x >= 0 && pos.y >= 0 && pos.y < blockMap.size() && pos.x < blockMap[pos.y].size())
 	{
-		for (auto sp = blockMap[mapPos.y][mapPos.x].begin(); sp != blockMap[mapPos.y][mapPos.x].end();)
-		{
-			if ((*sp)->spDef.texture != -1)
-			{
-				blockMap[mapPos.y][mapPos.x].erase(sp);
-				break;
-			}
-			else
-			{
-				sp++;
-			}
-		}
+		blockMap[pos.y][pos.x].insert(sprite);
+		return true;
+	}
+	return false;
+}
 
-		for (int i = 0; i < sprites.size(); i++)
-		{
-			if ((sf::Vector2i)sprites[i].position == mapPos)
-			{
-				sprites.erase(sprites.begin() + i);
-			}
-		}
+void Map::removeInBlockMap(sf::Vector2i pos, Sprite* sprite)
+{
+	if (pos.x >= 0 && pos.y >= 0 && pos.y < blockMap.size() && pos.x < blockMap[pos.y].size())
+	{
+		blockMap[pos.y][pos.x].erase(sprite);
 	}
 }

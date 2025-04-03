@@ -37,6 +37,7 @@ private:
 
 	void initButton();
 	void windowStateRightClick();
+	void scrollAndCntr(float delta);
 	void windowStateNoRightClick();
 	void windowStateLeftClick();
 	void editorWindowStateLeftClick();

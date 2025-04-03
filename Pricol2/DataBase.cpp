@@ -6,7 +6,7 @@ Data::Data()
 	key2text = new std::vector<std::tuple<int, std::wstring, int>>();
 
 	std::wstring line;
-	std::wifstream fileIn("KeyData.txt");
+	std::wifstream fileIn("Data/KeyData.txt");
 	fileIn.imbue(std::locale(fileIn.getloc(), new std::codecvt_utf8<wchar_t>));
 	if (fileIn.is_open())
 	{
@@ -29,7 +29,7 @@ Data::Data()
 	}
 	fileIn.close();
 
-	std::wifstream fileIn1("TextData.txt");
+	std::wifstream fileIn1("Data/TextData.txt");
 	fileIn1.imbue(std::locale(fileIn1.getloc(), new std::codecvt_utf8<wchar_t>));
 	if (fileIn1.is_open())
 	{
@@ -59,7 +59,7 @@ Data::~Data()
 
 std::vector<std::pair<int, int>> Data::getInvent()
 {
-	std::ifstream in{ "Texture/inventory.inv", std::ios::in | std::ios::binary };
+	std::ifstream in{ "Data/inventory.inv", std::ios::in | std::ios::binary };
 	if (!in.is_open()) return {};
 	
 	int size;
@@ -80,7 +80,7 @@ std::vector<std::pair<int, int>> Data::getInvent()
 
 void Data::saveInvent(std::vector<std::pair<int, int>> inv)
 {
-	std::ofstream out{ "Texture/inventory.inv", std::ios::out | std::ios::binary };
+	std::ofstream out{ "Data/inventory.inv", std::ios::out | std::ios::binary };
 	if (!out.is_open()) return;
 
 	int size = inv.size();
@@ -118,7 +118,7 @@ std::pair<std::wstring, int> Data::getText(int key)
 
 PlayerDef Data::getPlayerData()
 {
-	std::ifstream in{ "Texture/playerData.plr", std::ios::in | std::ios::binary };
+	std::ifstream in{ "Data/playerData.plr", std::ios::in | std::ios::binary };
 	if (!in.is_open()) return { 100, 100, 2, 2, 10, 50, 50, 500, 10000, 0, {} };
 
 	PlayerDef plDef{};
@@ -150,7 +150,7 @@ PlayerDef Data::getPlayerData()
 
 void Data::savePlayerData(Player* player)
 {
-	std::ofstream out{ "Texture/playerData.plr", std::ios::out | std::ios::binary };
+	std::ofstream out{ "Data/playerData.plr", std::ios::out | std::ios::binary };
 	if (!out.is_open()) return;
 
 	PlayerDef plDef = player->getPlayerDef();
@@ -178,7 +178,7 @@ void Data::savePlayerData(Player* player)
 
 std::vector<GunData> Data::getGunData()
 {
-	std::ifstream in{ "Texture/gunData.gun", std::ios::in | std::ios::binary };
+	std::ifstream in{ "Data/gunData.gun", std::ios::in | std::ios::binary };
 	if (!in.is_open()) return{};
 
 	int size;
@@ -208,7 +208,7 @@ std::vector<GunData> Data::getGunData()
 
 void Data::saveGunData(std::vector<GunData> guns)
 {
-	std::ofstream out{ "Texture/gunData.gun", std::ios::out | std::ios::binary };
+	std::ofstream out{ "Data/gunData.gun", std::ios::out | std::ios::binary };
 	if (!out.is_open()) return;
 
 	int size = guns.size();

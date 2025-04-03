@@ -89,12 +89,12 @@ void Game::getInput(sf::Event event, float deltaTime)
 			player->heal();
 		}
 
-		if (event.key.code == sf::Keyboard::P)
+		/*if (event.key.code == sf::Keyboard::P)
 		{
 			auto pair = mapManager->generate();
 			resetMap();
 			player->sprite->spMap.position = pair.first;
-		}
+		}*/
 	}
 }
 
