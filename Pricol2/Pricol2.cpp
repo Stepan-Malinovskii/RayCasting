@@ -1,6 +1,6 @@
 #include <cstdlib>
 #include <crtdbg.h>
-
+#include <thread>
 
 #include "Map.h"
 #include "Editor.h"
@@ -25,10 +25,10 @@ int main()
 
 	State state = State::Game;
 	
-	Resources::initResources();
 	std::unique_ptr<MapManager> mapManager = std::make_unique<MapManager>(&window);
 	mapManager->load();
 
+	Resources::initResources();
 	Editor editor{};
 	editor.init(&window, &editorWindow, mapManager.get());
 	Game game(&window, mapManager.get());
