@@ -105,7 +105,7 @@ private:
 };
 
 static std::vector<NpcDef> npcDef = {
-	{1} };
+	{1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1} };
 
 static std::vector<SpriteDef> spriteDef = {
 	{ L"player", SpriteType::PlayerT, 0.3f, 100.0f, -1, false, 0 },

@@ -89,12 +89,12 @@ void Game::getInput(sf::Event event, float deltaTime)
 			player->heal();
 		}
 
-		if (event.key.code == sf::Keyboard::P)
+		/*if (event.key.code == sf::Keyboard::P)
 		{
 			auto pair = mapManager->generate();
 			resetMap();
-			player->sprite->spMap.position = pair.second;
-		}
+			player->sprite->spMap.position = pair.first;
+		}*/
 	}
 }
 
@@ -162,6 +162,10 @@ void Game::getInput(float deltaTime)
 	player->checkBoost(lShiftPressed, deltaTime);
 	player->move(deltaPos, deltaTime);
 	player->updateMouseData({ deltaX, deltaY }, deltaTime);
+
+	sf::Listener::setDirection(verticalMoveParametrs.x, verticalMoveParametrs.y, 0.0f);
+	sf::Listener::setPosition(player->sprite->spMap.position.x, player->sprite->spMap.position.y, 0.0f);
+	sf::Listener::setUpVector(0.0f, 0.0f, -1.0f);
 }
 
 void Game::resetMap()
@@ -177,6 +181,7 @@ void Game::resetMap()
 void Game::update(float deltaTime)
 {
 	spManager->update(deltaTime);
+	SoundManager::update();
 }
 
 void Game::makeCycle(float deltaTime)

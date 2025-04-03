@@ -9,7 +9,7 @@ MapManager::~MapManager()
 
 void MapManager::save()
 {
-	std::ofstream out{ "Texture/testtest.map", std::ios::out | std::ios::binary};
+	std::ofstream out{ "Data/current.map", std::ios::out | std::ios::binary};
 	if (!out.is_open()) return;
 	if (nowMap->grid.empty()) return;
 
@@ -38,7 +38,7 @@ void MapManager::save()
 
 void MapManager::load()
 {
-	std::ifstream in{ "Texture/testtest.map", std::ios::in | std::ios::binary};
+	std::ifstream in{ "Data/current.map", std::ios::in | std::ios::binary};
 	if (!in.is_open()) return;
 	nowMap = new Map();
 
@@ -46,7 +46,11 @@ void MapManager::load()
 	in.read(reinterpret_cast<char*>(&w), sizeof(w));
 	in.read(reinterpret_cast<char*>(&h), sizeof(h));
 
-	if (h == 0 && w == 0) { return; }
+	if (h == 0 && w == 0)
+	{
+		h = SPACE_SIZE_H;
+		w = SPACE_SIZE_W;
+	}
 
 	nowMap->grid = std::vector(h, std::vector(w, std::array<int, LAYER_COUNT>()));
 	nowMap->blockMap = std::vector(h, std::vector(w, std::set<Sprite*>()));
@@ -60,7 +64,7 @@ void MapManager::load()
 		}
 	}
 
-	int numSp;
+	int numSp = 0;
 	in.read(reinterpret_cast<char*>(&numSp), sizeof(numSp));
 
 	nowMap->sprites = std::vector<MapSprite>(numSp);
@@ -68,6 +72,8 @@ void MapManager::load()
 		in.read(reinterpret_cast<char*>(&nowMap->sprites[i]), sizeof(nowMap->sprites[i]));
 
 	in.close();
+
+	//SoundManager::playSound(Resources::backgroundSound[0], 20, {nowMap->grid[0].size() / 2.0f, nowMap->grid.size() / 2.0f }, true, true);
 }
 
 void MapManager::rewriteSprites(std::vector<std::shared_ptr<Sprite>> sprs)
@@ -132,7 +138,9 @@ void MapManager::drawMap(int layerNumber)
 			{
 				spShape.setTextureRect(sf::IntRect(sf::Vector2i(ICON_SIZE * (sp.spriteDefId - 1), 0),
 					sf::Vector2i(ICON_SIZE, ICON_SIZE)));
+				spShape.setOrigin(spShape.getLocalBounds().width / 2, spShape.getLocalBounds().height / 2);
 				spShape.setPosition((float)TEXTURE_SIZE * sp.position);
+				spShape.rotate(sp.angle);
 				window->draw(spShape);
 			}
 		}
@@ -194,6 +202,19 @@ std::pair<sf::Vector2f, sf::Vector2f> MapManager::generate()
 	nowMap->grid = std::vector(SPACE_SIZE_H, std::vector(SPACE_SIZE_W, std::array<int, LAYER_COUNT>()));
 	nowMap->blockMap = std::vector(SPACE_SIZE_H, std::vector(SPACE_SIZE_W, std::set<Sprite*>()));
 	
+	std::vector<sf::IntRect> enemyRooms = rooms;
+
+	for (int i = 0; i < enemyRooms.size(); i++)
+	{
+		if (enemyRooms[i].contains((sf::Vector2i)stEnd.first))
+		{
+			enemyRooms.erase(enemyRooms.begin() + i);
+			break;
+		}
+	}
+
+	writeEnemy(enemyRooms);
+
 	for (auto rect : rooms)
 	{
 		for (auto i : std::vector<std::pair<int, int>>{ {FLOOR_LAYER, 1}, {CELL_LAYER, 2} })
@@ -232,6 +253,7 @@ std::pair<sf::Vector2f, sf::Vector2f> MapManager::generate()
 			nowMap->grid[h.top + 1][h.left][1] = 1;
 		}
 	}
+
 
 	return stEnd;
 }
@@ -274,6 +296,26 @@ void MapManager::writeRoom(sf::IntRect rect, int layer, int value)
 		for (int x = rect.left; x < rect.left + rect.width; x++)
 		{
 			nowMap->grid[y][x][layer] = value;
+		}
+	}
+}
+
+void MapManager::writeEnemy(std::vector<sf::IntRect> rooms)
+{
+	int midleRoomCount = ENEMY_LEVEL_COUNT / rooms.size();
+
+	for (auto r : rooms)
+	{
+		r.top += 2;
+		r.left += 2;
+		r.height -= 4;
+		r.width -= 4;
+		auto points = Random::uniquePoints(r, Random::intRandom(midleRoomCount * 0.8f, 
+																midleRoomCount * 1.2f));
+		for (auto p : points)
+		{
+			auto def = spriteDef[Random::intRandom(1, ENEMY_COUNT - 2)];
+			nowMap->setMapSprite({def.texture + 1, (sf::Vector2f)p, (float)Random::intRandom(0,180), def.maxHealpoint});
 		}
 	}
 }

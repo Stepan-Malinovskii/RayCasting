@@ -166,26 +166,24 @@ void Inventory::checkChose()
 
 void Inventory::update()
 {
-	if (window->hasFocus())
+	if (!window->hasFocus()) return;
+	static bool flag = false;
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !flag)
 	{
-		static bool flag = false;
-		if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !flag)
-		{
-			sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
-			sf::Vector2i worldPos = (sf::Vector2i)window->mapPixelToCoords(mousePos);
+		sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+		sf::Vector2i worldPos = (sf::Vector2i)window->mapPixelToCoords(mousePos);
 
-			flag = true;
-			int key = uiManager->checkButton(worldPos);
-			if (key != -1)
-			{
-				nowKey = key;
-				checkChose();
-			}
-		}
-		if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		flag = true;
+		int key = uiManager->checkButton(worldPos);
+		if (key != -1)
 		{
-			flag = false;
+			nowKey = key;
+			checkChose();
 		}
+	}
+	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	{
+		flag = false;
 	}
 }
 

@@ -35,11 +35,11 @@ public:
 	void deleteInBlockMap(Sprite* sp);
 	std::set<Sprite*> getBlockMap(sf::Vector2i pos) const;
 
+	void rotateSprite(sf::Vector2i pos, float angle);
+
 	void setMapSprite(MapSprite sp);
 	void deleteMapSprite(sf::Vector2i pos);
 	std::vector<MapSprite>& getMapSprites();
-
-	void deleteSprite(sf::Vector2i mapPos);
 
 	std::vector<std::vector<std::array<int, LAYER_COUNT>>> grid;
 	std::vector<std::vector<std::set<Sprite*>>> blockMap;

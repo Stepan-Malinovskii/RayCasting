@@ -115,21 +115,14 @@ void Item::setFunc(std::function<void(Player* sprite)> _useFunc) { useFunc = _us
 
 void Item::useItem(Player* sprite) { useFunc(sprite); }
 
-Gun::Gun(GunDef def, bool _isReset, int id) : Weapon(def.shutTime, def.maxDist),
+Gun::Gun(GunDef def, bool _isReset, int id, int _gunId) : Weapon(def.shutTime, def.maxDist),
 Itemble(def.name, def.disc, def.cost, id),
 damage{ def.damage }, maxCount{ def.maxCount }, nowCount{ def.nowCount },
-nowTimeBetwenReset{ def.resetTime }, timeBetwenReset{ def.resetTime }, isReset{ _isReset }
+nowTimeBetwenReset{ def.resetTime }, timeBetwenReset{ def.resetTime }, isReset{ _isReset }, gunId{ _gunId }
 {
 	nowRad = 1;
 	maxImpRad = 30;
 	maxRad = 30;
-}
-
-void Gun::setSound(sf::SoundBuffer* shut, sf::SoundBuffer* reset, sf::SoundBuffer* cantShut)
-{
-	if (shut != nullptr) shutSound.setBuffer(*shut);
-	if (reset != nullptr) resetSound.setBuffer(*reset);
-	if (cantShut != nullptr) cantShutSound.setBuffer(*cantShut);
 }
 
 void Gun::update(float dt)
@@ -180,7 +173,7 @@ int Gun::resetPatron(int count)
 				return count;
 			}
 			nowTimeBetwenReset = 0;
-			resetSound.play();
+			SoundManager::playSound(Resources::gunsResetSound[gunId], 30);
 			startAnimation(1);
 		}
 	}
@@ -191,7 +184,7 @@ void Gun::ussing(Sprite* sp, float dist)
 {
 	if (nowCount == 0 && isReset)
 	{
-		cantShutSound.play();
+		SoundManager::playSound(Resources::gunCantShoutSound, 30);
 		return;
 	}
 	else if (isCanUsed() && (nowTimeBetwenReset >= timeBetwenReset || !isReset))
@@ -205,7 +198,7 @@ void Gun::ussing(Sprite* sp, float dist)
 		}
 
 		nowCount--;
-		shutSound.play();
+		SoundManager::playSound(Resources::gunsShutSound[gunId], 30);
 		startAnimation(0);
 	}
 }
