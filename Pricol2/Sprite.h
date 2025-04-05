@@ -96,7 +96,7 @@ private:
 static std::vector<NpcDef> npcDef = {
 	{1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1} };
 
-static std::vector<SpriteDef> spriteDef = {
+static std::vector<SpriteDef> spriteDefs = {
 	{ L"player",        SpriteType::PlayerT, 0.3f, 5.0f,  100.0f,   -1,  false, 0 },
 	{ L"Бабл",          SpriteType::Enemy,   1.0f, 3.0f,  70.f,      0,  true, 10 },
 	{ L"Рогастик",      SpriteType::Enemy,   1.0f, 4.0f,  90.f,      1,  true, 15 },

@@ -314,7 +314,7 @@ void MapManager::writeEnemy(std::vector<sf::IntRect> rooms)
 																midleRoomCount * 1.2f));
 		for (auto p : points)
 		{
-			auto def = spriteDef[Random::intRandom(1, ENEMY_COUNT - 2)];
+			auto def = spriteDefs[Random::intRandom(1, ENEMY_COUNT - 2)];
 			nowMap->setMapSprite({def.texture + 1, (sf::Vector2f)p, (float)Random::intRandom(0,180), def.maxHealpoint});
 		}
 	}

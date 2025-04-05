@@ -50,10 +50,9 @@ int main()
 					if (state == State::Editor)
 					{
 						state = State::Game;
-						game.resetMap();
 						window.setMouseCursorVisible(false);
 						window.setView(window.getDefaultView());
-
+						game.editor();
 						editorWindow.setActive(false);
 						editorWindow.setVisible(false);
 					}

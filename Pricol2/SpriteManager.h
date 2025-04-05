@@ -14,12 +14,18 @@ public:
 	SpriteManager(Map* _nowMap, Data* _data, Dialog* _dialogSys);
 	~SpriteManager();
 	void update(float deltaTime);
-	Player* resetMap(Map* newMap);
+	Player* resetMap(Map* newMap, std::pair<sf::Vector2f, sf::Vector2f> mapPos);
 	Player* getPlayer();
+	Npc* getNpc(int id);
 	std::vector<Sprite*> getDeteachSprite();
 private:
 	int id;
 	void deleteSprite(std::shared_ptr<Sprite> sp);
+	void createSpriteFromMapSprite(MapSprite mapSprite);
+	std::shared_ptr<Sprite> createEnemy(MapSprite mapSprite, SpriteDef def);
+	std::shared_ptr<Sprite> createNpc(MapSprite mapSprite, SpriteDef );
+	void createDefaultPlayer();
+	void setupBlockmapAndStates();
 	void init();
 
 	Dialog* dialogSys;

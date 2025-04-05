@@ -26,14 +26,15 @@ public:
 	Game(sf::RenderWindow* window, MapManager* mapManager);
 	~Game();
 	void getInput(sf::Event event, float deltaTime);
-	void resetMap();
 	void makeCycle(float deltaTime);
 	void save();
+	void editor(); //Удалить после конца
 private:
 	void getInput(float deltaTime);
 	void update(float deltaT);
 	void render();
 	void initPlayer();
+	void generate();
 
 	Data* data;
 	Inventory* invent;

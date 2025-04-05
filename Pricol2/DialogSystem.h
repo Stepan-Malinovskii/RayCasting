@@ -36,7 +36,11 @@ private:
 
 	void buy();
 	void check();
+	void checkTrade();
+	void checkDialog();
 	void init();
+	void initTrade();
+	void initDialog();
 	void stop();
 };
 

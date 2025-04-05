@@ -40,13 +40,13 @@ void Editor::initButton()
 	sf::RectangleShape shape1(sf::Vector2f{ ICON_SIZE, ICON_SIZE });
 	b = Button({ shape1, {} });
 	b.setTexture(&Resources::spriteIcon);
-	for (x = 0; x < spriteDef.size() - 1; x++, y++)
+	for (x = 0; x < spriteDefs.size() - 1; x++, y++)
 	{
 		b.setPosition({ (float)ICON_SIZE * (x % COUNT_ROW_TEXT) + ICON_SIZE / 2, y / COUNT_ROW_TEXT * (float)ICON_SIZE });
 		b.setTextureRect({ { ICON_SIZE * x, 0}, {ICON_SIZE, ICON_SIZE} });
 
 		b.setFunc([=]() {
-			nowSpriteDef = spriteDef[x + 1];
+			nowSpriteDef = spriteDefs[x + 1];
 			});
 		buttons.push_back(std::make_shared<Button>(b));
 	}

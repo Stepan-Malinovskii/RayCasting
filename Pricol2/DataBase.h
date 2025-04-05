@@ -30,6 +30,9 @@ public:
 private:
 	std::vector<std::pair<int, std::vector<int>>>* key2key;
 	std::vector<std::tuple<int, std::wstring, int>>* key2text;
+
+	void loadKeyData();
+	void loadTextData();
 };
 
 #endif // !DATA

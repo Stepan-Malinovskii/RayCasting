@@ -5,56 +5,63 @@ Data::Data()
 	key2key = new std::vector<std::pair<int, std::vector<int>>>();
 	key2text = new std::vector<std::tuple<int, std::wstring, int>>();
 
-	std::wstring line;
-	std::wifstream fileIn("Data/KeyData.txt");
-	fileIn.imbue(std::locale(fileIn.getloc(), new std::codecvt_utf8<wchar_t>));
-	if (fileIn.is_open())
-	{
-		int fkey;
-		while (std::getline(fileIn, line))
-		{
-			int st = line.find(L'[');
-			int end = line.find(L']');
-			fkey = std::stoi(line.substr(st + 1, end - st - 1));
-			line = line.substr(end + 3, line.size() - end - 4);
-			std::vector<int> keys;
-			while (line.size() != 0)
-			{
-				int j = line.find(L',');
-				keys.push_back(std::stoi(line.substr(0, j)));
-				line = line.substr(j + 1);
-			}
-			key2key->push_back({ fkey, keys });
-		}
-	}
-	fileIn.close();
-
-	std::wifstream fileIn1("Data/TextData.txt");
-	fileIn1.imbue(std::locale(fileIn1.getloc(), new std::codecvt_utf8<wchar_t>));
-	if (fileIn1.is_open())
-	{
-		int fkey, eKey;
-		std::wstring text;
-		while (std::getline(fileIn1, line))
-		{
-			int st = line.find(L'[');
-			int end = line.find(L']');
-			fkey = std::stoi(line.substr(st + 1, end - st - 1));
-			st = line.rfind(L'[');
-			
-			text = line.substr(end + 2, st - end - 3);
-			end = line.rfind(L']');
-			eKey = std::stoi(line.substr(st + 1, end - st - 1));
-			key2text->push_back({ fkey, text, eKey });
-		}
-	}
-	fileIn1.close();
+	loadKeyData();
+	loadTextData();
 }
 
 Data::~Data()
 {
 	delete key2key;
 	delete key2text;
+}
+
+void Data::loadKeyData()
+{
+	std::wifstream fileIn("Data/KeyData.txt");
+	fileIn.imbue(std::locale(fileIn.getloc(), new std::codecvt_utf8<wchar_t>));
+	if (!fileIn.is_open()) return;
+
+	std::wstring line;
+
+	while (std::getline(fileIn, line))
+	{
+		int st = line.find(L'[');
+		int end = line.find(L']');
+		int fkey = std::stoi(line.substr(st + 1, end - st - 1));
+		line = line.substr(end + 3, line.size() - end - 4);
+		std::vector<int> keys;
+		while (line.size() != 0)
+		{
+			int j = line.find(L',');
+			keys.push_back(std::stoi(line.substr(0, j)));
+			line = line.substr(j + 1);
+		}
+		key2key->push_back({ fkey, keys });
+	}
+
+	fileIn.close();
+}
+
+void Data::loadTextData()
+{
+	std::wifstream fileIn("Data/TextData.txt");
+	fileIn.imbue(std::locale(fileIn.getloc(), new std::codecvt_utf8<wchar_t>));
+	if (!fileIn.is_open()) return;
+
+	std::wstring line, text;
+	while (std::getline(fileIn, line))
+	{
+		int st = line.find(L'[');
+		int end = line.find(L']');
+		int fkey = std::stoi(line.substr(st + 1, end - st - 1));
+		st = line.rfind(L'[');
+
+		text = line.substr(end + 2, st - end - 3);
+		end = line.rfind(L']');
+		int eKey = std::stoi(line.substr(st + 1, end - st - 1));
+		key2text->push_back({ fkey, text, eKey });
+	}
+	fileIn.close();
 }
 
 std::vector<std::pair<int, int>> Data::getInvent()

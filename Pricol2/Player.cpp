@@ -36,55 +36,40 @@ void Player::setInventory(Inventory* _invent)
 
 void Player::updateMouseData(sf::Vector2f mousePos, float deltaTime)
 {
-	//MousePart
 	sprite->spMap.angle += MOUSE_TURN_SPEED * ROTATION_SPEED * mousePos.x * deltaTime;
 
-	pitch -= mousePos.y * deltaTime * VERTICAL_MOUSE_SPEED;
-	if (pitch > 200) pitch = 200;
-	if (pitch < -200) pitch = -200;
+	pitch = std::clamp(pitch - mousePos.y * deltaTime * VERTICAL_MOUSE_SPEED, -200.0f, 200.0f);
 
-	//AnimatorPart
 	guns[nowGun]->update(deltaTime);
-	kick->update(deltaTime);
+	if (kick) kick->update(deltaTime);
 
-	//GravityPart
 	gravity(deltaTime);
 }
 
 void Player::checkBoost(bool isPressed, float deltaTime)
 {
-	static bool boostFlag = false, used = false;
+	static bool boostFlag = false;
 
-	if (isPressed)
-	{
-		if (nowEnergy > 0 && !boostFlag)
-		{
-			used = true;
-			nowSpeed = boostSpeed;
-			nowEnergy -= deltaTime * 1.2f;
-		}
-		else if (nowEnergy < 0)
-		{
-			boostFlag = true;
-			used = false;
-			nowSpeed = sprite->spDef.speed;
-		}
-	}
-	else
-	{
-		nowSpeed = sprite->spDef.speed;
-		used = false;
-	}
-	if (!used)
-	{
-		if (nowEnergy < maxEnergy)
-		{
-			nowEnergy += deltaTime;
-		}
-		else
-		{
-			nowEnergy = maxEnergy;
+	nowSpeed = sprite->spDef.speed;
+
+	if (boostFlag) {
+		nowEnergy = std::min(nowEnergy + deltaTime, maxEnergy);
+		if (nowEnergy >= maxEnergy) {
 			boostFlag = false;
+		}
+		return;
+	}
+
+	if (!isPressed) {
+		nowEnergy = std::min(nowEnergy + deltaTime, maxEnergy);
+	}
+	else {
+		if (nowEnergy > 0) {
+			nowSpeed = boostSpeed;
+			nowEnergy = std::max(nowEnergy - deltaTime * 1.2f, 0.0f);
+		}
+		else {
+			boostFlag = true;
 		}
 	}
 }
@@ -112,38 +97,28 @@ void Player::shakeCamera(float deltaTime, bool isRun)
 
 		shakeDelta *= 0.9f;
 
-		if (abs(shakeDelta.x) < 0.0001f) shakeDelta.x = 0.0f;
-		if (abs(shakeDelta.y) < 0.0001f) shakeDelta.y = 0.0f;
+		shakeDelta.x = std::abs(shakeDelta.x) < 0.0001f ? 0.0f : shakeDelta.x;
+		shakeDelta.y = std::abs(shakeDelta.y) < 0.0001f ? 0.0f : shakeDelta.y;
 	}
 }
 
 void Player::gravity(float deltaTime)
 {
-	if (isJump)
-	{
-		if (posZ < 0)
-		{
-			isJump = false;
-			jumpFlag = false;
-			posZ = 0;
-		}
-		else
-		{
-			if (posZ > 150)
-			{
-				jumpFlag = true;
-			}
-			if (!jumpFlag)
-			{
-				posZ += 750 * deltaTime;
-			}
-			else
-			{
-				posZ -= 750 * deltaTime;
-			}
-		}
-	}
+	if (!isJump) return;
 	
+	if (posZ < 0)
+	{
+		isJump = false;
+		jumpFlag = false;
+		posZ = 0;
+	}
+	else
+	{
+		if (posZ > 150) jumpFlag = true;
+
+		posZ += (jumpFlag ? -750 : 750) * deltaTime;
+		posZ = std::max(posZ, -1.0f);
+	}
 }
 
 void Player::jump()
@@ -180,13 +155,13 @@ void Player::takeDamage(float damage)
 void Player::fire(int gun)
 {
 	float radiansAngle = sprite->spMap.angle * PI / 180.0f;
-	sf::Vector2f verticalMoveParametrs(cos(radiansAngle), sin(radiansAngle));
+	sf::Vector2f direction(cos(radiansAngle), sin(radiansAngle));
 
 	if (gun == -1)
 	{
 		if (kick->isCanUsed() && guns[nowGun]->isCanUsed())
 		{
-			RayHit hit = raycast(nowMap, sprite->spMap.position, verticalMoveParametrs, false, sprite, 1);
+			RayHit hit = raycast(nowMap, sprite->spMap.position, direction, false, sprite, 1);
 			if (hit.cell == 1) nowMap->SetNewOnGrid(hit.mapPos.x, hit.mapPos.y, WALL_LAYER, 0);
 			kick->ussing(nullptr, 0);
 		}
@@ -195,9 +170,8 @@ void Player::fire(int gun)
 	{
 		if (guns[nowGun]->isCanUsed() && kick->isCanUsed())
 		{
-			RayHit hit = raycast(nowMap, sprite->spMap.position, verticalMoveParametrs, true, sprite, guns[nowGun]->maxDist, pitch);
-			float dist = 0;
-			if (hit.sprite != nullptr) { dist = sqrt(GETDIST(hit.sprite->spMap.position, sprite->spMap.position)); }
+			RayHit hit = raycast(nowMap, sprite->spMap.position, direction, true, sprite, guns[nowGun]->maxDist, pitch);
+			float dist = hit.sprite && hit.sprite->spDef.type != NPC ? dist = sqrt(GETDIST(hit.sprite->spMap.position, sprite->spMap.position)): 0; 
 			guns[nowGun]->ussing(hit.sprite, dist);
 		}
 	}
@@ -206,24 +180,20 @@ void Player::fire(int gun)
 Sprite* Player::dialog()
 {
 	float radiansAngle = sprite->spMap.angle * PI / 180.0f;
-	sf::Vector2f verticalMoveParametrs(cos(radiansAngle), sin(radiansAngle));
+	sf::Vector2f direction(cos(radiansAngle), sin(radiansAngle));
 
-	RayHit hit = raycast(nowMap, sprite->spMap.position, verticalMoveParametrs, true, sprite, 1, pitch);
-	if (hit.sprite != nullptr && hit.sprite->spDef.type == SpriteType::NPC) { return hit.sprite; }
-	return nullptr;
+	RayHit hit = raycast(nowMap, sprite->spMap.position, direction, true, sprite, 1, pitch);
+	return hit.sprite && hit.sprite->spDef.type == SpriteType::NPC ? hit.sprite : nullptr;
 }
 
 void Player::swapGun(bool flag)
 {
 	int delta = flag ? 1 : -1;
-	nowGun += delta;
-	nowGun = nowGun < 0 ? nowGun = 2 : nowGun % 3;
-	while (guns[nowGun] == nullptr)
+	nowGun = (nowGun + delta + 3) % 3;
+	while (!guns[nowGun]) 
 	{
-		nowGun += delta;
-		nowGun = nowGun < 0 ? nowGun = 2 : nowGun % 3;
+		nowGun = (nowGun + delta + 3) % 3;
 	}
-	
 }
 
 PlayerDef Player::getPlayerDef()
@@ -251,6 +221,8 @@ PlayerDef Player::getPlayerDef()
 	gunsData };
 }
 
+void Player::setNemMap(Map* _map) { nowMap = _map; }
+
 Gun* Player::getNowGun() { return guns[nowGun]; }
 
 sf::Vector2f Player::getDeltaShake() { return shakeDelta; }
@@ -265,11 +237,10 @@ void Player::takeItem(Itemble* item, int cnt)
 
 void Player::heal()
 {
-	if (nowHeal != nullptr)
+	if (nowHeal)
 	{
 		nowHeal->useFunc(this);
 		invent->useItem(nowHeal);
-
 		nowHeal = invent->takeMaxHeal();
 	}
 }

@@ -56,6 +56,7 @@ public:
 	Gun* getNowGun();
 	sf::Vector2f getDeltaShake();
 	PlayerDef getPlayerDef();
+	void setNemMap(Map* map);
 
 	Sprite* sprite;
 	Gun* kick;

@@ -20,6 +20,7 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 	{
 		player->takeItem(weaponManager->getItem(b.first), b.second);
 	}
+
 	dialogSys->setPlayer(player);
 }
 
@@ -33,6 +34,11 @@ Game::~Game()
 	delete invent;
 }
 
+void Game::editor()
+{
+	spManager->resetMap(mapManager->getNowMap(), { {2.0f, 2.0f},{}});
+}
+
 void Game::initPlayer()
 {
 	player = spManager->getPlayer();
@@ -44,8 +50,7 @@ void Game::initPlayer()
 	int i = 1;
 	for (auto it : plDef.gunsData)
 	{
-		player->setGun(weaponManager->getGunById(it), i);
-		i++;
+		player->setGun(weaponManager->getGunById(it), i++);
 	}
 }
 
@@ -78,8 +83,7 @@ void Game::getInput(sf::Event event, float deltaTime)
 	}
 	if (event.type == sf::Event::MouseWheelScrolled)
 	{
-		bool flag = event.mouseWheelScroll.delta > 0 ? true : false;
-		player->swapGun(flag);
+		player->swapGun(event.mouseWheelScroll.delta > 0);
 	}
 
 	if (event.type == sf::Event::KeyPressed)
@@ -89,12 +93,10 @@ void Game::getInput(sf::Event event, float deltaTime)
 			player->heal();
 		}
 
-		/*if (event.key.code == sf::Keyboard::P)
+		if (event.key.code == sf::Keyboard::P)
 		{
-			auto pair = mapManager->generate();
-			resetMap();
-			player->sprite->spMap.position = pair.first;
-		}*/
+			generate();
+		}
 	}
 }
 
@@ -102,76 +104,44 @@ void Game::getInput(float deltaTime)
 {
 	if (!window->hasFocus()) return;
 
-	float radiansAngle = player->sprite->spMap.angle * PI / 180.0f;
-	sf::Vector2f verticalMoveParametrs(cos(radiansAngle), sin(radiansAngle));
-	sf::Vector2f horizontalMoveParametrs(-verticalMoveParametrs.y, verticalMoveParametrs.x);
+	float radAng = player->sprite->spMap.angle * PI / 180.0f;
+	sf::Vector2f vertParams(cos(radAng), sin(radAng));
+	sf::Vector2f horParams(-vertParams.y, vertParams.x);
 	sf::Vector2f deltaPos(0, 0);
 	bool lShiftPressed = false;
-	float deltaX = 0, deltaY = 0;
 
-	if (GetAsyncKeyState('A'))
-	{
-		deltaPos -= horizontalMoveParametrs;
-	}
-	else if (GetAsyncKeyState('D'))
-	{
-		deltaPos += horizontalMoveParametrs;
-	}
-	if (GetAsyncKeyState('W'))
-	{
-		deltaPos += verticalMoveParametrs;
-	}
-	else if (GetAsyncKeyState('S'))
-	{
-		deltaPos -= verticalMoveParametrs;
-	}
-	if (GetAsyncKeyState('R'))
-	{
-		player->reloadingGun();
-	}
-	if (GetAsyncKeyState(VK_LSHIFT))
-	{
-		lShiftPressed = true;
-	}
-	if (GetAsyncKeyState(VK_SPACE))
-	{
-		player->jump();
-	}
-	if (GetAsyncKeyState('F'))
-	{
-		player->fire();
-	}
+	if (GetAsyncKeyState('A')) { deltaPos -= horParams; }
+	else if (GetAsyncKeyState('D')) { deltaPos += horParams; }
+	if (GetAsyncKeyState('W')) { deltaPos += vertParams; }
+	else if (GetAsyncKeyState('S')) { deltaPos -= vertParams; }
+	if (GetAsyncKeyState('R')) { player->reloadingGun(); }
+	if (GetAsyncKeyState(VK_LSHIFT)) { lShiftPressed = true; }
+	if (GetAsyncKeyState(VK_SPACE)) { player->jump(); }
+	if (GetAsyncKeyState('F')) { player->fire(); }
 	if (GetAsyncKeyState('E'))
 	{
 		Sprite* sp = player->dialog();
 		if (sp != nullptr)
 		{
-			Npc* npc = dynamic_cast<Npc*>(sp);
-			if (npc != nullptr)
-			{
-				npc->use();
-			}
+			auto npc = spManager->getNpc(sp->id);
+			if (npc) npc->use();
 		}
 	}
 
 	sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
-	deltaX = (mousePos.x - screenMidlePos.x) / 2.0f;
-	deltaY = (mousePos.y - screenMidlePos.y) / 2.0f;
-	sf::Mouse::setPosition(screenMidlePos, *window);
-
+	
 	player->checkBoost(lShiftPressed, deltaTime);
 	player->move(deltaPos, deltaTime);
-	player->updateMouseData({ deltaX, deltaY }, deltaTime);
+	player->updateMouseData({ (mousePos.x - screenMidlePos.x) / 2.0f, 
+							  (mousePos.y - screenMidlePos.y) / 2.0f }, deltaTime);
+	sf::Mouse::setPosition(screenMidlePos, *window);
 }
 
-void Game::resetMap()
+void Game::generate()
 {
 	data->savePlayerData(player);
-	spManager->resetMap(mapManager->getNowMap());
-	initPlayer();
-	dialogSys->setPlayer(player);
-	invent->player = player;
-	player->setInventory(invent);
+	auto pair = mapManager->generate();
+	spManager->resetMap(mapManager->getNowMap(), pair);
 }
 
 void Game::update(float deltaTime)
@@ -183,20 +153,18 @@ void Game::update(float deltaTime)
 void Game::makeCycle(float deltaTime)
 {
 #if !_DEBUG
-	if (deltaTime > 1/50.0f)
-	{
-		deltaTime = 0.005f;
-	}
-#endif //_DEBUG
+	deltaTime = std::min(deltaTime, 1.0f / 50.0f);
+#endif
+
+	window->clear();
+
 	if (invent->isOpen)
 	{
-		window->clear();
 		invent->update();
 		invent->drawInvent();
 	}
 	else if (dialogSys->isActive)
 	{
-		window->clear();
 		dialogSys->update();
 		dialogSys->draw();
 	}
