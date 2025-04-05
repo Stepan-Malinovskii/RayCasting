@@ -1,13 +1,6 @@
-#include <cstdlib>
-#include <crtdbg.h>
-#include <thread>
-
-#include "Map.h"
 #include "Editor.h"
-#include "Renderer.h"
 #include "Resources.h"
 #include "Game.h"
-#include "SpriteManager.h"
 #include "MapManager.h"
 
 enum class State{Editor, Game};
@@ -24,11 +17,11 @@ int main()
 	editorWindow.setVisible(false);
 
 	State state = State::Game;
-	
+
+	Resources::initResources();
 	std::unique_ptr<MapManager> mapManager = std::make_unique<MapManager>(&window);
 	mapManager->load();
 
-	Resources::initResources();
 	Editor editor{};
 	editor.init(&window, &editorWindow, mapManager.get());
 	Game game(&window, mapManager.get());

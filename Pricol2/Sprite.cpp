@@ -60,7 +60,7 @@ void Sprite::takeDamage(float damage)
 	spMap.nowHealPoint -= damage;
 	isDamages = true;
 	timeAtecked = 0;
-	SoundManager::playSound(Resources::takeDamage, 60, spMap.position);
+	SoundManager::playSound(Resources::takeDamage, 40);
 }
 
 bool Sprite::checkCollision(Map* map, sf::Vector2f newPos, bool xAxis)

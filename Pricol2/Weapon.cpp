@@ -184,7 +184,7 @@ void Gun::ussing(Sprite* sp, float dist)
 {
 	if (nowCount == 0 && isReset)
 	{
-		SoundManager::playSound(Resources::gunCantShoutSound, 30);
+		SoundManager::playSound(Resources::gunCantShoutSound, 40);
 		return;
 	}
 	else if (isCanUsed() && (nowTimeBetwenReset >= timeBetwenReset || !isReset))

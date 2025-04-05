@@ -23,7 +23,6 @@ public:
 	static sf::Image textureImage;
 	static sf::Texture spriteIcon;
 	static std::vector<sf::Texture> spritesTextures;
-	static std::vector<sf::SoundBuffer> backgroundSound;
 	static sf::SoundBuffer takeDamage;
 	static sf::SoundBuffer buttonClick;
 

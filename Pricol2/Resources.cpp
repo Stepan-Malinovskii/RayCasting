@@ -6,10 +6,9 @@ sf::Texture Resources::dialogBackround{};
 sf::Image Resources::textureImage{};
 sf::Texture Resources::spriteIcon{};
 std::vector<sf::Texture> Resources::spritesTextures{};
-sf::Texture Resources::skyTextures{};
-std::vector<sf::SoundBuffer> Resources::backgroundSound{};
 sf::SoundBuffer Resources::buttonClick{};
 sf::SoundBuffer Resources::takeDamage{};
+sf::Texture Resources::skyTextures{};
 
 sf::Texture Resources::itembleIcon{};
 sf::SoundBuffer Resources::gunCantShoutSound{};
@@ -34,19 +33,6 @@ void loadFor(std::string baseName, std::string format, std::vector<sf::Texture>*
 	}
 }
 
-void loadSoundFor(std::string baseName, std::string format, std::vector<sf::SoundBuffer>* data)
-{
-	int i = 1;
-	while (true)
-	{
-		std::string tryName = baseName + std::to_string(i) + format;
-		sf::SoundBuffer sound;
-		if (!sound.loadFromFile(tryName)) break;
-		i++;
-		data->push_back(sound);
-	}
-}
-
 void Resources::loadGun(std::string baseName, int index)
 {
 	std::string shutName = "Texture/" + baseName + "FireTexture";
@@ -63,8 +49,6 @@ void Resources::loadGun(std::string baseName, int index)
 
 void Resources::initResources()
 {
-	std::thread t1 = std::thread(loadSoundFor, "Sound/background", ".ogg", &backgroundSound);
-
 	if (!textureImage.loadFromFile("Texture/wall_texture.png")) throw "TextureLoadError!";
 	if (!dialogBackround.loadFromFile("Texture/dialogBackground.png")) throw "TextureLoadError!";
 	if (!textures.loadFromFile("Texture/wall_texture.png")) throw "TextureLoadError!";
@@ -81,6 +65,4 @@ void Resources::initResources()
 	for (int i = 0; i < 8; i++) { loadGun("gun" + std::to_string(i), i); }
 
 	if (!UIFont.loadFromFile("Texture/dehinted-HandveticaNeue-Regular.ttf")) throw "TextureLoadError!";
-
-	t1.join();
 }

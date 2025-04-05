@@ -1,4 +1,6 @@
-#pragma once
+#ifndef LEAF
+#define LEAF
+
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -30,3 +32,5 @@ public:
 	Leaf* getRoom();
 	void createHall(sf::Vector2i point);
 };
+
+#endif // !LEAF

@@ -73,7 +73,7 @@ void MapManager::load()
 
 	in.close();
 
-	//SoundManager::playSound(Resources::backgroundSound[0], 20, {nowMap->grid[0].size() / 2.0f, nowMap->grid.size() / 2.0f }, true, true);
+	SoundManager::playerMusic(Level);
 }
 
 void MapManager::rewriteSprites(std::vector<std::shared_ptr<Sprite>> sprs)
