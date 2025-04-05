@@ -51,7 +51,7 @@ void Game::initPlayer()
 
 void Game::save()
 {
-	mapManager->rewriteSprites(spManager->getSprites());
+	mapManager->rewriteSprites(spManager->getDeteachSprite());
 	weaponManager->saveGun();
 	data->savePlayerData(player);
 	data->saveInvent(invent->getInventToSave());
@@ -210,6 +210,6 @@ void Game::makeCycle(float deltaTime)
 
 void Game::render()
 {
-	renderer->Draw3DView(player, mapManager->getNowMap(), spManager->getSprites());
+	renderer->Draw3DView(player, mapManager->getNowMap(), spManager->getDeteachSprite());
 	uiManager->drawPlayerUI(player);
 }

@@ -2,27 +2,31 @@
 #include "DialogSystem.h"
 #include "Map.h"
 
-Sprite::Sprite(sf::Vector2f pos, float _size, int indText, int _id, float HP, float _angle, bool isDirect, SpriteType _type)
-	: spMap{indText + 1, pos, _angle, HP}, 
-	spDef{ L"", _type, _size, HP, indText, isDirect }, id{ _id }, isDamages{false}
+Sprite::Sprite(SpriteDef _spDef, MapSprite _spMap, int _id) :
+	spDef{ _spDef }, spMap{ _spMap }, id{ _id }, isDamages{ false }
 {
 	timeAtecked = 0;
-	if (spDef.texture != -1)
-	{
-		texture = &Resources::spritesTextures[spDef.texture];
-		textSize = texture->getSize().y;
-	}
-}
 
-Sprite::Sprite(SpriteDef _spDef, MapSprite _spMap, int _id) : 
-	spDef{ _spDef }, spMap{ _spMap }, id { _id }, isDamages{ false }
-{
-	timeAtecked = 0;
 	if (spDef.texture != -1)
 	{
 		texture = &Resources::spritesTextures[spDef.texture];
-		textSize = texture->getSize().y;
+		textSize = texture->getSize().x / 8;
 	}
+
+	float frameTime = 1.0f / spDef.speed;
+
+	auto run = Animation<int>({
+		{0, 1},
+		{ frameTime * 1, 2 },
+		{ frameTime * 2, 3 },
+		{ frameTime * 3, 4 },
+		{ frameTime * 4, 4 } });
+
+	auto stay = Animation<int>({ {0,0} });
+
+	auto dead = Animation<int>({ {0,5} });
+
+	animr = Animator<int>(0, {stay, run, dead});
 }
 
 void Sprite::move(Map* map, sf::Vector2f move)
@@ -45,22 +49,69 @@ void Sprite::move(Map* map, sf::Vector2f move)
 
 void Sprite::update(float deltaTime)
 {
-	if (!isDamages) return;
+	if (state == Dead) return;
+
+	if (spMap.nowHealPoint <= 0.0f)
+	{
+		isDamages = false;
+		state = Killes;
+		return;
+	}
+
+	animr.update(deltaTime);
+
 	if (timeAtecked >= 0.5f)
 	{
 		timeAtecked = 0;
 		isDamages = false;
 		return;
 	}
+
 	timeAtecked += deltaTime;
+}
+
+int Sprite::getTextIndex()
+{
+	return animr.get();
+}
+
+void Sprite::changeState(SpriteState _state)
+{
+	if (_state == Run)
+	{
+		if (state != Run)
+		{
+			animr.setAnimation(1, true);
+		}
+	}
+	else if (_state == Stay)
+	{
+		animr.setAnimation(0);
+	}
+	else if (_state == Dead)
+	{
+		animr.setAnimation(2, true);
+	}
+
+	state = _state;
 }
 
 void Sprite::takeDamage(float damage)
 {
+	if (state == Dead) return;
+
 	spMap.nowHealPoint -= damage;
+	SoundManager::playSound(Resources::takeDamage, 40);
+
+	if (spMap.nowHealPoint <= 0.0f)
+	{
+		isDamages = false;
+		state = Killes;
+		return;
+	}
+
 	isDamages = true;
 	timeAtecked = 0;
-	SoundManager::playSound(Resources::takeDamage, 40);
 }
 
 bool Sprite::checkCollision(Map* map, sf::Vector2f newPos, bool xAxis)
@@ -125,7 +176,7 @@ bool Sprite::checkCollision(Map* map, sf::Vector2f newPos, bool xAxis)
 }
 
 Npc::Npc(SpriteDef _spDef, MapSprite _spMap, int _id, int npcDefId, Dialog* _dialog) :
-	Sprite(_spDef, _spMap, _id), npcDefData{ npcDef[npcDefId]}, dialog{_dialog} { }
+	Sprite(_spDef, _spMap, _id), npcDefData{ npcDef[npcDefId]}, dialog{_dialog} {}
 
 
 void Npc::use()

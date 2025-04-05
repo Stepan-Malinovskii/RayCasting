@@ -13,7 +13,7 @@ Player::Player(Sprite* _sprite, PlayerDef def, Map* _nowMap) :
 	kick = nullptr;
 	pitch = 0, shakeTime = 0, posZ = 0.0f;
 	isJump = false, jumpFlag = false;
-	moveSpeed = 5.0f, boostSpeed = 8.0f, nowSpeed = 5.0f;
+	boostSpeed = 8.0f, nowSpeed = sprite->spDef.speed;
 }
 
 Gun* Player::setGun(Gun* gun, int pos) 
@@ -67,12 +67,12 @@ void Player::checkBoost(bool isPressed, float deltaTime)
 		{
 			boostFlag = true;
 			used = false;
-			nowSpeed = moveSpeed;
+			nowSpeed = sprite->spDef.speed;
 		}
 	}
 	else
 	{
-		nowSpeed = moveSpeed;
+		nowSpeed = sprite->spDef.speed;
 		used = false;
 	}
 	if (!used)
@@ -255,7 +255,7 @@ Gun* Player::getNowGun() { return guns[nowGun]; }
 
 sf::Vector2f Player::getDeltaShake() { return shakeDelta; }
 
-float Player::getMoveSpeed() { return moveSpeed; }
+float Player::getMoveSpeed() { return nowSpeed; }
 
 void Player::takeItem(Itemble* item, int cnt)
 {

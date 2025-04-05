@@ -37,7 +37,7 @@ bool Button::isClicked(sf::Vector2i& mousePos)
 	return false;
 }
 
-void Button::setFunc(std::function<void()> _fn)
+void Button::setFunc(std::function<void()>&& _fn)
 {
 	fn = _fn;
 }

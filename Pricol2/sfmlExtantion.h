@@ -79,7 +79,7 @@ public:
 	void setTexture(sf::Texture* text);
 	void setTextureRect(sf::IntRect rect);
 
-	void setFunc(std::function<void()> _fn);
+	void setFunc(std::function<void()>&& _fn);
 	bool isClicked(sf::Vector2i& mousePos);
 	void use();
 private:

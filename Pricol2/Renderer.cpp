@@ -22,7 +22,7 @@ void Renderer::Init()
 	floorSprite.setTexture(floorTexture);
 }
 
-void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<Sprite>> sprites)
+void Renderer::Draw3DView(Player* player, Map* map, std::vector<Sprite*> sprites)
 {
 	//StaticCalculations
 	float pRadians = player->sprite->spMap.angle * PI / 180.0f;
@@ -40,14 +40,14 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<
 			DrawFloor(rayDirLeft, rayDirRight, rayPos, player, map, start, end );
 		};
 	//SpritePart
-	auto getDist = [player](const std::shared_ptr<Sprite> sp)
+	auto getDist = [player](const Sprite* sp)
 		{
 			return SQUARE(player->sprite->spMap.position.x - sp->spMap.position.x) +
 				SQUARE(player->sprite->spMap.position.y - sp->spMap.position.y);
 		};
-	auto comperer = [player](const std::shared_ptr<Sprite> a, const std::shared_ptr<Sprite> b)
+	auto comperer = [player](const Sprite* a, const Sprite* b)
 		{
-			return COMPARER(a.get()->spMap.position, b.get()->spMap.position, player->sprite->spMap.position);
+			return COMPARER(a->spMap.position, b->spMap.position, player->sprite->spMap.position);
 		};
 
 	float invDet = 1.0f / (cameraPlane.x * pDirection.y - cameraPlane.y * pDirection.x);
@@ -138,7 +138,7 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<
 }
 
 void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, Player* player,
-	std::vector<std::shared_ptr<Sprite>>& sprites, float invDet)
+	std::vector<Sprite*> sprites, float invDet)
 {
 	for (auto sp : sprites)
 	{
@@ -146,6 +146,7 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, P
 		sf::Vector2f spritePos = sp->spMap.position - player->sprite->spMap.position;
 		float spDist = sqrt(SQUARE(spritePos.x) + SQUARE(spritePos.y));
 		float brightnes = 1 - spDist / BRIGHTNESTDIST;
+		int yText = sp->getTextIndex();
 		if (brightnes < 0.1f) brightnes = 0.1f;
 		sf::Color colorShade(255 * brightnes, 255 * brightnes, 255 * brightnes);
 		if (sp->isDamages) 
@@ -198,8 +199,8 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, P
 			if (transforme.y > 0 && transforme.y < distanceBuffer[i])
 			{
 				float textX = (i - drawStartX) * sp->textSize / spriteSize;
-				sf::Vector2f textStart(textX + deltaRotateText, 0);
-				sf::Vector2f textEnd(textX + deltaRotateText, sp->textSize);
+				sf::Vector2f textStart(textX + deltaRotateText, yText * sp->textSize);
+				sf::Vector2f textEnd(textX + deltaRotateText, (yText + 1) * sp->textSize);
 
 				sf::Vector2f vertStart(i, -spriteSize / 2.0f + SCREEN_H / 2.0f + player->pitch + player->posZ / transforme.y);
 				sf::Vector2f vertEnd(i, spriteSize / 2.0f + SCREEN_H / 2.0f + player->pitch + player->posZ / transforme.y);

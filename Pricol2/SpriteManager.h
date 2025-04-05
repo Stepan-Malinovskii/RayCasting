@@ -16,8 +16,7 @@ public:
 	void update(float deltaTime);
 	Player* resetMap(Map* newMap);
 	Player* getPlayer();
-	Npc getNpc(MapSprite* mSp);
-	std::vector<std::shared_ptr<Sprite>> getSprites();
+	std::vector<Sprite*> getDeteachSprite();
 private:
 	int id;
 	void deleteSprite(std::shared_ptr<Sprite> sp);
@@ -25,7 +24,10 @@ private:
 
 	Dialog* dialogSys;
 	Data* data;
-	std::vector<std::shared_ptr<Sprite>> sprites;
+	std::vector<std::shared_ptr<Sprite>> enemys;
+	std::vector<std::shared_ptr<Npc>> npcs;
+	std::vector<Sprite*> sprites;
+	std::vector<std::pair<float, std::shared_ptr<Sprite>>> to_dead;
 	std::unique_ptr<Player> player;
 	Map* nowMap;
 };

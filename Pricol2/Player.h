@@ -72,7 +72,7 @@ private:
 	sf::Vector2f shakeDelta;
 	int nowGun;
 	Gun* guns[3]{};
-	float moveSpeed, nowSpeed, boostSpeed, shakeTime;
+	float nowSpeed, boostSpeed, shakeTime;
 
 	void shakeCamera(float deltaTime, bool isRun);
 	void gravity(float deltaTime);

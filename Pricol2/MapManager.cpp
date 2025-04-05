@@ -76,7 +76,7 @@ void MapManager::load()
 	SoundManager::playerMusic(Level);
 }
 
-void MapManager::rewriteSprites(std::vector<std::shared_ptr<Sprite>> sprs)
+void MapManager::rewriteSprites(std::vector<Sprite*> sprs)
 {
 	nowMap->sprites.clear();
 	for (auto sp : sprs)
