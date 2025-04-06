@@ -15,6 +15,8 @@ Sprite::Sprite(SpriteDef _spDef, MapSprite _spMap, int _id) :
 
 	float frameTime = 1.0f / spDef.speed;
 
+	auto stay = Animation<int>({ {0,0} });
+
 	auto run = Animation<int>({
 		{0, 1},
 		{ frameTime * 1, 2 },
@@ -22,11 +24,15 @@ Sprite::Sprite(SpriteDef _spDef, MapSprite _spMap, int _id) :
 		{ frameTime * 3, 4 },
 		{ frameTime * 4, 4 } });
 
-	auto stay = Animation<int>({ {0,0} });
+	auto atack = Animation<int>({
+		{ frameTime * 1, 5 },
+		{ frameTime * 2, 6 },
+		{ frameTime * 3, 7 },
+		{ frameTime * 4, 8 } });
 
-	auto dead = Animation<int>({ {0,5} });
+	auto dead = Animation<int>({ {0,9} });
 
-	animr = Animator<int>(0, {stay, run, dead});
+	animr = Animator<int>(0, {stay, run, atack, dead});
 }
 
 void Sprite::move(Map* map, sf::Vector2f move)
@@ -50,13 +56,6 @@ void Sprite::move(Map* map, sf::Vector2f move)
 void Sprite::update(float deltaTime)
 {
 	if (state == Dead) return;
-
-	if (spMap.nowHealPoint <= 0.0f)
-	{
-		isDamages = false;
-		state = Killes;
-		return;
-	}
 
 	animr.update(deltaTime);
 
@@ -90,7 +89,7 @@ void Sprite::changeState(SpriteState _state)
 	}
 	else if (_state == Dead)
 	{
-		animr.setAnimation(2, true);
+		animr.setAnimation(3, true);
 	}
 
 	state = _state;

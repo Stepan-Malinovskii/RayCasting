@@ -41,20 +41,19 @@ void Editor::createTextureButton()
 
 void Editor::createSpriteButton()
 {
-	int y = buttons.size() / COUNT_ROW_TEXT * COUNT_ROW_TEXT;
+	int y = buttons.size() / COUNT_ROW_TEXT * COUNT_ROW_TEXT + COUNT_ROW_TEXT;
 
-	sf::RectangleShape shape1(sf::Vector2f{ ICON_SIZE, ICON_SIZE });
-	Button b({ shape1, {} });
+	sf::RectangleShape shape(sf::Vector2f{ ICON_SIZE, ICON_SIZE });
+	Button b({ shape, {} });
 	b.setTexture(&Resources::spriteIcon);
 
 	for (int x = 0; x < spriteDefs.size() - 1; x++, y++)
 	{
-		b.setPosition({ (float)ICON_SIZE * (x % COUNT_ROW_TEXT) + ICON_SIZE / 2, y / COUNT_ROW_TEXT * (float)ICON_SIZE });
+		b.setPosition({ (float)ICON_SIZE * (x % COUNT_ROW_TEXT) + ICON_SIZE / 2,
+						y / COUNT_ROW_TEXT * (float)ICON_SIZE });
 		b.setTextureRect({ { ICON_SIZE * x, 0}, {ICON_SIZE, ICON_SIZE} });
 
-		b.setFunc([=]() {
-			nowSpriteDef = spriteDefs[x + 1];
-			});
+		b.setFunc([=]() { nowSpriteDef = spriteDefs[x + 1]; });
 		buttons.push_back(std::make_shared<Button>(b));
 	}
 }

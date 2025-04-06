@@ -90,7 +90,7 @@ void Map::setMapSprite(MapSprite sp)
 void Map::deleteMapSprite(sf::Vector2i pos)
 {
 	auto it = std::remove_if(sprites.begin(), sprites.end(), [pos](MapSprite sp) {
-		return (sf::Vector2i)pos == pos; });
+		return (sf::Vector2i)sp.position == pos; });
 
 	if (it != sprites.end()) { sprites.erase(it); }
 }

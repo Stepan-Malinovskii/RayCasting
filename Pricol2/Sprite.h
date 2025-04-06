@@ -25,7 +25,7 @@ enum SpriteType
 
 enum SpriteState
 {
-	Stay, Run, Killes, Dead
+	Stay, Run, Atack, Killes, Dead
 };
 
 struct MapSprite
