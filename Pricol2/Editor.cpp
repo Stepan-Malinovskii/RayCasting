@@ -13,34 +13,41 @@ void Editor::init(sf::RenderWindow* _window, sf::RenderWindow* _editorWindow, Ma
 	windowView = window->getView();
 	editorView = editorWindow->getView();
 
-	initButton();
+	createTextureButton();
+	createSpriteButton();
 }
 
-void Editor::initButton()
+void Editor::createTextureButton()
 {
 	sf::RectangleShape shape(sf::Vector2f{ TEXTURE_SIZE, TEXTURE_SIZE });
 	shape.setScale({ 0.5f ,0.5f });
 	Button b({ shape, {} });
 	b.setTexture(&Resources::textures);
-	int x = 0, y = 0, h = 0;
+
+	int x = 0, y = 0;
 	for (; x < Resources::textures.getSize().x / TEXTURE_SIZE * 5; x++, y++)
 	{
-		b.setPosition({ (x % COUNT_ROW_TEXT) * (float)ICON_SIZE + ICON_SIZE / 2, (y / COUNT_ROW_TEXT) * (float)ICON_SIZE });
-		b.setTextureRect({ {(int)(x % TEXTURE_COUNT * TEXTURE_SIZE), (int)(x / TEXTURE_COUNT * TEXTURE_SIZE)},{TEXTURE_SIZE, TEXTURE_SIZE} });
+		b.setPosition({ (x % COUNT_ROW_TEXT) * (float)ICON_SIZE + ICON_SIZE / 2, 
+						(y / COUNT_ROW_TEXT) * (float)ICON_SIZE });
+		b.setTextureRect({ {(int)(x % TEXTURE_COUNT * TEXTURE_SIZE), 
+							(int)(x / TEXTURE_COUNT * TEXTURE_SIZE)},
+							{TEXTURE_SIZE, TEXTURE_SIZE} });
 
-		b.setFunc([=]() {
-			nowValue = x + 1;
-			});
+		b.setFunc([=]() { nowValue = x + 1; });
 
 		buttons.push_back(std::make_shared<Button>(b));
 	}
+}
 
-	y += (y / COUNT_ROW_TEXT + 1) * COUNT_ROW_TEXT - y;
+void Editor::createSpriteButton()
+{
+	int y = buttons.size() / COUNT_ROW_TEXT * COUNT_ROW_TEXT;
 
 	sf::RectangleShape shape1(sf::Vector2f{ ICON_SIZE, ICON_SIZE });
-	b = Button({ shape1, {} });
+	Button b({ shape1, {} });
 	b.setTexture(&Resources::spriteIcon);
-	for (x = 0; x < spriteDefs.size() - 1; x++, y++)
+
+	for (int x = 0; x < spriteDefs.size() - 1; x++, y++)
 	{
 		b.setPosition({ (float)ICON_SIZE * (x % COUNT_ROW_TEXT) + ICON_SIZE / 2, y / COUNT_ROW_TEXT * (float)ICON_SIZE });
 		b.setTextureRect({ { ICON_SIZE * x, 0}, {ICON_SIZE, ICON_SIZE} });
@@ -54,6 +61,8 @@ void Editor::initButton()
 
 void Editor::takeEditInput(sf::Event event)
 {
+	if (!editorWindow->hasFocus()) return;
+
 	editorMousePos = sf::Mouse::getPosition(*editorWindow);
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
@@ -117,23 +126,26 @@ void Editor::takeWindowInput(sf::Event event)
 
 void Editor::windowStateRightClick()
 {
-	if (window->hasFocus())
+	if (isFirstMouse)
 	{
-		if (isFirstMouse)
-		{
-			lastMousePos = windowMousePos;
-			isFirstMouse = false;
-		}
-		else
-		{
-			sf::Vector2i deltaMouse = windowMousePos - lastMousePos;
-
-			windowView.setCenter(windowView.getCenter() - (sf::Vector2f)deltaMouse);
-
-			sf::Mouse::setPosition(lastMousePos, *window);
-		}
-		window->setMouseCursorVisible(false);
+		lastMousePos = windowMousePos;
+		isFirstMouse = false;
 	}
+	else
+	{
+		sf::Vector2i deltaMouse = windowMousePos - lastMousePos;
+
+		windowView.setCenter(windowView.getCenter() - (sf::Vector2f)deltaMouse);
+
+		sf::Mouse::setPosition(lastMousePos, *window);
+	}
+	window->setMouseCursorVisible(false);
+}
+
+void Editor::windowStateNoRightClick()
+{
+	isFirstMouse = true;
+	window->setMouseCursorVisible(true);
 }
 
 void Editor::scrollAndCntr(float delta)
@@ -141,27 +153,17 @@ void Editor::scrollAndCntr(float delta)
 	if (!(nowLayer == SPRITE_LAYER)) return;
 
 	sf::Vector2f worldPos = window->mapPixelToCoords(windowMousePos);
-	sf::Vector2i mapPos = sf::Vector2i((int)floor(worldPos.x - 0.1f) / TEXTURE_SIZE,
-		(int)floor(worldPos.y - 0.1f) / TEXTURE_SIZE);
+	sf::Vector2i mapPos = getMapPos(worldPos);
 
 	if (mapManager->getNowMap()->isCellEmpty(mapPos)) return;
 	mapManager->getNowMap()->rotateSprite(mapPos, delta * 10);
 }
 
-void Editor::windowStateNoRightClick()
-{
-	if (window->hasFocus())
-	{
-		isFirstMouse = true;
-		window->setMouseCursorVisible(true);
-	}
-}
-
 void Editor::windowStateLeftClick()
 {
 	sf::Vector2f worldPos = window->mapPixelToCoords(windowMousePos);
-	sf::Vector2i mapPos = sf::Vector2i((int)floor(worldPos.x - 0.1f) / TEXTURE_SIZE,
-		(int)floor(worldPos.y - 0.1f) / TEXTURE_SIZE);
+	sf::Vector2i mapPos = getMapPos(worldPos);
+
 	if (nowLayer != SPRITE_LAYER)
 	{
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
@@ -194,18 +196,14 @@ void Editor::windowStateLeftClick()
 
 void Editor::editorWindowStateLeftClick()
 {
-	if (editorWindow->hasFocus())
-	{
-		sf::Vector2i worldPos = (sf::Vector2i)editorWindow->mapPixelToCoords(editorMousePos);
-		sf::Vector2i mapPos = sf::Vector2i((int)floor(worldPos.x - 0.1f) / TEXTURE_SIZE,
-			(int)floor(worldPos.y - 0.1f) / TEXTURE_SIZE);
+	sf::Vector2i worldPos = (sf::Vector2i)editorWindow->mapPixelToCoords(editorMousePos);
 
-		for (auto b : buttons)
+	for (auto b : buttons)
+	{
+		if (b->isClicked(worldPos))
 		{
-			if (b->isClicked(worldPos))
-			{
-				b->use();
-			}
+			b->use();
+			break;
 		}
 	}
 }
@@ -218,4 +216,10 @@ void Editor::drawEditor()
 	}
 }
 
-int Editor::drawerLayer() const { return nowLayer; }
+sf::Vector2i Editor::getMapPos(sf::Vector2f worldPos)
+{
+	return sf::Vector2i((int)floor(worldPos.x - 0.1f) / TEXTURE_SIZE,
+						(int)floor(worldPos.y - 0.1f) / TEXTURE_SIZE);
+}
+
+int Editor::drawerLayer() { return nowLayer; }

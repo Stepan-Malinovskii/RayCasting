@@ -5,16 +5,12 @@
 #include "Inventory.h"
 
 Player::Player(Sprite* _sprite, PlayerDef def, Map* _nowMap) : 
-	sprite{ _sprite }, nowGun{ 0 }, nowEnergy{ def.nowEnergy }, maxEnergy { def.maxEnergy },
+	nowEnergy{ def.nowEnergy }, maxEnergy { def.maxEnergy },
 	defence{ def.defence}, nowStrenght{ def.nowStrenght }, maxStrenght{ def.maxStrenght }, 
-	patrons{ def.countpantrons }, nowMap{ _nowMap }, money{ def.money }, details{ def.details }
-{
-	nowHeal = nullptr;
-	kick = nullptr;
-	pitch = 0, shakeTime = 0, posZ = 0.0f;
-	isJump = false, jumpFlag = false;
-	boostSpeed = 8.0f, nowSpeed = sprite->spDef.speed;
-}
+	patrons{ def.countpantrons }, money{ def.money }, details{ def.details },
+	nowMap{ _nowMap }, sprite{ _sprite }, nowGun{ 0 }, nowHeal{ nullptr }, kick{ nullptr },
+	invent{ nullptr }, pitch{ 0 }, shakeTime{ 0 }, posZ{ 0 }, isJump{ false }, jumpFlag{ false },
+	boostSpeed{ 8.0f }, nowSpeed{ sprite->spDef.speed } {}
 
 Gun* Player::setGun(Gun* gun, int pos) 
 {
@@ -23,10 +19,7 @@ Gun* Player::setGun(Gun* gun, int pos)
 	return temp;
 }
 
-Gun* Player::getGun(int pos)
-{
-	return guns[pos];
-}
+Gun* Player::getGun(int pos) { return guns[pos]; }
 
 void Player::setInventory(Inventory* _invent) 
 { 
@@ -121,18 +114,9 @@ void Player::gravity(float deltaTime)
 	}
 }
 
-void Player::jump()
-{
-	if (posZ == 0)
-	{
-		isJump = true;
-	}
-}
+void Player::jump() { if (posZ == 0) { isJump = true; } }
 
-void Player::reloadingGun()
-{
-	patrons = guns[nowGun]->resetPatron(patrons);
-}
+void Player::reloadingGun() { patrons = guns[nowGun]->resetPatron(patrons); }
 
 void Player::takeDamage(float damage)
 {
@@ -190,6 +174,7 @@ void Player::swapGun(bool flag)
 {
 	int delta = flag ? 1 : -1;
 	nowGun = (nowGun + delta + 3) % 3;
+
 	while (!guns[nowGun]) 
 	{
 		nowGun = (nowGun + delta + 3) % 3;

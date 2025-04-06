@@ -13,7 +13,7 @@ void Weapon::update(float dt)
 	nowTime += dt;
 }
 
-void Weapon::setAnimator(Animator<sf::Texture*>& anim) { weaponAnimator = anim; }
+void Weapon::setAnimator(Animator<sf::Texture*>&& anim) { weaponAnimator = anim; }
 
 void Weapon::drawWeapon(sf::RenderTarget* window, sf::Vector2f delta)
 {
@@ -103,7 +103,8 @@ type{ def.type }, maxUsing{ def.maxUSing }
 	else if (def.type == Armor)
 	{
 		setFunc([=](Player* pl) {pl->defence = def.effect;
-		pl->maxStrenght = def.maxUSing; pl->nowStrenght = def.maxUSing;});
+		pl->maxStrenght = def.maxUSing;
+		pl->nowStrenght = def.maxUSing;});
 	}
 	else if (def.type == Patrons)
 	{
@@ -139,45 +140,40 @@ void Gun::updateRad(bool isRun, float deltaTime)
 {
 	if (isRun)
 	{
-		if (nowRad < maxImpRad)
-			nowRad += maxRad * deltaTime * 2;
-		else nowRad = maxImpRad;
+		nowRad = std::min(nowRad + maxRad * deltaTime * 2, maxImpRad);
 	}
 	else
 	{
-		if (nowRad > 1)
-			nowRad -= maxRad * deltaTime * 2;
-		else nowRad = 1;
+		nowRad = std::max(nowRad - maxRad * deltaTime * 2, 1.0f);
 	}
 }
 
 int Gun::resetPatron(int count)
 {
-	if (isReset)
+	if (!isReset) return count;
+	
+	if (nowTimeBetwenReset < timeBetwenReset && nowCount >= maxCount && !isCanUsed()) return count;
+	
+	auto delta = maxCount - nowCount;
+
+	if (delta < count)
 	{
-		if (nowTimeBetwenReset >= timeBetwenReset && nowCount < maxCount && isCanUsed())
-		{
-			auto delta = maxCount - nowCount;
-			if (delta < count)
-			{
-				count -= delta;
-				nowCount = maxCount;
-			}
-			else if (count > 0)
-			{
-				nowCount += count;
-				count = 0;
-			}
-			else
-			{
-				return count;
-			}
-			nowTimeBetwenReset = 0;
-			SoundManager::playSound(Resources::gunsResetSound[gunId], 30);
-			startAnimation(1);
-		}
+		count -= delta;
+		nowCount = maxCount;
 	}
-	return count;
+	else if (count > 0)
+	{
+		nowCount += count;
+		count = 0;
+	}
+	else
+	{
+		return count;
+	}
+
+	nowTimeBetwenReset = 0;
+	SoundManager::playSound(Resources::gunsResetSound[gunId], 30);
+	startAnimation(1);
 }
 
 void Gun::ussing(Sprite* sp, float dist)
@@ -189,9 +185,9 @@ void Gun::ussing(Sprite* sp, float dist)
 	}
 	else if (isCanUsed() && (nowTimeBetwenReset >= timeBetwenReset || !isReset))
 	{
-		if (sp != nullptr)
+		if (sp)
 		{
-			if (Random::bitRandom() > (nowRad - 0.05f) /  maxRad - 0.35f || nowRad == 1)
+			if (Random::bitRandom() > (nowRad - 0.05f) / maxRad - 0.35f || nowRad == 1)
 			{
 				sp->takeDamage(damage * (dist < maxDist ? 1 : 0));
 			}

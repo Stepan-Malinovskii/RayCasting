@@ -25,6 +25,11 @@ public:
 private:
 	void initInv();
 	void checkChose();
+	void selectedItem();
+	void selectItemById();
+	void useSelectedItem(Item* item);
+	void useSelectedGun(Gun* gun);
+	void useSelectedImprove(Improve* improve);
 	int nowKey;
 	Itemble* choose;
 	std::map<Itemble*, int> items;

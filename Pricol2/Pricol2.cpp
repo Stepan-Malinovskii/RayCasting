@@ -19,25 +19,26 @@ int main()
 	State state = State::Game;
 
 	Resources::initResources();
+
 	std::unique_ptr<MapManager> mapManager = std::make_unique<MapManager>(&window);
 	mapManager->load();
 
-	Editor editor{};
-	editor.init(&window, &editorWindow, mapManager.get());
-	Game game(&window, mapManager.get());
+	std::unique_ptr<Editor> editor = std::make_unique<Editor>();
+	editor->init(&window, &editorWindow, mapManager.get());
+
+	std::unique_ptr<Game> game = std::make_unique<Game>(&window, mapManager.get());
 
 	sf::Clock gameClock;
-
 	float deltaTime = 0;
+
 	while (window.isOpen())
 	{
-
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
 			if (state == State::Editor)
 			{
-				editor.takeWindowInput(event);
+				editor->takeWindowInput(event);
 			}
 			if (event.type == sf::Event::Closed)
 			{
@@ -52,7 +53,7 @@ int main()
 						state = State::Game;
 						window.setMouseCursorVisible(false);
 						window.setView(window.getDefaultView());
-						game.editor();
+						game->editor();
 						editorWindow.setActive(false);
 						editorWindow.setVisible(false);
 					}
@@ -68,7 +69,7 @@ int main()
 
 			if (state == State::Game)
 			{
-				game.getInput(event, deltaTime);
+				game->getInput(event, deltaTime);
 			}
 		}
 
@@ -80,7 +81,7 @@ int main()
 				{
 					editorWindow.close();
 				}
-				editor.takeEditInput(event);
+				editor->takeEditInput(event);
 			}
 		}
 
@@ -88,14 +89,14 @@ int main()
 
 		if (state == State::Game)
 		{
-			game.makeCycle(deltaTime);
+			game->makeCycle(deltaTime);
 		}
 		else
 		{	
 			editorWindow.clear();
 
-			mapManager->drawMap(editor.drawerLayer());
-			editor.drawEditor();
+			mapManager->drawMap(editor->drawerLayer());
+			editor->drawEditor();
 			
 			editorWindow.display();
 		}
@@ -105,6 +106,6 @@ int main()
 		deltaTime = gameClock.getElapsedTime().asSeconds();
 		gameClock.restart();
 	}
-	game.save();
+	game->save();
 	return 0;
 }

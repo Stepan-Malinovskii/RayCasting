@@ -1,63 +1,83 @@
 #include "GunManager.h"
 
-WeaponManager::WeaponManager(Data* _data)
+WeaponManager::WeaponManager(Data* _data) :
+	data{ _data }, id{ 0 }
 {
-	data = _data;
-	id = 0;
+	createImprovements();
+	createItems();
+	createGuns();
+}
 
+void WeaponManager::createImprovements()
+{
 	for (int i = 0; i < improveDefs.size(); i++)
 	{
 		improvements.push_back(std::make_unique<Improve>(improveDefs[i], id));
 		itemble[id] = improvements.back().get();
 		id++;
 	}
+}
 
+void  WeaponManager::createItems()
+{
 	for (int i = 0; i < itemsDefs.size(); i++)
 	{
 		items.push_back(std::make_unique<Item>(itemsDefs[i], id));
 		itemble[id] = items.back().get();
 		id++;
 	}
+}
 
+void  WeaponManager::createGuns()
+{
 	auto gunsData = data->getGunData();
 
 	for (int i = 0; i < gunsDef.size(); i++)
 	{
-		Animation<sf::Texture*> shutAnim{};
-		int cnt = Resources::gunsFireAnim[i].size();
-		for (int j = 0; j < cnt; j++)
-		{
-			shutAnim.setKeyframe((j + 1) / (float)cnt * gunsDef[i].shutTime, &Resources::gunsFireAnim[i][j]);
-		}
-		if (cnt != 0) shutAnim.setKeyframe(gunsDef[i].shutTime, &Resources::gunsFireAnim[i][cnt - 1]);
-
-		Animation<sf::Texture*> resetAnim{};
-		cnt = Resources::gunsResetAnim[i].size();
-		for (int j = 0; j < cnt; j++)
-		{
-			resetAnim.setKeyframe((j + 1) / (float)cnt * gunsDef[i].resetTime, &Resources::gunsResetAnim[i][j]);
-		}
-		if (cnt != 0) resetAnim.setKeyframe(gunsDef[i].resetTime, &Resources::gunsResetAnim[i][cnt - 1]);
-
-		Animator<sf::Texture*> animr{ &Resources::gunsBaseText[i], {shutAnim, resetAnim} };
-
-		auto def = gunsDef[i];
+		GunDef def = gunsDef[i];
 		def.nowCount = gunsData[i].nowCount;
 
 		guns.push_back(std::make_unique<Gun>(def, i > 1, id, i));
-		guns.back()->setAnimator(animr);
+		guns.back()->setAnimator(std::move(createAnimator(i)));
+
 		itemble[id] = guns.back().get();
+
 		for (auto im : gunsData[i].improveId)
 		{
 			guns.back()->trySetImprove(improvements[im].get());
 		}
+
 		id++;
 	}
 }
 
-WeaponManager::~WeaponManager() {}
+Animator<sf::Texture*> WeaponManager::createAnimator(int gunIndex)
+{
+	return Animator<sf::Texture*>(&Resources::gunsBaseText[gunIndex], 
+		{ createAnimation(&Resources::gunsFireAnim[gunIndex], gunsDef[gunIndex].shutTime)
+		, createAnimation(&Resources::gunsResetAnim[gunIndex], gunsDef[gunIndex].resetTime) });
+}
 
-Gun* WeaponManager::getGunByIndex(int index) { return guns[index].get(); }
+Animation<sf::Texture*> WeaponManager::createAnimation(std::vector<sf::Texture>* frames, float duration)
+{
+	Animation<sf::Texture*> anim;
+	int count = frames->size();
+
+	for (int j = 0; j < count; ++j)
+	{
+		anim.setKeyframe((j + 1) / (float)count * duration, &(*frames)[j]);
+	}
+
+	if (count > 0)
+	{
+		anim.setKeyframe(duration, &(*frames)[count - 1]);
+	}
+
+	return anim;
+}
+
+Gun* WeaponManager::getGunByIndex(int index) { return index >= 0 && index < guns.size() ? 
+	guns[index].get(): throw "Invalid index"; }
 
 Gun* WeaponManager::getGunById(int id) { return dynamic_cast<Gun*>(itemble[id]); }
 
@@ -65,40 +85,51 @@ Itemble* WeaponManager::getItem(int index) { return itemble[index]; }
 
 std::vector<Gun*> WeaponManager::getGuns()
 {
-	std::vector<Gun*> g;
-	for (int i = 0; i < guns.size(); i++)
+	std::vector<Gun*> result;
+	result.reserve(guns.size());
+
+	for (const auto& gun : guns)
 	{
-		g.push_back(guns[i].get());
+		result.push_back(gun.get());
 	}
-	return g;
+
+	return result;
 }
 
 std::vector<Improve*> WeaponManager::getImprovs()
 {
-	std::vector<Improve*> g;
-	for (int i = 0; i < improvements.size(); i++)
+	std::vector<Improve*> result;
+	result.reserve(improvements.size());
+
+	for (const auto& improve : improvements)
 	{
-		g.push_back(improvements[i].get());
+		result.push_back(improve.get());
 	}
-	return g;
+
+	return result;
 }
 
 std::vector<Item*> WeaponManager::getItems()
 {
-	std::vector<Item*> g;
-	for (int i = 0; i < items.size(); i++)
+	std::vector<Item*> result;
+	result.reserve(items.size());
+
+	for (const auto& item : items)
 	{
-		g.push_back(items[i].get());
+		result.push_back(item.get());
 	}
-	return g;
+
+	return result;
 }
 
 void WeaponManager::saveGun()
 {
 	std::vector<GunData> defs;
-	for (int i = 0; i < guns.size(); i++)
+	defs.reserve(guns.size());
+
+	for (const auto& gun : guns)
 	{
-		defs.push_back(guns[i]->getGunData());
+		defs.push_back(gun->getGunData());
 	}
 
 	data->saveGunData(defs);

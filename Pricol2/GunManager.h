@@ -9,7 +9,7 @@ class WeaponManager
 {
 public:
 	WeaponManager(Data* data);
-	~WeaponManager();
+	~WeaponManager() = default;
 	Gun* getGunByIndex(int index);
 	Gun* getGunById(int id);
 	Itemble* getItem(int id);
@@ -24,6 +24,12 @@ private:
 	std::vector<std::unique_ptr<Item>> items;
 	std::vector<std::unique_ptr<Gun>> guns;
 	Data* data;
+
+	void createImprovements();
+	void createGuns();
+	void createItems();
+	Animator<sf::Texture*> createAnimator(int gunIndex);
+	Animation<sf::Texture*> createAnimation(std::vector<sf::Texture>* frames, float duration);
 };
 
 static std::vector<ItemsDef> itemsDefs{

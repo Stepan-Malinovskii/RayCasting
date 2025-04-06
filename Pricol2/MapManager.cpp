@@ -1,6 +1,6 @@
 #include "MapManager.h"
 
-MapManager::MapManager(sf::RenderWindow* _window) : window{ _window }{}
+MapManager::MapManager(sf::RenderWindow* _window) : window{ _window }, nowMap{ nullptr } {}
 
 MapManager::~MapManager()
 {
@@ -16,6 +16,7 @@ void MapManager::save()
 	auto grid = nowMap->grid;
 	int h = grid.size();
 	int w = grid[0].size();
+
 	out.write(reinterpret_cast<const char*>(&w), sizeof(w));
 	out.write(reinterpret_cast<const char*>(&h), sizeof(h));
 
@@ -32,7 +33,10 @@ void MapManager::save()
 	int numSp = sprites.size();
 	out.write(reinterpret_cast<const char*>(&numSp), sizeof(numSp));
 	for (int i = 0; i < sprites.size(); i++)
+	{
 		out.write(reinterpret_cast<const char*>(&sprites[i]), sizeof(sprites[i]));
+	}
+
 	out.close();
 }
 
@@ -72,17 +76,12 @@ void MapManager::load()
 		in.read(reinterpret_cast<char*>(&nowMap->sprites[i]), sizeof(nowMap->sprites[i]));
 
 	in.close();
-
-	SoundManager::playerMusic(Level);
 }
 
 void MapManager::rewriteSprites(std::vector<Sprite*> sprs)
 {
 	nowMap->sprites.clear();
-	for (auto sp : sprs)
-	{
-		nowMap->sprites.push_back(sp->spMap);
-	}
+	for (auto sp : sprs) { nowMap->sprites.push_back(sp->spMap); }
 }
 
 void MapManager::drawMap(int layerNumber)
@@ -195,6 +194,7 @@ std::pair<sf::Vector2f, sf::Vector2f> MapManager::generate()
 	}
 
 	auto stEnd = findStEnd(leafs);
+
 	delete root;
 	delete nowMap;
 

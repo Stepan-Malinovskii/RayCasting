@@ -33,6 +33,7 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<Sprite*> sprites
 	//FloorPart
 	sf::Vector2f rayDirLeft{ pDirection - cameraPlane },
 		rayDirRight{ pDirection + cameraPlane };
+
 	auto floor_func = [&](int thread_id)
 		{
 			int start = (int)((SCREEN_H / (THREAD_COUNT - 1) * thread_id));

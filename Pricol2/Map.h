@@ -28,12 +28,12 @@ class Map
 {
 public:
 	void SetNewOnGrid(int x, int y, int layerNumber, int value);
-	int const GetOnGrid(int x, int y, int layerNumber) const;
+	int GetOnGrid(int x, int y, int layerNumber);
 
 	bool isCellEmpty(sf::Vector2i pos);
 	void setupBlockmap(Sprite* sp);
 	void deleteInBlockMap(Sprite* sp);
-	std::set<Sprite*> getBlockMap(sf::Vector2i pos) const;
+	std::set<Sprite*> getBlockMap(sf::Vector2i pos);
 
 	void rotateSprite(sf::Vector2i pos, float angle);
 
@@ -46,6 +46,8 @@ public:
 
 	std::vector<MapSprite> sprites;
 private:
+	bool isValidGridPos(int x, int y);
+	bool isValidBlockmapPos(int x, int y);
 	bool insertInBlockMap(sf::Vector2i pos, Sprite* sprite);
 	void removeInBlockMap(sf::Vector2i pos, Sprite* sprite);
 };

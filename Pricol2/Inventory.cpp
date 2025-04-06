@@ -4,26 +4,27 @@ Inventory::Inventory(sf::RenderWindow* _window, Player* _player, UIManager* _uiM
 	window{ _window }, uiManager { _uiManager }, player{ _player } 
 {
 	isOpen = false;
+	choose = nullptr;
+	nowKey = 0;
 }
 
 Item* Inventory::takeMaxHeal()
 {
-	Item* nowHeal = nullptr;
-	for (auto var : items)
+	Item* maxHeal = nullptr;
+
+	for (const auto& [item, count] : items)
 	{
-		auto t = dynamic_cast<Item*>(var.first);
-		if (t != nullptr)
+		auto healItem = dynamic_cast<Item*>(item);
+		if (healItem && healItem->type == Heal)
 		{
-			if (t->type == Heal)
+			if (!maxHeal || healItem->id > maxHeal->id)
 			{
-				if (nowHeal == nullptr || t->id > nowHeal->id)
-				{
-					nowHeal = t;
-				}
+				maxHeal = healItem;
 			}
 		}
 	}
-	return nowHeal;
+
+	return maxHeal;
 }
 
 void Inventory::takeItem(Itemble* item, int cnt)
@@ -80,86 +81,84 @@ void Inventory::checkChose()
 {
 	if (nowKey >= 100)
 	{
-		if (dynamic_cast<Item*>(choose) != nullptr)
-		{
-			auto item = dynamic_cast<Item*>(choose);
-			item->useFunc(player);
-			useItem(choose);
-		}
-		else if (dynamic_cast<Gun*>(choose) != nullptr)
-		{
-			auto gun = dynamic_cast<Gun*>(choose);
-			if (nowKey == 100)
-			{
-				if (player->getGun(2) != gun)
-				{
-					player->setGun(gun, 1);
-				}
-			}
-			else if (nowKey == 101)
-			{
-				if (player->getGun(1) != gun)
-				{
-					player->setGun(gun, 2);
-				}
-			}
-			else
-			{
-				int i = 102;
-				for (auto it : gun->improvement)
-				{
-					if (i == nowKey)
-					{
-						items[dynamic_cast<Itemble*>(gun->deleteImprove(it.first))] += 1;
-						break;
-					}
-					i++;
-				}
-			}
-		}
-		else
-		{
-			auto imp = dynamic_cast<Improve*>(choose);
-			if (nowKey == 100)
-			{
-				auto gun = player->getGun(1);
-				if (gun != nullptr)
-				{
-					auto temp = gun->trySetImprove(imp);
-					useItem(choose);
-					if (temp != nullptr)
-					{
-						items[dynamic_cast<Itemble*>(temp)] += 1;
-					}
-				}
-			}
-			else if (nowKey == 101)
-			{
-				auto gun = player->getGun(2);
-				if (gun != nullptr)
-				{
-					auto temp = gun->trySetImprove(imp);
-					useItem(choose);
-					if (temp != nullptr)
-					{
-						items[dynamic_cast<Itemble*>(temp)] += 1;
-					}
-				}
-			}
-		}
-		choose = nullptr;
-		initInv();
+		selectedItem();
 	}
 	else
 	{
-		for (auto pair : items)
+		selectItemById();
+	}
+}
+
+void Inventory::selectedItem()
+{
+	if (auto item = dynamic_cast<Item*>(choose); item) 
+	{ useSelectedItem(item); }
+	else if (auto gun = dynamic_cast<Gun*>(choose); gun) 
+	{ useSelectedGun(gun); }
+	else if (auto improve = dynamic_cast<Improve*>(choose); improve) 
+	{ useSelectedImprove(improve); }
+	
+	choose = nullptr;
+	initInv();
+}
+
+void Inventory::selectItemById()
+{
+	for (const auto& [item, count] : items)
+	{
+		if (item->id == nowKey)
 		{
-			if (pair.first->id == nowKey)
+			choose = item;
+			initInv();
+			break;
+		}
+	}
+}
+
+void Inventory::useSelectedItem(Item* item)
+{
+	item->useFunc(player);
+	useItem(choose);
+}
+
+void Inventory::useSelectedGun(Gun* gun)
+{
+	if (nowKey == 100)
+	{
+		if (player->getGun(2) != gun) { player->setGun(gun, 1); }
+	}
+	else if (nowKey == 101)
+	{
+		if (player->getGun(1) != gun) { player->setGun(gun, 2); }
+	}
+	else
+	{
+		int i = 102;
+		for (auto it : gun->improvement)
+		{
+			if (i == nowKey)
 			{
-				choose = pair.first;
-				initInv();
+				items[dynamic_cast<Itemble*>(gun->deleteImprove(it.first))] += 1;
 				break;
 			}
+			i++;
+		}
+	}
+}
+
+void Inventory::useSelectedImprove(Improve* improve)
+{
+	Gun* targetGun = nullptr;
+
+	if (nowKey == 100) { targetGun = player->getGun(1); }
+	else if (nowKey == 101) { targetGun = player->getGun(2); }
+
+	if (targetGun)
+	{
+		useItem(choose);
+		if (auto removedImprove = targetGun->trySetImprove(improve); removedImprove)
+		{
+			items[dynamic_cast<Itemble*>(removedImprove)] += 1;
 		}
 	}
 }
@@ -167,23 +166,25 @@ void Inventory::checkChose()
 void Inventory::update()
 {
 	if (!window->hasFocus()) return;
-	static bool flag = false;
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !flag)
+
+	static bool isMouseDown = false;
+
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !isMouseDown)
 	{
 		sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
-		sf::Vector2i worldPos = (sf::Vector2i)window->mapPixelToCoords(mousePos);
 
-		flag = true;
-		int key = uiManager->checkButton(worldPos);
+		isMouseDown = true;
+
+		int key = uiManager->checkButton(mousePos);
 		if (key != -1)
 		{
 			nowKey = key;
 			checkChose();
 		}
 	}
-	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	else if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{
-		flag = false;
+		isMouseDown = false;
 	}
 }
 

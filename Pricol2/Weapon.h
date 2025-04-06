@@ -116,7 +116,7 @@ public:
 
 	virtual bool isCanUsed();
 
-	virtual void setAnimator(Animator<sf::Texture*>& anim);
+	virtual void setAnimator(Animator<sf::Texture*>&& anim);
 
 	float maxDist;
 protected:

@@ -152,8 +152,8 @@ void Game::update(float deltaTime)
 
 void Game::makeCycle(float deltaTime)
 {
-#if !_DEBUG
-	deltaTime = std::min(deltaTime, 1.0f / 50.0f);
+#ifdef NDEBUG
+	deltaTime = std::min(deltaTime, 1.0f / 144.0f);
 #endif
 
 	window->clear();

@@ -21,7 +21,7 @@ public:
 	void takeEditInput(sf::Event event);
 	void drawEditor();
 
-	int drawerLayer() const;
+	int drawerLayer();
 private:
 	sf::RenderWindow* window;
 	sf::RenderWindow* editorWindow;
@@ -35,12 +35,14 @@ private:
 	MapManager* mapManager;
 	std::vector<std::shared_ptr<Button>> buttons;
 
-	void initButton();
+	void createTextureButton();
+	void createSpriteButton();
 	void windowStateRightClick();
 	void scrollAndCntr(float delta);
 	void windowStateNoRightClick();
 	void windowStateLeftClick();
 	void editorWindowStateLeftClick();
+	sf::Vector2i getMapPos(sf::Vector2f worldPos);
 };
 
 #endif // !EDITOR
