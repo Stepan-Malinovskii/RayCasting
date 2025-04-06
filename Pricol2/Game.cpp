@@ -46,6 +46,7 @@ void Game::initPlayer()
 	player->setGun(weaponManager->getGunByIndex(1), 0);
 
 	PlayerDef plDef = data->getPlayerData();
+	player->patrons = 100;
 
 	int i = 1;
 	for (auto it : plDef.gunsData)

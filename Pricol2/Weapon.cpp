@@ -174,6 +174,7 @@ int Gun::resetPatron(int count)
 	nowTimeBetwenReset = 0;
 	SoundManager::playSound(Resources::gunsResetSound[gunId], 30);
 	startAnimation(1);
+	return count;
 }
 
 void Gun::ussing(Sprite* sp, float dist)

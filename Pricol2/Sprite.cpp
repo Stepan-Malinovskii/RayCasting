@@ -17,20 +17,30 @@ Sprite::Sprite(SpriteDef _spDef, MapSprite _spMap, int _id) :
 
 	auto stay = Animation<int>({ {0,0} });
 
-	auto run = Animation<int>({
-		{0, 1},
-		{ frameTime * 1, 2 },
-		{ frameTime * 2, 3 },
-		{ frameTime * 3, 4 },
-		{ frameTime * 4, 4 } });
+	int index = 1;
+	Animation<int> run;
+	if (spDef.isCanRun)
+	{
+		run = Animation<int>({
+		{ frameTime * 0, index++ },
+		{ frameTime * 1, index++ },
+		{ frameTime * 2, index++ },
+		{ frameTime * 3, index },
+		{ frameTime * 4, index++ } });
+	}
+	else
+	{
+		run = stay;
+	}
 
 	auto atack = Animation<int>({
-		{ frameTime * 1, 5 },
-		{ frameTime * 2, 6 },
-		{ frameTime * 3, 7 },
-		{ frameTime * 4, 8 } });
+		{ frameTime * 0, index++ },
+		{ frameTime * 1, index++ },
+		{ frameTime * 2, index++ },
+		{ frameTime * 3, index },
+		{ frameTime * 4, index++ }});
 
-	auto dead = Animation<int>({ {0,9} });
+	auto dead = Animation<int>({ {0, index} });
 
 	animr = Animator<int>(0, {stay, run, atack, dead});
 }
