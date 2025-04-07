@@ -7,12 +7,6 @@ Sprite::Sprite(SpriteDef _spDef, MapSprite _spMap, int _id) :
 {
 	timeAtecked = 0;
 
-	if (spDef.texture != -1)
-	{
-		texture = &Resources::spritesTextures[spDef.texture];
-		textSize = texture->getSize().x / 8;
-	}
-
 	float frameTime = 1.0f / spDef.speed;
 
 	auto stay = Animation<int>({ {0,0} });
@@ -33,16 +27,23 @@ Sprite::Sprite(SpriteDef _spDef, MapSprite _spMap, int _id) :
 		run = stay;
 	}
 
+	frameTime = 1.0f / 3;
+
 	auto atack = Animation<int>({
 		{ frameTime * 0, index++ },
 		{ frameTime * 1, index++ },
-		{ frameTime * 2, index++ },
-		{ frameTime * 3, index },
-		{ frameTime * 4, index++ }});
+		{ frameTime * 2, index },
+		{ frameTime * 3, index++ }});
 
 	auto dead = Animation<int>({ {0, index} });
 
 	animr = Animator<int>(0, {stay, run, atack, dead});
+
+	if (spDef.texture != -1)
+	{
+		texture = &Resources::spritesTextures[spDef.texture];
+		textSize = texture->getSize().y / (index + 1);
+	}
 }
 
 void Sprite::move(Map* map, sf::Vector2f move)
@@ -96,6 +97,13 @@ void Sprite::changeState(SpriteState _state)
 	else if (_state == Stay)
 	{
 		animr.setAnimation(0);
+	}
+	else if (_state == Atack)
+	{
+		if (state != Atack)
+		{
+			animr.setAnimation(2, true);
+		}
 	}
 	else if (_state == Dead)
 	{
@@ -185,7 +193,10 @@ bool Sprite::checkCollision(Map* map, sf::Vector2f newPos, bool xAxis)
 }
 
 Npc::Npc(SpriteDef _spDef, MapSprite _spMap, int _id, int npcDefId, Dialog* _dialog) :
-	Sprite(_spDef, _spMap, _id), npcDefData{ npcDef[npcDefId]}, dialog{_dialog} {}
+	Sprite(_spDef, _spMap, _id), npcDefData{ npcDef[npcDefId]}, dialog{_dialog} 
+{
+	textSize = texture->getSize().y;
+}
 
 
 void Npc::use()

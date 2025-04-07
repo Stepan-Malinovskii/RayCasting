@@ -14,20 +14,7 @@ void SpriteManager::init()
 	id = 1;
 	sprites.clear();
 	npcs.clear();
-	if (enemys.size() != 0)
-	{
-		std::shared_ptr<Sprite> sp;
-		for (int i = 0; i < enemys.size(); i++)
-		{
-			if (enemys[i]->id == 0)
-			{
-				sp = enemys[i];
-				break;
-			}
-		}
-		enemys.clear();
-		enemys.push_back(std::move(sp));
-	}
+	enemys.clear();
 
 	for (auto sp : nowMap->getMapSprites()) {
 		createSpriteFromMapSprite(sp);
@@ -62,12 +49,12 @@ std::shared_ptr<Sprite> SpriteManager::createEnemy(MapSprite mapSprite, SpriteDe
 {
 	enemys.push_back(std::make_shared<Sprite>(def, mapSprite, id));
 
-	if (mapSprite.spriteDefId == 0 && !player)
+	if (mapSprite.spriteDefId == 0)
 	{
 		PlayerDef plDef = data->getPlayerData();
 		enemys.back()->id = 0;
-		enemys.back()->spDef.maxHealpoint = plDef.maxHp;
-		enemys.back()->spMap.nowHealPoint = plDef.nowHp;
+		enemys.back()->spDef.maxHealpoint = 180/*plDef.maxHp*/;
+		enemys.back()->spMap.nowHealPoint = 180/*plDef.nowHp*/;
 		player = std::make_unique<Player>(enemys.back().get(), plDef, nowMap);
 	}
 
@@ -148,6 +135,10 @@ void SpriteManager::update(float deltaTime)
 			if (distance > 30 && enemy->state < Killes)
 			{
 				enemy->changeState(Stay);
+			}
+			else if (distance < 5 && enemy->state < Killes)
+			{
+				enemy->changeState(Atack);
 			}
 			else if (distance < 20 && enemy->state < Killes)
 			{

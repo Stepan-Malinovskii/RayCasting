@@ -37,6 +37,7 @@ Game::~Game()
 void Game::editor()
 {
 	spManager->resetMap(mapManager->getNowMap(), { {2.0f, 2.0f},{}});
+	initPlayer();
 }
 
 void Game::initPlayer()
