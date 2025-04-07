@@ -11,7 +11,7 @@
 #include <set>
 #include <iostream>
 
-constexpr float PI = 3.14159265359f;
+constexpr float PI = 3.14159265359f, TRIGER_DIST_MAX = 80, TRIGER_DIST_MIN = 40;
 constexpr int ENEMY_COUNT = 14;
 
 class Map;
@@ -47,6 +47,7 @@ struct SpriteDef
 	bool isDirectional;
 	int midleDrop;
 	bool isCanRun;
+	float atackDist;
 };
 
 struct NpcDef
@@ -98,24 +99,24 @@ static std::vector<NpcDef> npcDef = {
 	{1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1} };
 
 static std::vector<SpriteDef> spriteDefs = {
-	{ L"player",        SpriteType::PlayerT, 0.3f, 5.0f,  100.0f,   -1,  false, 0,    false},
-	{ L"Бабл",          SpriteType::Enemy,   1.0f, 3.0f,  70.f,      0,  true,  10,   true},
-	{ L"Рогастик",      SpriteType::Enemy,   1.0f, 4.0f,  90.f,      1,  true,  15,   true},
-	{ L"Розовый пинки", SpriteType::Enemy,   1.0f, 5.0f,  100.f,     2,  true,  20,   true},
-	{ L"Кибер демон",   SpriteType::Enemy,   1.0f, 4.0f,  120.f,     3,  true,  25,   true},
-	{ L"Спайдер",       SpriteType::Enemy,   1.0f, 5.0f,  200.f,     4,  true,  30,   true},
-	{ L"Красный череп", SpriteType::Enemy,   1.0f, 6.0f,  150.f,     5,  true,  35,   true},
-	{ L"Бомбастик",     SpriteType::Enemy,   1.0f, 3.0f,   300.f,    6,  true,  40,   true},
-	{ L"Зеленый пинки", SpriteType::Enemy,   1.0f, 6.0f,  200.f,     7,  true,  45,   true},
-	{ L"Розовый череп", SpriteType::Enemy,   1.0f, 6.0f,  200.f,     8,  true,  50,   true},
-	{ L"Ревенант",      SpriteType::Enemy,   1.0f, 5.0f,  180.f,     9,  true,  55,   true},
-	{ L"Мега бабл",     SpriteType::Enemy,   1.0f, 4.0f,  300.f,     10, true,  60,   false},
-	{ L"Мать",          SpriteType::Enemy,   1.0f, 4.0f,  320.f,     11, true,  65,   true},
-	{ L"Boss",          SpriteType::Enemy,   1.0f, 5.0f,  2000.f,    12, true,  1000, true},
-	{ L"Петрович",      SpriteType::NPC,     1.0f, 1.0f,  1000000.f, 13, true,  0,    false},
-	{ L"Молотов",       SpriteType::NPC,     1.0f, 1.0f,  1000000.f, 14, true,  0,    false},
-	{ L"Роман",         SpriteType::NPC,     1.0f, 1.0f,  1000000.f, 15, true,  0,    false},
-	{ L"Ванька",        SpriteType::NPC,     1.0f, 1.0f,  1000000.f, 16, true,  0,    false},
-	{ L"Тихон",         SpriteType::NPC,     1.0f, 1.0f,  1000000.f, 17, true,  0,    false},
-	{ L"Виктор",        SpriteType::NPC,     1.0f, 1.0f,  1000000.f, 18, true,  0,    false} };
+	{ L"player",        SpriteType::PlayerT, 0.3f, 5.0f,  100.0f,   -1,  false, 0,    false, 0},
+	{ L"Бабл",          SpriteType::Enemy,   1.0f, 3.0f,  70.f,      0,  true,  10,   true,  5},
+	{ L"Синчик",        SpriteType::Enemy,   1.0f, 4.0f,  90.f,      1,  true,  15,   true,  5},
+	{ L"Розовый пинки", SpriteType::Enemy,   1.0f, 5.0f,  100.f,     2,  true,  20,   true,  5},
+	{ L"Кибер демон",   SpriteType::Enemy,   1.0f, 4.0f,  120.f,     3,  true,  25,   true,  20},
+	{ L"Спайдер",       SpriteType::Enemy,   1.0f, 5.0f,  200.f,     4,  true,  30,   true,  20},
+	{ L"Красный череп", SpriteType::Enemy,   1.0f, 6.0f,  150.f,     5,  true,  35,   true,  5},
+	{ L"Бомбастик",     SpriteType::Enemy,   1.0f, 3.0f,   300.f,    6,  true,  40,   true,  20},
+	{ L"Зеленый пинки", SpriteType::Enemy,   1.0f, 6.0f,  200.f,     7,  true,  45,   true,  5},
+	{ L"Розовый череп", SpriteType::Enemy,   1.0f, 6.0f,  200.f,     8,  true,  50,   true,  5},
+	{ L"Ревенант",      SpriteType::Enemy,   1.0f, 5.0f,  180.f,     9,  true,  55,   true,  20},
+	{ L"Мега бабл",     SpriteType::Enemy,   1.0f, 4.0f,  300.f,     10, true,  60,   false, 20},
+	{ L"Мать",          SpriteType::Enemy,   1.0f, 4.0f,  320.f,     11, true,  65,   true,  5},
+	{ L"Boss",          SpriteType::Enemy,   1.0f, 5.0f,  2000.f,    12, true,  1000, true,  5},
+	{ L"Петрович",      SpriteType::NPC,     1.0f, 1.0f,  1000000.f, 13, true,  0,    false, 0},
+	{ L"Молотов",       SpriteType::NPC,     1.0f, 1.0f,  1000000.f, 14, true,  0,    false, 0},
+	{ L"Роман",         SpriteType::NPC,     1.0f, 1.0f,  1000000.f, 15, true,  0,    false, 0},
+	{ L"Ванька",        SpriteType::NPC,     1.0f, 1.0f,  1000000.f, 16, true,  0,    false, 0},
+	{ L"Тихон",         SpriteType::NPC,     1.0f, 1.0f,  1000000.f, 17, true,  0,    false, 0},
+	{ L"Виктор",        SpriteType::NPC,     1.0f, 1.0f,  1000000.f, 18, true,  0,    false, 0} };
 #endif // !SPRITE

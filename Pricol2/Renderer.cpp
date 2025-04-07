@@ -51,8 +51,6 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<Sprite*> sprites
 			return COMPARER(a->spMap.position, b->spMap.position, player->sprite->spMap.position);
 		};
 
-	float invDet = 1.0f / (cameraPlane.x * pDirection.y - cameraPlane.y * pDirection.x);
-
 	auto sprite_func = [&]() {
 		std::sort(sprites.begin(), sprites.end(), comperer);
 		};
@@ -132,15 +130,16 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<Sprite*> sprites
 	sf::RenderStates states{ &Resources::textures };
 	window->draw(walls, states);
 	
-	DrawSprite(pDirection, cameraPlane, player, sprites, invDet);
+	DrawSprite(pDirection, cameraPlane, player, sprites);
 
 	spriteColumns.clear();
 	walls.clear();
 }
 
 void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, Player* player,
-	std::vector<Sprite*> sprites, float invDet)
+	std::vector<Sprite*> sprites)
 {
+	float invDet = 1.0f / (cameraPlane.x * pDirection.y - cameraPlane.y * pDirection.x);
 	for (auto sp : sprites)
 	{
 		if (sp->spDef.texture < 0) continue;
@@ -162,7 +161,6 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, P
 		// [               ]     * [ ]   =  1/(planeX*dirY-dirX*planeY) *  [                 ] * [ ]
 		// [ planeY   dirY ]       [y]                                     [ -planeY  planeX ]   [y]
 
-
 		sf::Vector2f transforme(pDirection.y * spritePos.x - pDirection.x * spritePos.y,
 			-cameraPlane.y * spritePos.x + cameraPlane.x * spritePos.y);
 		transforme *= invDet;
@@ -180,9 +178,7 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, P
 			float len = sqrt(dir.x * dir.x + dir.y * dir.y);
 			dir /= len;
 
-			float spAngle = sp->spMap.angle * PI / 180.0f;
-			float angle = spAngle - atan2(dir.y, dir.x);
-			angle = angle * 180.0f / PI;
+			float angle = sp->spMap.angle - atan2(dir.y, dir.x) * 180.0f / PI + 180.0f;
 			angle = round(angle / 45.0f) * 45.0f;
 			angle = fmod(angle, 360.0f);
 			if (angle < 0.0f)

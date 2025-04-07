@@ -42,7 +42,7 @@ private:
 	void DrawFloor(sf::Vector2f& rayDirLeft, sf::Vector2f& rayDirRight, sf::Vector2f& rayPos, 
 		Player* player, Map* map, int startH, int endH);
 	void DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, Player* player,
-		std::vector<Sprite*> sprites, float invDet);
+		std::vector<Sprite*> sprites);
 };
 
 #endif // !RENDERER

@@ -53,8 +53,8 @@ std::shared_ptr<Sprite> SpriteManager::createEnemy(MapSprite mapSprite, SpriteDe
 	{
 		PlayerDef plDef = data->getPlayerData();
 		enemys.back()->id = 0;
-		enemys.back()->spDef.maxHealpoint = 180/*plDef.maxHp*/;
-		enemys.back()->spMap.nowHealPoint = 180/*plDef.nowHp*/;
+		enemys.back()->spDef.maxHealpoint = plDef.maxHp;
+		enemys.back()->spMap.nowHealPoint = plDef.nowHp;
 		player = std::make_unique<Player>(enemys.back().get(), plDef, nowMap);
 	}
 
@@ -131,18 +131,27 @@ void SpriteManager::update(float deltaTime)
 		if (enemy.get()->spDef.texture != -1)
 		{
 			float distance = GETDIST(enemy->spMap.position, player->sprite->spMap.position);
-
-			if (distance > 30 && enemy->state < Killes)
+			if (enemy->state < Killes)
 			{
-				enemy->changeState(Stay);
-			}
-			else if (distance < 5 && enemy->state < Killes)
-			{
-				enemy->changeState(Atack);
-			}
-			else if (distance < 20 && enemy->state < Killes)
-			{
-				enemy->changeState(Run);
+				float angle = enemy->spMap.angle * PI / 180.0f;
+				sf::Vector2f dir{ cos(angle), sin(angle)};
+				sf::Vector2f toPlayerDir = player->sprite->spMap.position
+					- enemy->spMap.position;
+				if (distance < enemy->spDef.atackDist)
+				{
+					enemy->changeState(Atack);
+					enemy->spMap.angle = std::atan2(toPlayerDir.y, toPlayerDir.x) * 180.0f / PI;
+				}
+				else if (distance < TRIGER_DIST_MIN)
+				{
+					enemy->changeState(Run);
+					enemy->spMap.angle = std::atan2(toPlayerDir.y, toPlayerDir.x) * 180.0f / PI;
+					enemy->move(nowMap, enemy->spDef.speed * deltaTime * dir);
+				}
+				else if (distance > TRIGER_DIST_MAX)
+				{
+					enemy->changeState(Stay);
+				}
 			}
 		}
 	}
