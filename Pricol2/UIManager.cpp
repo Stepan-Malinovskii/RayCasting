@@ -379,12 +379,12 @@ void UIManager::initPlayer()
 			std::wostringstream oss;
 			oss << std::fixed << std::setprecision(2) << player->sprite->spMap.nowHealPoint;
 			oss << " / ";
-			oss << std::fixed << std::setprecision(2) << player->sprite->spDef.maxHealpoint;
+			oss << std::fixed << std::setprecision(2) << player->sprite->enemyDef.maxHealpoint;
 			std::wstring str = oss.str();
 
 			group1.shape.setFillColor({ 255, 23, 23 });
 			float newXH = baseX * (player->sprite->spMap.nowHealPoint <= 0 ? 0 :
-				player->sprite->spMap.nowHealPoint) / player->sprite->spDef.maxHealpoint;
+				player->sprite->spMap.nowHealPoint) / player->sprite->enemyDef.maxHealpoint;
 			group1.shape.setSize({ newXH, 40 });
 			group1.setString(str);
 			window->draw(group1.shape);

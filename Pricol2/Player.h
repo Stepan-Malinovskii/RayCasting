@@ -35,7 +35,7 @@ struct PlayerDef
 class Player
 {
 public:
-	Player(Sprite* sprite, PlayerDef def, Map* _nowMap);
+	Player(Enemy* sprite, PlayerDef def, Map* _nowMap);
 
 	void setInventory(Inventory* invent);
 	void updateMouseData(sf::Vector2f mousePos, float deltaTime);
@@ -58,7 +58,7 @@ public:
 	PlayerDef getPlayerDef();
 	void setNemMap(Map* map);
 
-	Sprite* sprite;
+	Enemy* sprite;
 	Gun* kick;
 	float pitch, posZ, maxEnergy, nowEnergy;
 	float defence, nowStrenght, maxStrenght;

@@ -3,50 +3,26 @@
 #include "Map.h"
 
 Sprite::Sprite(SpriteDef _spDef, MapSprite _spMap, int _id) :
-	spDef{ _spDef }, spMap{ _spMap }, id{ _id }, isDamages{ false }
+	spDef{ _spDef }, spMap{ _spMap }, id{ _id }
 {
-	timeAtecked = 0;
-
-	float frameTime = 1.0f / spDef.speed;
-
-	auto stay = Animation<int>({ {0,0} });
-
-	int index = 1;
-	Animation<int> run;
-	if (spDef.isCanRun)
-	{
-		run = Animation<int>({
-		{ frameTime * 0, index++ },
-		{ frameTime * 1, index++ },
-		{ frameTime * 2, index++ },
-		{ frameTime * 3, index },
-		{ frameTime * 4, index++ } });
-	}
-	else
-	{
-		run = stay;
-	}
-
-	frameTime = 1.0f / 3;
-
-	auto atack = Animation<int>({
-		{ frameTime * 0, index++ },
-		{ frameTime * 1, index++ },
-		{ frameTime * 2, index },
-		{ frameTime * 3, index++ }});
-
-	auto dead = Animation<int>({ {0, index} });
-
-	animr = Animator<int>(0, {stay, run, atack, dead});
-
 	if (spDef.texture != -1)
 	{
 		texture = &Resources::spritesTextures[spDef.texture];
-		textSize = texture->getSize().y / (index + 1);
-	}
+		textSize = texture->getSize().x / 8;
+	}                                                                
 }
 
-void Sprite::move(Map* map, sf::Vector2f move)
+std::pair<int, bool> Sprite::getTextIndex()
+{
+	return { 0, false };
+}
+
+std::pair<int, bool> Enemy::getTextIndex()
+{
+	return { animr.get(), isDamages };
+}
+
+void Enemy::move(Map* map, sf::Vector2f move)
 {
 	if (move == sf::Vector2f()) return;
 
@@ -64,7 +40,7 @@ void Sprite::move(Map* map, sf::Vector2f move)
 	map->setupBlockmap(this);
 }
 
-void Sprite::update(float deltaTime)
+void Enemy::update(float deltaTime)
 {
 	if (state == Dead) return;
 
@@ -80,12 +56,7 @@ void Sprite::update(float deltaTime)
 	timeAtecked += deltaTime;
 }
 
-int Sprite::getTextIndex()
-{
-	return animr.get();
-}
-
-void Sprite::changeState(SpriteState _state)
+void Enemy::changeState(SpriteState _state)
 {
 	if (_state == Run)
 	{
@@ -113,7 +84,7 @@ void Sprite::changeState(SpriteState _state)
 	state = _state;
 }
 
-void Sprite::takeDamage(float damage)
+void Enemy::takeDamage(float damage)
 {
 	if (state == Dead) return;
 
@@ -131,7 +102,7 @@ void Sprite::takeDamage(float damage)
 	timeAtecked = 0;
 }
 
-bool Sprite::checkCollision(Map* map, sf::Vector2f newPos, bool xAxis)
+bool Enemy::checkCollision(Map* map, sf::Vector2f newPos, bool xAxis)
 {
 	sf::Vector2f thisSize{ spDef.size / 2.0f, spDef.size / 2.0f };
 	sf::Vector2f thisStart = newPos - thisSize;
@@ -192,12 +163,46 @@ bool Sprite::checkCollision(Map* map, sf::Vector2f newPos, bool xAxis)
 	return false;
 }
 
+Enemy::Enemy(SpriteDef spDef, MapSprite spMap, EnemyDef _enemyDef, int id) :
+	Sprite(spDef, spMap, id), enemyDef{ _enemyDef }, state{ Stay }, timeAtecked{ 0.5f }, isDamages{ false }
+{
+	float frameTime = 1.0f / enemyDef.speed;
+	auto stay = Animation<int>({ {0,0} });
+
+	int index = 1;
+	Animation<int> run;
+	if (enemyDef.isCanRun)
+	{
+		run = Animation<int>({
+		{ frameTime * 0, index++ },
+		{ frameTime * 1, index++ },
+		{ frameTime * 2, index++ },
+		{ frameTime * 3, index },
+		{ frameTime * 4, index++ } });
+	}
+	else
+	{
+		run = stay;
+	}
+
+	frameTime = 1.0f / 3;
+
+	auto atack = Animation<int>({
+	{ frameTime * 0, index++ },
+	{ frameTime * 1, index++ },
+	{ frameTime * 2, index },
+	{ frameTime * 3, index++ }});
+
+	auto dead = Animation<int>({ {0, index} });
+
+	animr = Animator<int>(0, {stay, run, atack, dead});
+}
+
 Npc::Npc(SpriteDef _spDef, MapSprite _spMap, int _id, int npcDefId, Dialog* _dialog) :
 	Sprite(_spDef, _spMap, _id), npcDefData{ npcDef[npcDefId]}, dialog{_dialog} 
 {
 	textSize = texture->getSize().y;
 }
-
 
 void Npc::use()
 {

@@ -78,7 +78,7 @@ void MapManager::load()
 	in.close();
 }
 
-void MapManager::rewriteSprites(std::vector<Sprite*> sprs)
+void MapManager::rewriteSprites(std::vector<std::shared_ptr<Sprite>> sprs)
 {
 	nowMap->sprites.clear();
 	for (auto sp : sprs) { nowMap->sprites.push_back(sp->spMap); }
@@ -314,8 +314,9 @@ void MapManager::writeEnemy(std::vector<sf::IntRect> rooms)
 																midleRoomCount * 1.2f));
 		for (auto p : points)
 		{
-			auto def = spriteDefs[Random::intRandom(1, ENEMY_COUNT - 2)];
-			nowMap->setMapSprite({def.texture + 1, (sf::Vector2f)p, (float)Random::intRandom(0,180), def.maxHealpoint});
+			auto index = Random::intRandom(1, ENEMY_COUNT - 2);
+			auto def = spriteDefs[index];
+			nowMap->setMapSprite({def.texture + 1, (sf::Vector2f)p, (float)Random::intRandom(0,180), enemyDef[index].maxHealpoint});
 		}
 	}
 }

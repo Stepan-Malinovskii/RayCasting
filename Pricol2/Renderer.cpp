@@ -22,7 +22,7 @@ void Renderer::Init()
 	floorSprite.setTexture(floorTexture);
 }
 
-void Renderer::Draw3DView(Player* player, Map* map, std::vector<Sprite*> sprites)
+void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<Sprite>> sprites)
 {
 	//StaticCalculations
 	float pRadians = player->sprite->spMap.angle * PI / 180.0f;
@@ -41,12 +41,7 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<Sprite*> sprites
 			DrawFloor(rayDirLeft, rayDirRight, rayPos, player, map, start, end );
 		};
 	//SpritePart
-	auto getDist = [player](const Sprite* sp)
-		{
-			return SQUARE(player->sprite->spMap.position.x - sp->spMap.position.x) +
-				SQUARE(player->sprite->spMap.position.y - sp->spMap.position.y);
-		};
-	auto comperer = [player](const Sprite* a, const Sprite* b)
+	auto comperer = [player](const std::shared_ptr<Sprite> a, const std::shared_ptr<Sprite> b)
 		{
 			return COMPARER(a->spMap.position, b->spMap.position, player->sprite->spMap.position);
 		};
@@ -137,7 +132,7 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<Sprite*> sprites
 }
 
 void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, Player* player,
-	std::vector<Sprite*> sprites)
+	std::vector<std::shared_ptr<Sprite>> sprites)
 {
 	float invDet = 1.0f / (cameraPlane.x * pDirection.y - cameraPlane.y * pDirection.x);
 	for (auto sp : sprites)
@@ -146,10 +141,10 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, P
 		sf::Vector2f spritePos = sp->spMap.position - player->sprite->spMap.position;
 		float spDist = sqrt(SQUARE(spritePos.x) + SQUARE(spritePos.y));
 		float brightnes = 1 - spDist / BRIGHTNESTDIST;
-		int yText = sp->getTextIndex();
+		auto spData = sp->getTextIndex();
 		if (brightnes < 0.1f) brightnes = 0.1f;
 		sf::Color colorShade(255 * brightnes, 255 * brightnes, 255 * brightnes);
-		if (sp->isDamages) 
+		if (spData.second) 
 		{ 
 			if (colorShade.r * 1.5f > 255) colorShade.r = 255;
 			colorShade.g /= 2;
@@ -196,8 +191,8 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, P
 			if (transforme.y > 0 && transforme.y < distanceBuffer[i])
 			{
 				float textX = (i - drawStartX) * sp->textSize / spriteSize;
-				sf::Vector2f textStart(textX + deltaRotateText, yText * sp->textSize);
-				sf::Vector2f textEnd(textX + deltaRotateText, (yText + 1) * sp->textSize);
+				sf::Vector2f textStart(textX + deltaRotateText, spData.first * sp->textSize);
+				sf::Vector2f textEnd(textX + deltaRotateText, (spData.first + 1) * sp->textSize);
 
 				sf::Vector2f vertStart(i, -spriteSize / 2.0f + SCREEN_H / 2.0f + player->pitch + player->posZ / transforme.y);
 				sf::Vector2f vertEnd(i, spriteSize / 2.0f + SCREEN_H / 2.0f + player->pitch + player->posZ / transforme.y);

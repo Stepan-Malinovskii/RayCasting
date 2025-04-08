@@ -17,23 +17,21 @@ public:
 	Player* resetMap(Map* newMap, std::pair<sf::Vector2f, sf::Vector2f> mapPos);
 	Player* getPlayer();
 	Npc* getNpc(int id);
-	std::vector<Sprite*> getDeteachSprite();
+	std::vector<std::shared_ptr<Sprite>> getDeteachSprite();
 private:
 	int id;
-	void killEnemy(Sprite* sp);
+	void killEnemy(Enemy* enem);
 	void createSpriteFromMapSprite(MapSprite mapSprite);
-	std::shared_ptr<Sprite> createEnemy(MapSprite mapSprite, SpriteDef def);
-	std::shared_ptr<Sprite> createNpc(MapSprite mapSprite, SpriteDef );
+	void createEnemy(MapSprite mapSprite, SpriteDef def);
+	void createNpc(MapSprite mapSprite, SpriteDef );
 	void createDefaultPlayer();
-	void setupBlockmapAndStates();
 	void init();
 
 	Dialog* dialogSys;
 	Data* data;
-	std::vector<std::shared_ptr<Sprite>> allSprite;
-	std::vector<Sprite*> enemys;
-	std::vector<Sprite*> dead;
-	std::vector<Sprite*> sprites;
+	std::vector<std::shared_ptr<Sprite>> allSprites;
+	std::vector<Enemy*> enemys;
+	std::vector<Enemy*> dead;
 	std::unique_ptr<Player> player;
 	Map* nowMap;
 };

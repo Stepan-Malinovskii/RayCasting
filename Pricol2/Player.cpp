@@ -4,13 +4,13 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include "Inventory.h"
 
-Player::Player(Sprite* _sprite, PlayerDef def, Map* _nowMap) : 
+Player::Player(Enemy* _sprite, PlayerDef def, Map* _nowMap) : 
 	nowEnergy{ def.nowEnergy }, maxEnergy { def.maxEnergy },
 	defence{ def.defence}, nowStrenght{ def.nowStrenght }, maxStrenght{ def.maxStrenght }, 
 	patrons{ def.countpantrons }, money{ def.money }, details{ def.details },
 	nowMap{ _nowMap }, sprite{ _sprite }, nowGun{ 0 }, nowHeal{ nullptr }, kick{ nullptr },
 	invent{ nullptr }, pitch{ 0 }, shakeTime{ 0 }, posZ{ 0 }, isJump{ false }, jumpFlag{ false },
-	boostSpeed{ 8.0f }, nowSpeed{ sprite->spDef.speed } {}
+	boostSpeed{ 8.0f }, nowSpeed{ sprite->enemyDef.speed } {}
 
 Gun* Player::setGun(Gun* gun, int pos) 
 {
@@ -43,7 +43,7 @@ void Player::checkBoost(bool isPressed, float deltaTime)
 {
 	static bool boostFlag = false;
 
-	nowSpeed = sprite->spDef.speed;
+	nowSpeed = sprite->enemyDef.speed;
 
 	if (boostFlag) {
 		nowEnergy = std::min(nowEnergy + deltaTime, maxEnergy);
@@ -155,8 +155,8 @@ void Player::fire(int gun)
 		if (guns[nowGun]->isCanUsed() && kick->isCanUsed())
 		{
 			RayHit hit = raycast(nowMap, sprite->spMap.position, direction, true, sprite, guns[nowGun]->maxDist, pitch);
-			float dist = hit.sprite && hit.sprite->spDef.type != NPC ? dist = sqrt(GETDIST(hit.sprite->spMap.position, sprite->spMap.position)): 0; 
-			guns[nowGun]->ussing(hit.sprite, dist);
+			float dist = hit.sprite && hit.sprite->spDef.type != SpriteType::NPC ? dist = sqrt(GETDIST(hit.sprite->spMap.position, sprite->spMap.position)): 0;
+			guns[nowGun]->ussing(dynamic_cast<Enemy*>(hit.sprite), dist);
 		}
 	}
 }
@@ -193,7 +193,7 @@ PlayerDef Player::getPlayerDef()
 		}
 	}
 
-	return { sprite->spDef.maxHealpoint,
+	return { sprite->enemyDef.maxHealpoint,
 	sprite->spMap.nowHealPoint,
 	maxEnergy,
 	nowEnergy,

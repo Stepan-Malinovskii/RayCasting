@@ -80,16 +80,16 @@ type{ def.type }, maxUsing{ def.maxUSing }
 	if (def.type == Heal)
 	{
 		setFunc([=](Player* pl) {pl->sprite->spMap.nowHealPoint += def.effect;
-		pl->sprite->spMap.nowHealPoint = std::min(pl->sprite->spDef.maxHealpoint, pl->sprite->spMap.nowHealPoint);});
+		pl->sprite->spMap.nowHealPoint = std::min(pl->sprite->enemyDef.maxHealpoint, pl->sprite->spMap.nowHealPoint);});
 	}
 	else if (def.type == MaxHeal)
 	{
 		setFunc([=](Player* pl) {
 			if (Random::bitRandom() > 0.2f)
-				pl->sprite->spDef.maxHealpoint += def.effect;
+				pl->sprite->enemyDef.maxHealpoint += def.effect;
 			else
-				pl->sprite->spDef.maxHealpoint -= def.effect / 2;
-			pl->sprite->spMap.nowHealPoint = std::min(pl->sprite->spDef.maxHealpoint, pl->sprite->spMap.nowHealPoint);});
+				pl->sprite->enemyDef.maxHealpoint -= def.effect / 2;
+			pl->sprite->spMap.nowHealPoint = std::min(pl->sprite->enemyDef.maxHealpoint, pl->sprite->spMap.nowHealPoint);});
 	}
 	else if (def.type == MaxEnergy)
 	{
@@ -177,11 +177,11 @@ int Gun::resetPatron(int count)
 	return count;
 }
 
-void Gun::ussing(Sprite* sp, float dist)
+void Gun::ussing(Enemy* sp, float dist)
 {
 	if (nowCount == 0 && isReset)
 	{
-		SoundManager::playSound(Resources::gunCantShoutSound, 40);
+		SoundManager::playSound(Resources::gunCantShoutSound, 60);
 		return;
 	}
 	else if (isCanUsed() && (nowTimeBetwenReset >= timeBetwenReset || !isReset))

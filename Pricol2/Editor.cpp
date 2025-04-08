@@ -186,7 +186,14 @@ void Editor::windowStateLeftClick()
 			{
 				if (mapManager->getNowMap()->isCellEmpty(mapPos))
 				{
-					mapManager->getNowMap()->setMapSprite({ nowSpriteDef.texture + 1, { mapPos.x + 0.5f, mapPos.y + 0.5f }, -90.0f, nowSpriteDef.maxHealpoint });
+					float nowHp = 10;
+
+					if (nowSpriteDef.texture + 1 < ENEMY_COUNT)
+					{
+						nowHp = enemyDef[nowSpriteDef.texture].maxHealpoint;
+					}
+
+					mapManager->getNowMap()->setMapSprite({ nowSpriteDef.texture + 1, { mapPos.x + 0.5f, mapPos.y + 0.5f }, -90.0f, nowHp });
 				}
 			}
 		}

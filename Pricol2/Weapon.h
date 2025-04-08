@@ -123,7 +123,7 @@ protected:
 
 	virtual void startAnimation(int number);
 
-	virtual void ussing(Sprite* sp, float dist) = 0;
+	virtual void ussing(Enemy* sp, float dist) = 0;
 
 	Animator<sf::Texture*> weaponAnimator;
 	float timeBetwen, nowTime;
@@ -147,7 +147,7 @@ public:
 
 	GunData getGunData();
 
-	void ussing(Sprite* sp, float dist) override;
+	void ussing(Enemy* sp, float dist) override;
 
 	bool isReset;
 	int nowCount;
