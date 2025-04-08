@@ -20,7 +20,7 @@ public:
 	std::vector<Sprite*> getDeteachSprite();
 private:
 	int id;
-	void deleteSprite(std::shared_ptr<Sprite> sp);
+	void killEnemy(Sprite* sp);
 	void createSpriteFromMapSprite(MapSprite mapSprite);
 	std::shared_ptr<Sprite> createEnemy(MapSprite mapSprite, SpriteDef def);
 	std::shared_ptr<Sprite> createNpc(MapSprite mapSprite, SpriteDef );
@@ -30,10 +30,10 @@ private:
 
 	Dialog* dialogSys;
 	Data* data;
-	std::vector<std::shared_ptr<Sprite>> enemys;
-	std::vector<std::shared_ptr<Npc>> npcs;
+	std::vector<std::shared_ptr<Sprite>> allSprite;
+	std::vector<Sprite*> enemys;
+	std::vector<Sprite*> dead;
 	std::vector<Sprite*> sprites;
-	std::vector<std::pair<float, std::shared_ptr<Sprite>>> to_dead;
 	std::unique_ptr<Player> player;
 	Map* nowMap;
 };
