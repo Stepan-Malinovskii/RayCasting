@@ -251,79 +251,67 @@ void UIManager::initInvent(std::map<Itemble*, int> items, Itemble* choose)
 		dataGroup1.setSize({ dataGroup1.getSize().x, dataGroup1.getSize().y * 2 });
 		dataGroup1.move({ 0, oldSize / 2 + dataGroup1.getSize().y / 2 + 5 });
 
-		auto test = dynamic_cast<Item*>(choose);
-		if (test == nullptr || test->type != Heal)
+		oldSize = dataGroup.getSize().y;
+		dataGroup.setSize({ dataGroup.getSize().x, DIALOG_H * 2 / 3 - INTERVAL });
+		dataGroup.move({ 0, oldSize / 2 + dataGroup.getSize().y / 2 + INTERVAL });
+		buttons.push_back(Button(dataGroup));
+
+		Group makeGroup(invGroup);
+		sf::Vector2f pos = dataGroup.getPosition();
+		pos.y -= dataGroup.getSize().y / 2 - 5 - makeGroup.getSize().y / 2;
+		makeGroup.setPosition(pos);
+
+		std::wostringstream oss;
+		if (auto item = dynamic_cast<Item*>(choose); item)
 		{
-			oldSize = dataGroup.getSize().y;
-			dataGroup.setSize({ dataGroup.getSize().x, DIALOG_H * 2 / 3 - INTERVAL });
-			dataGroup.move({ 0, oldSize / 2 + dataGroup.getSize().y / 2 + INTERVAL });
-			buttons.push_back(Button(dataGroup));
-
-			Group makeGroup(invGroup);
-			sf::Vector2f pos = dataGroup.getPosition();
-			pos.y -= dataGroup.getSize().y / 2 - 5 - makeGroup.getSize().y / 2;
-			makeGroup.setPosition(pos);
-
-			std::wostringstream oss;
-			if (dynamic_cast<Item*>(choose) != nullptr)
-			{
-				auto item = dynamic_cast<Item*>(choose);
-				if (item->type != Heal)
-				{
-					makeGroup.setString(L"Использовать");
-					buttons.push_back(Button(makeGroup));
-					buttons.back().setFunc([&]() { keyButton = 100;});
-				}
-
-				oss << choose->disc;
-			}
-			else if (dynamic_cast<Gun*>(choose) != nullptr)
-			{
-				auto gun = dynamic_cast<Gun*>(choose);
-				makeGroup.setString(L"Надеть вместо 1-го");
+				makeGroup.setString(L"Использовать");
 				buttons.push_back(Button(makeGroup));
 				buttons.back().setFunc([&]() { keyButton = 100;});
 
-				makeGroup.move({ 0, makeGroup.getSize().y + 5 });
-				makeGroup.setString(L"Надеть вместо 2-го");
-				buttons.push_back(Button(makeGroup));
-				buttons.back().setFunc([&]() { keyButton = 101;});
-
-				int i = 102;
-				for (auto it : gun->improvement)
-				{
-					makeGroup.move({ 0, makeGroup.getSize().y + 5 });
-					makeGroup.setString(L"Снять " + it.second->name);
-					buttons.push_back(Button(makeGroup));
-					buttons.back().setFunc([=]() { keyButton = i;});
-					i++;
-				}
-
-				oss << L"Урон: " << std::fixed << std::setprecision(2) << gun->damage;
-				oss << " | ";
-				oss << L"Обойма: " << std::fixed << std::setprecision(2) << gun->maxCount;
-				oss << " | ";
-				oss << L"Разброс: " << std::fixed << std::setprecision(2) << gun->maxImpRad;
-			}
-			else
-			{
-				auto imp = dynamic_cast<Improve*>(choose);
-
-				auto gun = dynamic_cast<Gun*>(choose);
-				makeGroup.setString(L"Надеть на 1-ое");
-				buttons.push_back(Button(makeGroup));
-				buttons.back().setFunc([&]() { keyButton = 100;});
-
-				makeGroup.move({ 0, makeGroup.getSize().y + 5 });
-				makeGroup.setString(L"Надеть на 2-ое");
-				buttons.push_back(Button(makeGroup));
-				buttons.back().setFunc([&]() { keyButton = 101;});
-
-				oss << choose->disc;
-			}
-			dataGroup1.setString(splitText(oss.str(), dataGroup1.getSize().x, dataGroup1.text.getCharacterSize()));
-			buttons.push_back(dataGroup1);
+			oss << choose->disc;
 		}
+		else if (auto gun = dynamic_cast<Gun*>(choose); gun)
+		{
+			makeGroup.setString(L"Надеть вместо 1-го");
+			buttons.push_back(Button(makeGroup));
+			buttons.back().setFunc([&]() { keyButton = 100;});
+
+			makeGroup.move({ 0, makeGroup.getSize().y + 5 });
+			makeGroup.setString(L"Надеть вместо 2-го");
+			buttons.push_back(Button(makeGroup));
+			buttons.back().setFunc([&]() { keyButton = 101;});
+
+			int i = 102;
+			for (auto it : gun->improvement)
+			{
+				makeGroup.move({ 0, makeGroup.getSize().y + 5 });
+				makeGroup.setString(L"Снять " + it.second->name);
+				buttons.push_back(Button(makeGroup));
+				buttons.back().setFunc([=]() { keyButton = i;});
+				i++;
+			}
+
+			oss << L"Урон: " << std::fixed << std::setprecision(2) << gun->damage;
+			oss << " | ";
+			oss << L"Обойма: " << std::fixed << std::setprecision(2) << gun->maxCount;
+			oss << " | ";
+			oss << L"Разброс: " << std::fixed << std::setprecision(2) << gun->maxImpRad;
+		}
+		else if (auto imp = dynamic_cast<Improve*>(choose); imp)
+		{
+			makeGroup.setString(L"Надеть на 1-ое");
+			buttons.push_back(Button(makeGroup));
+			buttons.back().setFunc([&]() { keyButton = 100;});
+
+			makeGroup.move({ 0, makeGroup.getSize().y + 5 });
+			makeGroup.setString(L"Надеть на 2-ое");
+			buttons.push_back(Button(makeGroup));
+			buttons.back().setFunc([&]() { keyButton = 101;});
+
+			oss << choose->disc;
+		}
+		dataGroup1.setString(splitText(oss.str(), dataGroup1.getSize().x, dataGroup1.text.getCharacterSize()));
+		buttons.push_back(dataGroup1);
 	}
 }
 
@@ -377,14 +365,14 @@ void UIManager::initPlayer()
 			window->draw(group3.shape);
 
 			std::wostringstream oss;
-			oss << std::fixed << std::setprecision(2) << player->sprite->spMap.nowHealPoint;
+			oss << std::fixed << std::setprecision(2) << player->enemy->spMap.nowHealPoint;
 			oss << " / ";
-			oss << std::fixed << std::setprecision(2) << player->sprite->enemyDef.maxHealpoint;
+			oss << std::fixed << std::setprecision(2) << player->enemy->enemyDef.maxHealpoint;
 			std::wstring str = oss.str();
 
 			group1.shape.setFillColor({ 255, 23, 23 });
-			float newXH = baseX * (player->sprite->spMap.nowHealPoint <= 0 ? 0 :
-				player->sprite->spMap.nowHealPoint) / player->sprite->enemyDef.maxHealpoint;
+			float newXH = baseX * (player->enemy->spMap.nowHealPoint <= 0 ? 0 :
+				player->enemy->spMap.nowHealPoint) / player->enemy->enemyDef.maxHealpoint;
 			group1.shape.setSize({ newXH, 40 });
 			group1.setString(str);
 			window->draw(group1.shape);
@@ -418,7 +406,7 @@ void UIManager::initPlayer()
 			window->draw(group3.shape);
 			window->draw(group3.text);
 
-			if (player->nowHeal != nullptr)
+			if (player->nowHeal)
 			{
 				sf::RectangleShape rect({ ICON_SIZE, ICON_SIZE });
 				rect.setTexture(&Resources::itembleIcon);

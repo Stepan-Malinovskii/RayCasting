@@ -79,17 +79,17 @@ type{ def.type }, maxUsing{ def.maxUSing }
 {
 	if (def.type == Heal)
 	{
-		setFunc([=](Player* pl) {pl->sprite->spMap.nowHealPoint += def.effect;
-		pl->sprite->spMap.nowHealPoint = std::min(pl->sprite->enemyDef.maxHealpoint, pl->sprite->spMap.nowHealPoint);});
+		setFunc([=](Player* pl) {pl->enemy->spMap.nowHealPoint += def.effect;
+		pl->enemy->spMap.nowHealPoint = std::min(pl->enemy->enemyDef.maxHealpoint, pl->enemy->spMap.nowHealPoint);});
 	}
 	else if (def.type == MaxHeal)
 	{
 		setFunc([=](Player* pl) {
 			if (Random::bitRandom() > 0.2f)
-				pl->sprite->enemyDef.maxHealpoint += def.effect;
+				pl->enemy->enemyDef.maxHealpoint += def.effect;
 			else
-				pl->sprite->enemyDef.maxHealpoint -= def.effect / 2;
-			pl->sprite->spMap.nowHealPoint = std::min(pl->sprite->enemyDef.maxHealpoint, pl->sprite->spMap.nowHealPoint);});
+				pl->enemy->enemyDef.maxHealpoint -= def.effect / 2;
+			pl->enemy->spMap.nowHealPoint = std::min(pl->enemy->enemyDef.maxHealpoint, pl->enemy->spMap.nowHealPoint);});
 	}
 	else if (def.type == MaxEnergy)
 	{
@@ -156,7 +156,7 @@ int Gun::resetPatron(int count)
 	
 	auto delta = maxCount - nowCount;
 
-	if (delta <= 0)
+	if (delta <= 0 || count == 0)
 	{
 		return count;
 	}

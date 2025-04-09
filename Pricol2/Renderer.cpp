@@ -25,10 +25,10 @@ void Renderer::Init()
 void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<Sprite>>* sprites)
 {
 	//StaticCalculations
-	float pRadians = player->sprite->spMap.angle * PI / 180.0f;
+	float pRadians = player->enemy->spMap.angle * PI / 180.0f;
 	sf::Vector2f pDirection{ cosf(pRadians), sinf(pRadians) };
 	sf::Vector2f cameraPlane = sf::Vector2f(- pDirection.y, pDirection.x) * ASPECT;
-	sf::Vector2f rayPos = player->sprite->spMap.position;
+	sf::Vector2f rayPos = player->enemy->spMap.position;
 
 	//FloorPart
 	sf::Vector2f rayDirLeft{ pDirection - cameraPlane },
@@ -43,7 +43,7 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<
 	//SpritePart
 	auto comperer = [player](const std::shared_ptr<Sprite> a, const std::shared_ptr<Sprite> b)
 		{
-			return COMPARER(a->spMap.position, b->spMap.position, player->sprite->spMap.position);
+			return COMPARER(a->spMap.position, b->spMap.position, player->enemy->spMap.position);
 		};
 
 	auto sprite_func = [&]() {
@@ -59,7 +59,7 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<
 
 	//SkyPart
 	sf::Vector2u skyTextureSize = Resources::skyTextures.getSize();
-	int textureOffsetX = (int)(player->sprite->spMap.angle / 90.0f * skyTextureSize.x);
+	int textureOffsetX = (int)(player->enemy->spMap.angle / 90.0f * skyTextureSize.x);
 	while (textureOffsetX < 0)
 	{
 		textureOffsetX += skyTextureSize.x;
@@ -138,7 +138,7 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, P
 	for (auto sp : *sprites)
 	{
 		if (sp->spDef.texture < 0) continue;
-		sf::Vector2f spritePos = sp->spMap.position - player->sprite->spMap.position;
+		sf::Vector2f spritePos = sp->spMap.position - player->enemy->spMap.position;
 		float spDist = sqrt(SQUARE(spritePos.x) + SQUARE(spritePos.y));
 		float brightnes = 1 - spDist / BRIGHTNESTDIST;
 		auto spData = sp->getTextIndex();

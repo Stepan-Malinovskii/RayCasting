@@ -5,9 +5,12 @@ Player::Player(Enemy* _sprite, PlayerDef def, Map* _nowMap) :
 	nowEnergy{ def.nowEnergy }, maxEnergy { def.maxEnergy },
 	defence{ def.defence}, nowStrenght{ def.nowStrenght }, maxStrenght{ def.maxStrenght }, 
 	patrons{ def.countpantrons }, money{ def.money }, details{ def.details },
-	nowMap{ _nowMap }, sprite{ _sprite }, nowGun{ 0 }, nowHeal{ nullptr }, kick{ nullptr },
+	nowMap{ _nowMap }, enemy{ _sprite }, nowGun{ 0 }, nowHeal{ nullptr }, kick{ nullptr },
 	invent{ nullptr }, pitch{ 0 }, shakeTime{ 0 }, posZ{ 0 }, isJump{ false }, jumpFlag{ false },
-	boostSpeed{ 8.0f }, nowSpeed{ sprite->enemyDef.speed } {}
+	boostSpeed{ 8.0f }, nowSpeed{ enemy->enemyDef.speed } 
+{
+	enemy->textSize = 104.0f;
+}
 
 Gun* Player::setGun(Gun* gun, int pos) 
 {
@@ -26,7 +29,7 @@ void Player::setInventory(Inventory* _invent)
 
 void Player::updateMouseData(sf::Vector2f mousePos, float deltaTime)
 {
-	sprite->spMap.angle += MOUSE_TURN_SPEED * ROTATION_SPEED * mousePos.x * deltaTime;
+	enemy->spMap.angle += MOUSE_TURN_SPEED * ROTATION_SPEED * mousePos.x * deltaTime;
 
 	pitch = std::clamp(pitch - mousePos.y * deltaTime * VERTICAL_MOUSE_SPEED, -200.0f, 200.0f);
 
@@ -40,7 +43,7 @@ void Player::checkBoost(bool isPressed, float deltaTime)
 {
 	static bool boostFlag = false;
 
-	nowSpeed = sprite->enemyDef.speed;
+	nowSpeed = enemy->enemyDef.speed;
 
 	if (boostFlag) {
 		nowEnergy = std::min(nowEnergy + deltaTime, maxEnergy);
@@ -67,7 +70,7 @@ void Player::checkBoost(bool isPressed, float deltaTime)
 void Player::move(sf::Vector2f deltaPos, float deltaTime)
 {
 	guns[nowGun]->updateRad(deltaPos != sf::Vector2f(), deltaTime);
-	sprite->move(nowMap, deltaPos * deltaTime * nowSpeed);
+	enemy->move(nowMap, deltaPos * deltaTime * nowSpeed);
 	shakeCamera(deltaTime, deltaPos != sf::Vector2f());
 }
 
@@ -130,19 +133,19 @@ void Player::takeDamage(float damage)
 		}
 	}
 
-	sprite->takeDamage(damage);
+	enemy->takeDamage(damage);
 }
 
 void Player::fire(int gun)
 {
-	float radiansAngle = sprite->spMap.angle * PI / 180.0f;
+	float radiansAngle = enemy->spMap.angle * PI / 180.0f;
 	sf::Vector2f direction(cos(radiansAngle), sin(radiansAngle));
 
 	if (gun == -1)
 	{
 		if (kick->isCanUsed() && guns[nowGun]->isCanUsed())
 		{
-			RayHit hit = raycast(nowMap, sprite->spMap.position, direction, false, sprite, 1);
+			RayHit hit = raycast(nowMap, enemy->spMap.position, direction, false, enemy, 1);
 			if (hit.cell == 1) nowMap->SetNewOnGrid(hit.mapPos.x, hit.mapPos.y, WALL_LAYER, 0);
 			kick->ussing(nullptr, 0);
 		}
@@ -151,8 +154,8 @@ void Player::fire(int gun)
 	{
 		if (guns[nowGun]->isCanUsed() && kick->isCanUsed())
 		{
-			RayHit hit = raycast(nowMap, sprite->spMap.position, direction, true, sprite, guns[nowGun]->maxDist, pitch);
-			float dist = hit.sprite && hit.sprite->spDef.type != SpriteType::NPC ? dist = sqrt(GETDIST(hit.sprite->spMap.position, sprite->spMap.position)): 0;
+			RayHit hit = raycast(nowMap, enemy->spMap.position, direction, true, enemy, guns[nowGun]->maxDist, pitch);
+			float dist = hit.sprite && hit.sprite->spDef.type != SpriteType::NPC ? dist = sqrt(GETDIST(hit.sprite->spMap.position, enemy->spMap.position)): 0;
 			guns[nowGun]->ussing(dynamic_cast<Enemy*>(hit.sprite), dist);
 		}
 	}
@@ -160,10 +163,10 @@ void Player::fire(int gun)
 
 Sprite* Player::dialog()
 {
-	float radiansAngle = sprite->spMap.angle * PI / 180.0f;
+	float radiansAngle = enemy->spMap.angle * PI / 180.0f;
 	sf::Vector2f direction(cos(radiansAngle), sin(radiansAngle));
 
-	RayHit hit = raycast(nowMap, sprite->spMap.position, direction, true, sprite, 1, pitch);
+	RayHit hit = raycast(nowMap, enemy->spMap.position, direction, true, enemy, 1, pitch);
 	return hit.sprite && hit.sprite->spDef.type == SpriteType::NPC ? hit.sprite : nullptr;
 }
 
@@ -190,8 +193,8 @@ PlayerDef Player::getPlayerDef()
 		}
 	}
 
-	return { sprite->enemyDef.maxHealpoint,
-	sprite->spMap.nowHealPoint,
+	return { enemy->enemyDef.maxHealpoint,
+	enemy->spMap.nowHealPoint,
 	maxEnergy,
 	nowEnergy,
 	defence,

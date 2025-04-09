@@ -9,13 +9,13 @@ Sprite::Sprite(SpriteDef _spDef, MapSprite _spMap, int _id) :
 	{
 		texture = &Resources::spritesTextures[spDef.texture];
 		textSize = texture->getSize().x / 8;
-	}                                                                
+	}
 }
 
 std::pair<int, bool> Sprite::getTextIndex() { return { 0, false }; }
 
 Enemy::Enemy(SpriteDef spDef, MapSprite spMap, EnemyDef _enemyDef, int id) :
-	Sprite(spDef, spMap, id), enemyDef{ _enemyDef }, state{ Stay }, timeAtecked{ 0.5f }, isDamages{ false }, nowTimeAtack{ 0 }
+	Sprite(spDef, spMap, id), enemyDef{ _enemyDef }, state{ Stay }, timeAtecked{ 0.5f }, isDamaged{ false }, nowTimeAtack{ 0 }
 {
 	float frameTime = 1.0f / enemyDef.speed;
 	auto stay = Animation<int>({ {0,0} });
@@ -49,7 +49,7 @@ Enemy::Enemy(SpriteDef spDef, MapSprite spMap, EnemyDef _enemyDef, int id) :
 	animr = Animator<int>(0, { stay, run, atack, dead });
 }
 
-std::pair<int, bool> Enemy::getTextIndex() { return { animr.get(), isDamages }; }
+std::pair<int, bool> Enemy::getTextIndex() { return { animr.get(), isDamaged }; }
 
 void Enemy::move(Map* map, sf::Vector2f move)
 {
@@ -69,64 +69,88 @@ void Enemy::move(Map* map, sf::Vector2f move)
 	map->setupBlockmap(this);
 }
 
-void Enemy::update(float deltaTime)
-{
-	if (state == Dead) return;
-
-	animr.update(deltaTime);
-
-	if (timeAtecked < 0.5f)
+	void Enemy::update(float deltaTime)
 	{
-		timeAtecked += deltaTime;
-	}
-	else
-	{
-		timeAtecked = 0.5f;
-		isDamages = false;
+		if (state == Dead) return;
+
+		animr.update(deltaTime);
+
+		updateTimeSinceLastAttack(deltaTime);
+		updateTimeSinceDamaged(deltaTime);
 	}
 
-	if (nowTimeAtack < enemyDef.timeBettwenAtack)
-	{
-		nowTimeAtack += deltaTime;
-	}
-	else
-	{
-		nowTimeAtack = enemyDef.timeBettwenAtack;
-	}
-}
-
-bool Enemy::changeState(SpriteState _state)
-{
-	if (_state == Run)
-	{
-		if (state != Run)
-		{
-			state = _state;
-			animr.setAnimation(1, true);
-			return true;
-		}
-	}
-	else if (_state == Stay)
-	{
-		animr.setAnimation(0);
-		return true;
-	}
-	else if (_state == Atack)
+	void Enemy::updateTimeSinceLastAttack(float deltaTime)
 	{
 		if (nowTimeAtack >= enemyDef.timeBettwenAtack)
 		{
-			nowTimeAtack = 0.0f;
-			animr.setAnimation(2);
-			return true;
+			isCanAttack = true;
+			canChangeState = true;
+		}
+		else
+		{
+			nowTimeAtack += deltaTime;
 		}
 	}
-	else if (_state == Dead)
+
+	void Enemy::updateTimeSinceDamaged(float deltaTime)
 	{
-		animr.setAnimation(3, true);
+		if (timeAtecked < 0.5f)
+		{
+			timeAtecked += deltaTime;
+		}
+		else
+		{
+			isDamaged = false;
+		}
+	}
+
+	bool Enemy::changeState(EnemyState _state)
+	{
+		if (_state == Attack)
+		{
+			if (isCanAttack)
+			{
+				animr.setAnimation(2);
+				nowTimeAtack = 0.0f;
+				canChangeState = false;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		if (_state == Run)
+		{
+			if (state == Run)
+			{
+				return false;
+			}
+			else
+			{
+				animr.setAnimation(1, true);
+			}
+		}
+
+		if (_state == Stay)
+		{
+			if (state == Stay)
+			{
+				return false;
+			}
+			else
+			{
+				animr.setAnimation(0);
+			}
+		}
+		if (_state == Dead)
+		{
+			animr.setAnimation(3, true);
+		}
+
+		state = _state;
 		return true;
 	}
-	return false;
-}
 
 void Enemy::takeDamage(float damage)
 {
@@ -137,12 +161,12 @@ void Enemy::takeDamage(float damage)
 
 	if (spMap.nowHealPoint <= 0.0f)
 	{
-		isDamages = false;
+		isDamaged = false;
 		state = Killes;
 		return;
 	}
 
-	isDamages = true;
+	isDamaged = true;
 	timeAtecked = 0;
 }
 
@@ -208,7 +232,7 @@ bool Enemy::checkCollision(Map* map, sf::Vector2f newPos, bool xAxis)
 }
 
 Npc::Npc(SpriteDef _spDef, MapSprite _spMap, int _id, int npcDefId, Dialog* _dialog) :
-	Sprite(_spDef, _spMap, _id), npcDefData{ npcDef[npcDefId]}, dialog{_dialog} 
+	Sprite(_spDef, _spMap, _id), npcDefData{ npcDef[npcDefId] }, dialog{ _dialog }
 {
 	textSize = texture->getSize().y;
 }

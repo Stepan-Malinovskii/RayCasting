@@ -10,18 +10,17 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 	uiManager = new UIManager(window);
 	dialogSys = new Dialog(window, data, uiManager, weaponManager);
 	spManager = new SpriteManager(mapManager->getNowMap(), data, dialogSys);
+	player = spManager->getPlayer();
+	invent = new Inventory(window, player, uiManager);
 	initPlayer();
 
-	invent = new Inventory(window, player, uiManager);
-	player->setInventory(invent);
 	auto a = data->getInvent();
 
 	for (auto b : a)
 	{
 		player->takeItem(weaponManager->getItem(b.first), b.second);
 	}
-
-	dialogSys->setPlayer(player);
+	player->enemy->spMap.nowHealPoint = 180.0f;
 }
 
 Game::~Game()
@@ -34,17 +33,12 @@ Game::~Game()
 	delete invent;
 }
 
-void Game::editor()
-{
-	spManager->resetMap(mapManager->getNowMap(), { {2.0f, 2.0f},{}});
-	initPlayer();
-}
-
 void Game::initPlayer()
 {
-	player = spManager->getPlayer();
+	player->setInventory(invent);
 	player->kick = weaponManager->getGunByIndex(0);
 	player->setGun(weaponManager->getGunByIndex(1), 0);
+	player->nowHeal = invent->takeMaxHeal();
 	PlayerDef plDef = data->getPlayerData();
 
 	int i = 1;
@@ -52,6 +46,22 @@ void Game::initPlayer()
 	{
 		player->setGun(weaponManager->getGunById(it), i++);
 	}
+
+	dialogSys->setPlayer(player);
+}
+
+void Game::editor()
+{
+	player = spManager->resetMap(mapManager->getNowMap(), { {2.0f, 2.0f}, {} });
+	initPlayer();
+}
+
+void Game::generate()
+{
+	data->savePlayerData(player);
+	auto pair = mapManager->generate();
+	player = spManager->resetMap(mapManager->getNowMap(), pair);
+	initPlayer();
 }
 
 void Game::save()
@@ -104,7 +114,7 @@ void Game::getInput(float deltaTime)
 {
 	if (!window->hasFocus()) return;
 
-	float radAng = player->sprite->spMap.angle * PI / 180.0f;
+	float radAng = player->enemy->spMap.angle * PI / 180.0f;
 	sf::Vector2f vertParams(cos(radAng), sin(radAng));
 	sf::Vector2f horParams(-vertParams.y, vertParams.x);
 	sf::Vector2f deltaPos(0, 0);
@@ -135,14 +145,6 @@ void Game::getInput(float deltaTime)
 	player->updateMouseData({ (mousePos.x - screenMidlePos.x) / 2.0f, 
 							  (mousePos.y - screenMidlePos.y) / 2.0f }, deltaTime);
 	sf::Mouse::setPosition(screenMidlePos, *window);
-}
-
-void Game::generate()
-{
-	data->savePlayerData(player);
-	auto pair = mapManager->generate();
-	spManager->resetMap(mapManager->getNowMap(), pair);
-	initPlayer();
 }
 
 void Game::update(float deltaTime)

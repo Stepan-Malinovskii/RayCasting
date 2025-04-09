@@ -23,9 +23,9 @@ enum class SpriteType
 	Enemy, PlayerT, NPC
 };
 
-enum SpriteState
+enum EnemyState
 {
-	Stay, Run, Atack, Killes, Dead
+	Stay, Run, Attack, Killes, Dead
 };
 
 struct MapSprite
@@ -86,14 +86,21 @@ public:
 	void update(float deltaTime);
 	void move(Map* map, sf::Vector2f move);
 	void takeDamage(float damage);
-	bool changeState(SpriteState state);
+	bool changeState(EnemyState state);
 
 	EnemyDef enemyDef;
-	SpriteState state;
+	EnemyState state;
+	bool isCanAttack = false;
+	bool isAtack = false;
+	bool canChangeState = true;
+	Animator<int> animr;
 private:
 	float timeAtecked, nowTimeAtack;
-	bool isDamages;
-	Animator<int> animr;
+	bool isDamaged;
+	
+
+	void updateTimeSinceLastAttack(float deltaTime);
+	void updateTimeSinceDamaged(float deltaTime);
 	bool checkCollision(Map* map, sf::Vector2f newPos, bool xAxis);
 };
 
@@ -112,20 +119,20 @@ static std::vector<NpcDef> npcDef = {
 	{1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1} };
 
 static std::vector<EnemyDef> enemyDef = {
-	{true,  0.0f,  0.0f, 0,  0.0f, 5.0f, 0.0f },
-	{true,  5.0f,  1.0f, 10, 3.0f, 3.0f, 70.f },
-	{true,  5.0f,  1.0f, 15, 3.0f, 4.0f, 90.f },
-	{true,  5.0f,  1.0f, 20, 3.0f, 5.0f, 100.f},
-	{true,  20.0f, 1.0f, 25, 3.0f, 4.0f, 120.f},
-	{true,  20.0f, 1.0f, 30, 3.0f, 5.0f, 200.f},
-	{true,  5.0f,  1.0f, 35, 3.0f, 6.0f, 150.f},
-	{true,  20.0f, 1.0f, 40, 3.0f, 3.0f, 300.f},
-	{true,  5.0f,  1.0f, 45, 3.0f, 6.0f, 200.f},
-	{true,  5.0f,  1.0f, 50, 3.0f, 6.0f, 200.f},
-	{true,  20.0f, 1.0f, 55, 3.0f, 5.0f, 180.f},
-	{false, 20.0f, 1.0f, 60, 3.0f, 4.0f, 300.f},
-	{true,  5.0f,  1.0f, 65, 3.0f, 4.0f, 320.f},
-	{true,  5.0f,  1.0f, 10, 3.0f, 5.0f, 2000.f}
+	{true,  0.0f,  0.0f,  0,  0.0f, 5.0f, 0.0f },
+	{true,  5.0f,  5.0f,  10, 1.5f, 3.0f, 70.0f  },
+	{true,  5.0f,  8.0f,  15, 1.0f, 4.0f, 90.0f  },
+	{true,  5.0f,  10.0f, 20, 1.5f, 5.0f, 100.0f },
+	{true,  20.0f, 8.0f,  25, 1.0f, 4.0f, 120.0f },
+	{true,  20.0f, 10.0f, 30, 1.0f, 5.0f, 200.0f },
+	{true,  5.0f,  12.0f, 35, 1.5f, 6.0f, 150.0f },
+	{true,  20.0f, 20.0f, 40, 1.5f, 3.0f, 300.0f },
+	{true,  5.0f,  15.0f, 45, 1.5f, 6.0f, 200.0f },
+	{true,  5.0f,  20.0f, 50, 1.5f, 6.0f, 200.0f },
+	{true,  20.0f, 22.0f, 55, 1.0f, 5.0f, 180.0f },
+	{false, 20.0f, 35.0f, 60, 1.5f, 4.0f, 300.0f },
+	{true,  5.0f,  26.0f, 65, 1.5f, 4.0f, 320.0f },
+	{true,  5.0f,  30.0f, 10, 1.5f, 5.0f, 2000.0f}
 };
 
 static std::vector<SpriteDef> spriteDefs = {

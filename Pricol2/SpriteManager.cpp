@@ -18,7 +18,6 @@ void SpriteManager::init()
 		(*allSprites)[i].reset();
 	}
 	allSprites->clear();
-	dead.clear();
 	enemys.clear();
 	player.reset();
 
@@ -52,18 +51,20 @@ void SpriteManager::createEnemy(MapSprite mapSprite, SpriteDef def)
 		enemy->spMap.nowHealPoint = plDef.nowHp;
 		player = std::make_unique<Player>(enemy.get(), plDef, nowMap);
 		player->patrons = plDef.countpantrons;
-	}
-
-	if (enemy->spMap.nowHealPoint <= 0.0f)
-	{
-		enemy->changeState(Dead);
-		dead.push_back(enemy.get());
+		nowMap->setupBlockmap(enemy.get());
 	}
 	else
 	{
-		enemy->changeState(Stay);
-		enemys.push_back(enemy.get());
-		nowMap->setupBlockmap(enemy.get());
+		if (enemy->spMap.nowHealPoint <= 0.0f)
+		{
+			enemy->changeState(Dead);
+		}
+		else
+		{
+			enemy->changeState(Stay);
+			enemys.push_back(enemy.get());
+			nowMap->setupBlockmap(enemy.get());
+		}
 	}
 
 	allSprites->push_back(std::move(enemy));
@@ -102,7 +103,7 @@ Player* SpriteManager::resetMap(Map* newMap, std::pair<sf::Vector2f, sf::Vector2
 {
 	nowMap = newMap;
 	init();
-	player->sprite->spMap.position = mapPos.first;
+	player->enemy->spMap.position = mapPos.first;
 	player->setNemMap(newMap);
 	return player.get();
 }
@@ -137,37 +138,85 @@ void SpriteManager::aiControler(float deltaTime)
 {
 	for (auto enemy : enemys)
 	{
-		if (enemy->spDef.texture == -1) continue;
+		if (enemy->isAtack && enemy->animr.get() == 0)
+		{
+			enemy->isAtack = false;
+			player->takeDamage(enemy->enemyDef.damage);
+		}
 
-		float distance = GETDIST(enemy->spMap.position, player->sprite->spMap.position);
+		float distance = GETDIST(enemy->spMap.position, player->enemy->spMap.position);
+
+		sf::Vector2f toPlayerDir = player->enemy->spMap.position - enemy->spMap.position;
 
 		float angle = enemy->spMap.angle * PI / 180.0f;
 		sf::Vector2f dir{ cos(angle), sin(angle) };
-		sf::Vector2f toPlayerDir = player->sprite->spMap.position
-			- enemy->spMap.position;
 
-		if (distance < enemy->enemyDef.atackDist)
+		auto newState = determineNewState(enemy, distance);
+
+		if (newState == Run)
 		{
-			if (enemy->changeState(Atack))
+			if (enemy->canChangeState)
 			{
-				player.get()->takeDamage(enemy->enemyDef.damage);
-			}
-			else
-			{
-				enemy->spMap.angle = std::atan2(toPlayerDir.y, toPlayerDir.x) * 180.0f / PI;
+				if (Random::bitRandom() > 0.7f) enemy->spMap.angle = std::atan2(toPlayerDir.y, toPlayerDir.x) * 180.0f / PI;
+				enemy->move(nowMap, enemy->enemyDef.speed * deltaTime * dir);
+				enemy->changeState(newState);
 			}
 		}
-		else if (distance < TRIGER_DIST_MIN)
+		else if (newState == Attack)
 		{
-			enemy->changeState(Run);
-			enemy->spMap.angle = std::atan2(toPlayerDir.y, toPlayerDir.x) * 180.0f / PI;
-			enemy->move(nowMap, enemy->enemyDef.speed * deltaTime * dir);
+			if (enemy->changeState(newState))
+			{
+				if (isCanAttack(enemy, deltaTime))
+				{
+					enemy->isAtack = true;
+				}
+				else
+				{
+					if (Random::bitRandom() > 0.3f) enemy->spMap.angle = std::atan2(toPlayerDir.y, toPlayerDir.x) * 180.0f / PI;
+				}
+			}
 		}
-		else if (distance > TRIGER_DIST_MAX)
+		else if (newState == Stay)
 		{
-			enemy->changeState(Stay);
+			enemy->changeState(newState);
 		}
 	}
+}
+
+EnemyState SpriteManager::determineNewState(Enemy* enemy, float distance)
+{
+	if (distance < enemy->enemyDef.atackDist)
+	{
+		return Attack;
+	}
+	else if (distance < TRIGER_DIST_MIN)
+	{
+		return Run;
+	}
+	else if (distance > TRIGER_DIST_MAX)
+	{
+		return Stay;
+	}
+}
+
+bool SpriteManager::isCanAttack(Enemy* enemy, float deltaTime)
+{
+	if (!enemy->isCanAttack) return false;
+
+	enemy->isCanAttack = false;
+
+	float angle = enemy->spMap.angle * PI / 180.0f;
+	sf::Vector2f dir{ cos(angle), sin(angle) };
+
+	RayHit hit = raycast(nowMap, enemy->spMap.position, dir, true, enemy, enemy->enemyDef.atackDist);
+	if (hit.sprite)
+	{
+		if (hit.sprite == dynamic_cast<Sprite*>(player->enemy))
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 void SpriteManager::killEnemy(Enemy* enem)
@@ -175,8 +224,6 @@ void SpriteManager::killEnemy(Enemy* enem)
 	enem->changeState(Dead);
 	player->money += Random::intRandom((int)(enem->enemyDef.midleDrop * 0.8f), (int)(enem->enemyDef.midleDrop * 1.2f));
 	nowMap->deleteInBlockMap(enem);
-
-	dead.push_back(enem);
 
 	for (int i = 0; i < enemys.size(); i++)
 	{

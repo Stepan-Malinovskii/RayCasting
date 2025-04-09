@@ -59,7 +59,7 @@ public:
 	PlayerDef getPlayerDef();
 	void setNemMap(Map* map);
 
-	Enemy* sprite;
+	Enemy* enemy;
 	Gun* kick;
 	float pitch, posZ, maxEnergy, nowEnergy;
 	float defence, nowStrenght, maxStrenght;
