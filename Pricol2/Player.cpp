@@ -1,7 +1,4 @@
 #include "Player.h"
-#include "Raycast.h"
-#include <SFML/Graphics/CircleShape.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
 #include "Inventory.h"
 
 Player::Player(Enemy* _sprite, PlayerDef def, Map* _nowMap) : 
@@ -122,8 +119,8 @@ void Player::takeDamage(float damage)
 {
 	if (nowStrenght > 0)
 	{
-		damage *= (1 - defence);
-		nowStrenght -= damage * defence;
+		damage *= (1 - defence / 100.f);
+		nowStrenght -= damage * 10.0f / defence;
 
 		if (nowStrenght <= 0)
 		{

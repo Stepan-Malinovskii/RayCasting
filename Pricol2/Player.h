@@ -12,6 +12,7 @@
 #include "Resources.h"
 #include "Animation.h"
 #include "Weapon.h"
+#include "Raycast.h"
 
 constexpr float ROTATION_SPEED = 80.0f, MOUSE_TURN_SPEED = 0.08f, VERTICAL_MOUSE_SPEED = 25.0f;
 

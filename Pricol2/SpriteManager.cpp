@@ -130,10 +130,15 @@ void SpriteManager::update(float deltaTime)
 		}
 	}
 
+	aiControler(deltaTime);
+}
+
+void SpriteManager::aiControler(float deltaTime)
+{
 	for (auto enemy : enemys)
 	{
-		if (enemy->spDef.texture == -1) continue;	
-		
+		if (enemy->spDef.texture == -1) continue;
+
 		float distance = GETDIST(enemy->spMap.position, player->sprite->spMap.position);
 
 		float angle = enemy->spMap.angle * PI / 180.0f;
@@ -143,8 +148,14 @@ void SpriteManager::update(float deltaTime)
 
 		if (distance < enemy->enemyDef.atackDist)
 		{
-			enemy->changeState(Atack);
-			enemy->spMap.angle = std::atan2(toPlayerDir.y, toPlayerDir.x) * 180.0f / PI;
+			if (enemy->changeState(Atack))
+			{
+				player.get()->takeDamage(enemy->enemyDef.damage);
+			}
+			else
+			{
+				enemy->spMap.angle = std::atan2(toPlayerDir.y, toPlayerDir.x) * 180.0f / PI;
+			}
 		}
 		else if (distance < TRIGER_DIST_MIN)
 		{
@@ -177,4 +188,7 @@ void SpriteManager::killEnemy(Enemy* enem)
 	}
 }
 
-SpriteManager::~SpriteManager() {}
+SpriteManager::~SpriteManager()
+{
+	delete allSprites;
+}

@@ -86,12 +86,12 @@ public:
 	void update(float deltaTime);
 	void move(Map* map, sf::Vector2f move);
 	void takeDamage(float damage);
-	void changeState(SpriteState state);
+	bool changeState(SpriteState state);
 
 	EnemyDef enemyDef;
 	SpriteState state;
 private:
-	float timeAtecked;
+	float timeAtecked, nowTimeAtack;
 	bool isDamages;
 	Animator<int> animr;
 	bool checkCollision(Map* map, sf::Vector2f newPos, bool xAxis);
@@ -113,19 +113,19 @@ static std::vector<NpcDef> npcDef = {
 
 static std::vector<EnemyDef> enemyDef = {
 	{true,  0.0f,  0.0f, 0,  0.0f, 5.0f, 0.0f },
-	{true,  5.0f,  1.0f, 10, 1.0f, 3.0f, 70.f },
-	{true,  5.0f,  1.0f, 15, 1.0f, 4.0f, 90.f },
-	{true,  5.0f,  1.0f, 20, 1.0f, 5.0f, 100.f},
-	{true,  20.0f, 1.0f, 25, 1.0f, 4.0f, 120.f},
-	{true,  20.0f, 1.0f, 30, 1.0f, 5.0f, 200.f},
-	{true,  5.0f,  1.0f, 35, 1.0f, 6.0f, 150.f},
-	{true,  20.0f, 1.0f, 40, 1.0f, 3.0f, 300.f},
-	{true,  5.0f,  1.0f, 45, 1.0f, 6.0f, 200.f},
-	{true,  5.0f,  1.0f, 50, 1.0f, 6.0f, 200.f},
-	{true,  20.0f, 1.0f, 55, 1.0f, 5.0f, 180.f},
-	{false, 20.0f, 1.0f, 60, 1.0f, 4.0f, 300.f},
-	{true,  5.0f,  1.0f, 65, 1.0f, 4.0f, 320.f},
-	{true,  5.0f,  1.0f, 10, 1.0f, 5.0f, 2000.f}
+	{true,  5.0f,  1.0f, 10, 3.0f, 3.0f, 70.f },
+	{true,  5.0f,  1.0f, 15, 3.0f, 4.0f, 90.f },
+	{true,  5.0f,  1.0f, 20, 3.0f, 5.0f, 100.f},
+	{true,  20.0f, 1.0f, 25, 3.0f, 4.0f, 120.f},
+	{true,  20.0f, 1.0f, 30, 3.0f, 5.0f, 200.f},
+	{true,  5.0f,  1.0f, 35, 3.0f, 6.0f, 150.f},
+	{true,  20.0f, 1.0f, 40, 3.0f, 3.0f, 300.f},
+	{true,  5.0f,  1.0f, 45, 3.0f, 6.0f, 200.f},
+	{true,  5.0f,  1.0f, 50, 3.0f, 6.0f, 200.f},
+	{true,  20.0f, 1.0f, 55, 3.0f, 5.0f, 180.f},
+	{false, 20.0f, 1.0f, 60, 3.0f, 4.0f, 300.f},
+	{true,  5.0f,  1.0f, 65, 3.0f, 4.0f, 320.f},
+	{true,  5.0f,  1.0f, 10, 3.0f, 5.0f, 2000.f}
 };
 
 static std::vector<SpriteDef> spriteDefs = {

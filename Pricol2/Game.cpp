@@ -45,7 +45,6 @@ void Game::initPlayer()
 	player = spManager->getPlayer();
 	player->kick = weaponManager->getGunByIndex(0);
 	player->setGun(weaponManager->getGunByIndex(1), 0);
-
 	PlayerDef plDef = data->getPlayerData();
 
 	int i = 1;

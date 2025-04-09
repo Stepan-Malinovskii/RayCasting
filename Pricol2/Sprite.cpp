@@ -12,15 +12,44 @@ Sprite::Sprite(SpriteDef _spDef, MapSprite _spMap, int _id) :
 	}                                                                
 }
 
-std::pair<int, bool> Sprite::getTextIndex()
+std::pair<int, bool> Sprite::getTextIndex() { return { 0, false }; }
+
+Enemy::Enemy(SpriteDef spDef, MapSprite spMap, EnemyDef _enemyDef, int id) :
+	Sprite(spDef, spMap, id), enemyDef{ _enemyDef }, state{ Stay }, timeAtecked{ 0.5f }, isDamages{ false }, nowTimeAtack{ 0 }
 {
-	return { 0, false };
+	float frameTime = 1.0f / enemyDef.speed;
+	auto stay = Animation<int>({ {0,0} });
+
+	int index = 1;
+	Animation<int> run;
+	if (enemyDef.isCanRun)
+	{
+		run = Animation<int>({
+		{ frameTime * 0, index++ },
+		{ frameTime * 1, index++ },
+		{ frameTime * 2, index++ },
+		{ frameTime * 3, index },
+		{ frameTime * 4, index++ } });
+	}
+	else
+	{
+		run = stay;
+	}
+
+	frameTime = 1.0f / 3;
+
+	auto atack = Animation<int>({
+	{ frameTime * 0, index++ },
+	{ frameTime * 1, index++ },
+	{ frameTime * 2, index },
+	{ frameTime * 3, index++ } });
+
+	auto dead = Animation<int>({ {0, index} });
+
+	animr = Animator<int>(0, { stay, run, atack, dead });
 }
 
-std::pair<int, bool> Enemy::getTextIndex()
-{
-	return { animr.get(), isDamages };
-}
+std::pair<int, bool> Enemy::getTextIndex() { return { animr.get(), isDamages }; }
 
 void Enemy::move(Map* map, sf::Vector2f move)
 {
@@ -46,42 +75,57 @@ void Enemy::update(float deltaTime)
 
 	animr.update(deltaTime);
 
-	if (timeAtecked >= 0.5f)
+	if (timeAtecked < 0.5f)
 	{
-		timeAtecked = 0;
+		timeAtecked += deltaTime;
+	}
+	else
+	{
+		timeAtecked = 0.5f;
 		isDamages = false;
-		return;
 	}
 
-	timeAtecked += deltaTime;
+	if (nowTimeAtack < enemyDef.timeBettwenAtack)
+	{
+		nowTimeAtack += deltaTime;
+	}
+	else
+	{
+		nowTimeAtack = enemyDef.timeBettwenAtack;
+	}
 }
 
-void Enemy::changeState(SpriteState _state)
+bool Enemy::changeState(SpriteState _state)
 {
 	if (_state == Run)
 	{
 		if (state != Run)
 		{
+			state = _state;
 			animr.setAnimation(1, true);
+			return true;
 		}
 	}
 	else if (_state == Stay)
 	{
 		animr.setAnimation(0);
+		return true;
 	}
 	else if (_state == Atack)
 	{
-		if (state != Atack)
+		if (nowTimeAtack >= enemyDef.timeBettwenAtack)
 		{
-			animr.setAnimation(2, true);
+			nowTimeAtack = 0.0f;
+			animr.setAnimation(2);
+			return true;
 		}
 	}
 	else if (_state == Dead)
 	{
 		animr.setAnimation(3, true);
+		return true;
 	}
-
-	state = _state;
+	return false;
 }
 
 void Enemy::takeDamage(float damage)
@@ -161,41 +205,6 @@ bool Enemy::checkCollision(Map* map, sf::Vector2f newPos, bool xAxis)
 	}
 
 	return false;
-}
-
-Enemy::Enemy(SpriteDef spDef, MapSprite spMap, EnemyDef _enemyDef, int id) :
-	Sprite(spDef, spMap, id), enemyDef{ _enemyDef }, state{ Stay }, timeAtecked{ 0.5f }, isDamages{ false }
-{
-	float frameTime = 1.0f / enemyDef.speed;
-	auto stay = Animation<int>({ {0,0} });
-
-	int index = 1;
-	Animation<int> run;
-	if (enemyDef.isCanRun)
-	{
-		run = Animation<int>({
-		{ frameTime * 0, index++ },
-		{ frameTime * 1, index++ },
-		{ frameTime * 2, index++ },
-		{ frameTime * 3, index },
-		{ frameTime * 4, index++ } });
-	}
-	else
-	{
-		run = stay;
-	}
-
-	frameTime = 1.0f / 3;
-
-	auto atack = Animation<int>({
-	{ frameTime * 0, index++ },
-	{ frameTime * 1, index++ },
-	{ frameTime * 2, index },
-	{ frameTime * 3, index++ }});
-
-	auto dead = Animation<int>({ {0, index} });
-
-	animr = Animator<int>(0, {stay, run, atack, dead});
 }
 
 Npc::Npc(SpriteDef _spDef, MapSprite _spMap, int _id, int npcDefId, Dialog* _dialog) :

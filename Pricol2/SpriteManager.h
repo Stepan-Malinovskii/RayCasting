@@ -25,6 +25,7 @@ private:
 	void createEnemy(MapSprite mapSprite, SpriteDef def);
 	void createNpc(MapSprite mapSprite, SpriteDef );
 	void createDefaultPlayer();
+	void aiControler(float deltaTime);
 	void init();
 
 	Dialog* dialogSys;
