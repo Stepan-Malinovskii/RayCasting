@@ -6,17 +6,18 @@
 SpriteManager::SpriteManager(Map* _nowMap, Data* _data, Dialog* _dialogSys) : 
 	nowMap{ _nowMap }, dialogSys{ _dialogSys }, data{ _data }, id { 1 }
 {
+	allSprites = new std::vector<std::shared_ptr<Sprite>>();
 	init();
 }
 
 void SpriteManager::init()
 {
 	id = 1;
-	for (int i = 0; i < allSprites.size(); i++)
+	for (int i = 0; i < allSprites->size(); i++)
 	{
-		allSprites[i].reset();
+		(*allSprites)[i].reset();
 	}
-	allSprites.clear();
+	allSprites->clear();
 	dead.clear();
 	enemys.clear();
 	player.reset();
@@ -65,13 +66,13 @@ void SpriteManager::createEnemy(MapSprite mapSprite, SpriteDef def)
 		nowMap->setupBlockmap(enemy.get());
 	}
 
-	allSprites.push_back(std::move(enemy));
+	allSprites->push_back(std::move(enemy));
 }
 
 void SpriteManager::createNpc(MapSprite mapSprite, SpriteDef def)
 {
-	allSprites.push_back(std::make_shared<Npc>(Npc(def, mapSprite, id, mapSprite.spriteDefId - ENEMY_COUNT, dialogSys)));
-	nowMap->setupBlockmap(allSprites.back().get());
+	allSprites->push_back(std::make_shared<Npc>(Npc(def, mapSprite, id, mapSprite.spriteDefId - ENEMY_COUNT, dialogSys)));
+	nowMap->setupBlockmap(allSprites->back().get());
 }
 
 void SpriteManager::createDefaultPlayer()
@@ -94,7 +95,7 @@ void SpriteManager::createDefaultPlayer()
 	player = std::make_unique<Player>(enemy.get(), plDef, nowMap);
 	player->patrons = plDef.countpantrons;
 
-	allSprites.push_back(std::move(enemy));
+	allSprites->push_back(std::move(enemy));
 }
 
 Player* SpriteManager::resetMap(Map* newMap, std::pair<sf::Vector2f, sf::Vector2f> mapPos)
@@ -110,12 +111,12 @@ Player* SpriteManager::getPlayer() { return player.get(); }
 
 Npc* SpriteManager::getNpc(int id)
 {
-	auto npc = std::find_if(allSprites.begin(), allSprites.end(), 
+	auto npc = std::find_if(allSprites->begin(), allSprites->end(), 
 		[id](std::shared_ptr<Sprite> sp) {return sp->id == id;});
-	return npc != allSprites.end() ? dynamic_cast<Npc*>(npc->get()) : nullptr;
+	return npc != allSprites->end() ? dynamic_cast<Npc*>(npc->get()) : nullptr;
 }
 
-std::vector<std::shared_ptr<Sprite>> SpriteManager::getDeteachSprite() { return allSprites;  }
+std::vector<std::shared_ptr<Sprite>>* SpriteManager::getDeteachSprite() { return allSprites;  }
 
 void SpriteManager::update(float deltaTime)
 {

@@ -156,7 +156,11 @@ int Gun::resetPatron(int count)
 	
 	auto delta = maxCount - nowCount;
 
-	if (delta < count)
+	if (delta <= 0)
+	{
+		return count;
+	}
+	else if (delta < count)
 	{
 		count -= delta;
 		nowCount = maxCount;
@@ -165,10 +169,6 @@ int Gun::resetPatron(int count)
 	{
 		nowCount += count;
 		count = 0;
-	}
-	else
-	{
-		return count;
 	}
 
 	nowTimeBetwenReset = 0;

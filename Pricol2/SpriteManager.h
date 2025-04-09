@@ -17,7 +17,7 @@ public:
 	Player* resetMap(Map* newMap, std::pair<sf::Vector2f, sf::Vector2f> mapPos);
 	Player* getPlayer();
 	Npc* getNpc(int id);
-	std::vector<std::shared_ptr<Sprite>> getDeteachSprite();
+	std::vector<std::shared_ptr<Sprite>>* getDeteachSprite();
 private:
 	int id;
 	void killEnemy(Enemy* enem);
@@ -29,7 +29,7 @@ private:
 
 	Dialog* dialogSys;
 	Data* data;
-	std::vector<std::shared_ptr<Sprite>> allSprites;
+	std::vector<std::shared_ptr<Sprite>>* allSprites;
 	std::vector<Enemy*> enemys;
 	std::vector<Enemy*> dead;
 	std::unique_ptr<Player> player;

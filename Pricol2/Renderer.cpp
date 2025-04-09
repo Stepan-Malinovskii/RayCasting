@@ -22,7 +22,7 @@ void Renderer::Init()
 	floorSprite.setTexture(floorTexture);
 }
 
-void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<Sprite>> sprites)
+void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<Sprite>>* sprites)
 {
 	//StaticCalculations
 	float pRadians = player->sprite->spMap.angle * PI / 180.0f;
@@ -47,7 +47,7 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<
 		};
 
 	auto sprite_func = [&]() {
-		std::sort(sprites.begin(), sprites.end(), comperer);
+		std::sort(sprites->begin(), sprites->end(), comperer);
 		};
 
 	for (int cnt = 0; cnt < THREAD_COUNT - 1; cnt++)
@@ -132,10 +132,10 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<
 }
 
 void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, Player* player,
-	std::vector<std::shared_ptr<Sprite>> sprites)
+	std::vector<std::shared_ptr<Sprite>>* sprites)
 {
 	float invDet = 1.0f / (cameraPlane.x * pDirection.y - cameraPlane.y * pDirection.x);
-	for (auto sp : sprites)
+	for (auto sp : *sprites)
 	{
 		if (sp->spDef.texture < 0) continue;
 		sf::Vector2f spritePos = sp->spMap.position - player->sprite->spMap.position;

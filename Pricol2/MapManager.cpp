@@ -78,10 +78,10 @@ void MapManager::load()
 	in.close();
 }
 
-void MapManager::rewriteSprites(std::vector<std::shared_ptr<Sprite>> sprs)
+void MapManager::rewriteSprites(std::vector<std::shared_ptr<Sprite>>* sprs)
 {
 	nowMap->sprites.clear();
-	for (auto sp : sprs) { nowMap->sprites.push_back(sp->spMap); }
+	for (auto sp : *sprs) { nowMap->sprites.push_back(sp->spMap); }
 }
 
 void MapManager::drawMap(int layerNumber)
