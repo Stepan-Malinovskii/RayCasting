@@ -28,7 +28,7 @@ private:
 	void createNpc(MapSprite mapSprite, SpriteDef );
 	void createDefaultPlayer();
 	void aiControler(float deltaTime);
-	bool isCanAttack(Enemy* enemy, float deltaTime);
+	bool isEnemyHit(Enemy* enemy);
 	void init();
 
 	Dialog* dialogSys;

@@ -69,88 +69,72 @@ void Enemy::move(Map* map, sf::Vector2f move)
 	map->setupBlockmap(this);
 }
 
-	void Enemy::update(float deltaTime)
+void Enemy::update(float deltaTime)
+{
+	if (state == Dead) return;
+
+	animr.update(deltaTime);
+
+	updateTimeSinceLastAttack(deltaTime);
+	updateTimeSinceDamaged(deltaTime);
+}
+
+void Enemy::updateTimeSinceLastAttack(float deltaTime)
+{
+	if (nowTimeAtack >= enemyDef.timeBettwenAtack)
 	{
-		if (state == Dead) return;
+		isCanAttack = true;
+	}
+	else
+	{
+		nowTimeAtack += deltaTime;
+	}
+}
 
-		animr.update(deltaTime);
+void Enemy::updateTimeSinceDamaged(float deltaTime)
+{
+	if (timeAtecked < 0.5f)
+	{
+		timeAtecked += deltaTime;
+	}
+	else
+	{
+		isDamaged = false;
+	}
+}
 
-		updateTimeSinceLastAttack(deltaTime);
-		updateTimeSinceDamaged(deltaTime);
+bool Enemy::canChangeState()
+{
+	return animr.get() == 0 || animr.isLopping == true;
+}
+
+void Enemy::changeState(EnemyState newState)
+{
+	if (newState == Stay)
+	{
+		animr.setAnimation(0);
+	}
+	else if (newState == Run)
+	{
+		if (state != Run)
+		{
+			animr.setAnimation(1, true);
+		}
+	}
+	else if (newState == Attack)
+	{
+		isCanAttack = false;
+		animr.setAnimation(2);
+		nowTimeAtack = 0.0f;
+	}
+	else if (newState == Dead)
+	{
+		animr.setAnimation(3);
+		isDamaged = false;
 	}
 
-	void Enemy::updateTimeSinceLastAttack(float deltaTime)
-	{
-		if (nowTimeAtack >= enemyDef.timeBettwenAtack)
-		{
-			isCanAttack = true;
-			canChangeState = true;
-		}
-		else
-		{
-			nowTimeAtack += deltaTime;
-		}
-	}
-
-	void Enemy::updateTimeSinceDamaged(float deltaTime)
-	{
-		if (timeAtecked < 0.5f)
-		{
-			timeAtecked += deltaTime;
-		}
-		else
-		{
-			isDamaged = false;
-		}
-	}
-
-	bool Enemy::changeState(EnemyState _state)
-	{
-		if (_state == Attack)
-		{
-			if (isCanAttack)
-			{
-				animr.setAnimation(2);
-				nowTimeAtack = 0.0f;
-				canChangeState = false;
-			}
-			else
-			{
-				return false;
-			}
-		}
-
-		if (_state == Run)
-		{
-			if (state == Run)
-			{
-				return false;
-			}
-			else
-			{
-				animr.setAnimation(1, true);
-			}
-		}
-
-		if (_state == Stay)
-		{
-			if (state == Stay)
-			{
-				return false;
-			}
-			else
-			{
-				animr.setAnimation(0);
-			}
-		}
-		if (_state == Dead)
-		{
-			animr.setAnimation(3, true);
-		}
-
-		state = _state;
-		return true;
-	}
+	state = newState;
+}
 
 void Enemy::takeDamage(float damage)
 {
@@ -158,13 +142,6 @@ void Enemy::takeDamage(float damage)
 
 	spMap.nowHealPoint -= damage;
 	SoundManager::playSound(Resources::takeDamage, 40);
-
-	if (spMap.nowHealPoint <= 0.0f)
-	{
-		isDamaged = false;
-		state = Killes;
-		return;
-	}
 
 	isDamaged = true;
 	timeAtecked = 0;

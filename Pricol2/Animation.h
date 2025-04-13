@@ -51,6 +51,8 @@ private:
 template <typename T> class Animator
 {
 public:
+	bool isLopping = false;
+
 	Animator(T _base = T(), std::vector<Animation<T>> _animations = {}) :
 		base{ _base }, animations{ _animations }, current{ -1 } {}
 
@@ -88,7 +90,6 @@ public:
 private:
 	T base;
 	std::vector<Animation<T>> animations;
-	bool isLopping = false;
 	int current;
 	float time;
 };

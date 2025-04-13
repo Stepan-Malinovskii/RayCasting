@@ -125,8 +125,9 @@ void SpriteManager::update(float deltaTime)
 	{
 		enemy->update(deltaTime);
 
-		if (enemy->state == Killes)
+		if (enemy->spMap.nowHealPoint <= 0.0f)
 		{
+			enemy->changeState(Killes);
 			killEnemy(enemy);
 		}
 	}
@@ -141,44 +142,41 @@ void SpriteManager::aiControler(float deltaTime)
 		if (enemy->isAtack && enemy->animr.get() == 0)
 		{
 			enemy->isAtack = false;
-			player->takeDamage(enemy->enemyDef.damage);
+			if (isEnemyHit(enemy) && Random::bitRandom() < 0.6f) player->takeDamage(enemy->enemyDef.damage);
 		}
 
 		float distance = GETDIST(enemy->spMap.position, player->enemy->spMap.position);
+		auto newState = determineNewState(enemy, distance);
 
 		sf::Vector2f toPlayerDir = player->enemy->spMap.position - enemy->spMap.position;
 
 		float angle = enemy->spMap.angle * PI / 180.0f;
 		sf::Vector2f dir{ cos(angle), sin(angle) };
 
-		auto newState = determineNewState(enemy, distance);
-
 		if (newState == Run)
 		{
-			if (enemy->canChangeState)
-			{
-				if (Random::bitRandom() > 0.7f) enemy->spMap.angle = std::atan2(toPlayerDir.y, toPlayerDir.x) * 180.0f / PI;
-				enemy->move(nowMap, enemy->enemyDef.speed * deltaTime * dir);
-				enemy->changeState(newState);
-			}
+			if (Random::bitRandom() > 0.7f) enemy->spMap.angle = std::atan2(toPlayerDir.y, toPlayerDir.x) * 180.0f / PI;
+			enemy->move(nowMap, enemy->enemyDef.speed * deltaTime * dir);
+
+			enemy->changeState(Run);
 		}
 		else if (newState == Attack)
 		{
-			if (enemy->changeState(newState))
+			if (!enemy->canChangeState()) continue;
+
+			if (enemy->isCanAttack)
 			{
-				if (isCanAttack(enemy, deltaTime))
-				{
-					enemy->isAtack = true;
-				}
-				else
-				{
-					if (Random::bitRandom() > 0.3f) enemy->spMap.angle = std::atan2(toPlayerDir.y, toPlayerDir.x) * 180.0f / PI;
-				}
+				enemy->isAtack = true;
+				enemy->changeState(Attack);
+			}
+			else
+			{
+				if (Random::bitRandom() > 0.3f) enemy->spMap.angle = std::atan2(toPlayerDir.y, toPlayerDir.x) * 180.0f / PI;
 			}
 		}
 		else if (newState == Stay)
 		{
-			enemy->changeState(newState);
+			enemy->changeState(Stay);
 		}
 	}
 }
@@ -199,12 +197,8 @@ EnemyState SpriteManager::determineNewState(Enemy* enemy, float distance)
 	}
 }
 
-bool SpriteManager::isCanAttack(Enemy* enemy, float deltaTime)
+bool SpriteManager::isEnemyHit(Enemy* enemy)
 {
-	if (!enemy->isCanAttack) return false;
-
-	enemy->isCanAttack = false;
-
 	float angle = enemy->spMap.angle * PI / 180.0f;
 	sf::Vector2f dir{ cos(angle), sin(angle) };
 

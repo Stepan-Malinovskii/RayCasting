@@ -86,18 +86,17 @@ public:
 	void update(float deltaTime);
 	void move(Map* map, sf::Vector2f move);
 	void takeDamage(float damage);
-	bool changeState(EnemyState state);
+	bool canChangeState();
+	void changeState(EnemyState newState);
 
 	EnemyDef enemyDef;
-	EnemyState state;
 	bool isCanAttack = false;
 	bool isAtack = false;
-	bool canChangeState = true;
 	Animator<int> animr;
 private:
 	float timeAtecked, nowTimeAtack;
 	bool isDamaged;
-	
+	EnemyState state;
 
 	void updateTimeSinceLastAttack(float deltaTime);
 	void updateTimeSinceDamaged(float deltaTime);
