@@ -13,13 +13,21 @@ SpriteManager::SpriteManager(Map* _nowMap, Dialog* _dialogSys) :
 void SpriteManager::init()
 {
 	id = 1;
-	for (int i = 0; i < allSprites->size(); i++)
+	int i = 0;
+	while (i < allSprites->size())
 	{
-		(*allSprites)[i].reset();
+		if ((*allSprites)[i]->id != 0)
+		{ 
+			(*allSprites)[i].reset(); 
+			allSprites->erase(allSprites->begin() + i);
+		}
+		else
+		{
+			i++;
+		}
 	}
-	allSprites->clear();
+
 	enemys.clear();
-	player.reset();
 
 	for (auto sp : nowMap->getMapSprites()) {
 		createSpriteFromMapSprite(sp);
@@ -43,7 +51,7 @@ void SpriteManager::createEnemy(MapSprite mapSprite, SpriteDef def)
 {
 	auto enemy = std::make_shared<Enemy>(def, mapSprite, enemyDef[mapSprite.spriteDefId], id);
 
-	if (mapSprite.spriteDefId == 0)
+	if (mapSprite.spriteDefId == 0 && !player)
 	{
 		auto& data = Data::getInstance();
 		PlayerDef plDef = data.getPlayerData();
@@ -101,13 +109,12 @@ void SpriteManager::createDefaultPlayer()
 	allSprites->push_back(std::move(enemy));
 }
 
-Player* SpriteManager::resetMap(Map* newMap, std::pair<sf::Vector2f, sf::Vector2f> mapPos)
+void SpriteManager::resetMap(Map* newMap, std::pair<sf::Vector2f, sf::Vector2f> mapPos)
 {
 	nowMap = newMap;
 	init();
 	player->enemy->spMap.position = mapPos.first;
 	player->setNemMap(newMap);
-	return player.get();
 }
 
 Player* SpriteManager::getPlayer() { return player.get(); }

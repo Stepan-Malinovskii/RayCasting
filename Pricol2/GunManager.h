@@ -14,6 +14,7 @@ public:
 	Gun* getGunByIndex(int index);
 	Gun* getGunById(int id);
 	Itemble* getItem(int id);
+	std::vector<Itemble*> getTravelItem();
 	std::vector<Gun*> getGuns();
 	std::vector<Improve*> getImprovs();
 	std::vector<Item*> getItems();
@@ -23,7 +24,9 @@ private:
 	std::vector<std::unique_ptr<Improve>> improvements;
 	std::vector<std::unique_ptr<Item>> items;
 	std::vector<std::unique_ptr<Gun>> guns;
+	std::vector<std::unique_ptr<Itemble>> travelItem;
 
+	void createTravel();
 	void saveGun();
 	void createImprovements();
 	void createGuns();

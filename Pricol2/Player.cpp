@@ -18,6 +18,11 @@ Player::Player(Enemy* _sprite, PlayerDef def, Map* _nowMap) :
 		});
 }
 
+Player::~Player()
+{
+	auto& event = EventSystem::getInstance();
+}
+
 Gun* Player::setGun(Gun* gun, int pos) 
 {
 	auto temp = guns[pos];

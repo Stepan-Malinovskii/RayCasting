@@ -28,7 +28,7 @@ public:
     {
         auto event = getOrCreateEvent<T>(eventName);
         auto handlerPtr = std::make_shared<EventHandler<T>>(handler);
-        std::lock_guard<std::mutex> lock(mutex_);
+        std::lock_guard<std::recursive_mutex> lock(mutex_);
         event->handlers.push_back(handlerPtr);
         return handlerPtr;
     }
@@ -39,7 +39,7 @@ public:
         auto event = getEvent<T>(eventName);
         if (!event) return;
 
-        std::lock_guard<std::mutex> lock(mutex_);
+        std::lock_guard<std::recursive_mutex> lock(mutex_);
         auto& handlers = event->handlers;
         handlers.erase(std::remove_if(handlers.begin(), handlers.end(),
             [&handler](const std::shared_ptr<EventHandler<T>>& h)
@@ -55,7 +55,7 @@ public:
         auto event = getEvent<T>(eventName);
         if (!event) return;
 
-        std::lock_guard<std::mutex> lock(mutex_);
+        std::lock_guard<std::recursive_mutex> lock(mutex_);
         for (const auto& handler : event->handlers)
         {
             (*handler)(eventData);
@@ -67,17 +67,18 @@ private:
     ~EventSystem() = default;
 
     template <typename T>
-    struct Event {
+    struct Event
+    {
         std::vector<std::shared_ptr<EventHandler<T>>> handlers;
     };
 
     std::unordered_map<std::string, std::shared_ptr<void>> events;
-    std::mutex mutex_;
+    std::recursive_mutex mutex_;
 
     template <typename T>
     std::shared_ptr<Event<T>> getOrCreateEvent(const std::string& eventName)
     {
-        std::lock_guard<std::mutex> lock(mutex_);
+        std::lock_guard<std::recursive_mutex> lock(mutex_);
         if (events.find(eventName) == events.end())
         {
             events[eventName] = std::make_shared<Event<T>>();
@@ -88,7 +89,7 @@ private:
     template <typename T>
     std::shared_ptr<Event<T>> getEvent(const std::string& eventName)
     {
-        std::lock_guard<std::mutex> lock(mutex_);
+        std::lock_guard<std::recursive_mutex> lock(mutex_);
         if (events.find(eventName) == events.end())
         {
             return nullptr;

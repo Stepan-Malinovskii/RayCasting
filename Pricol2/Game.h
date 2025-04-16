@@ -34,7 +34,6 @@ public:
 private:
 	void getInput(float deltaTime);
 	void initPlayer();
-	void swapLocation();
 
 	RenderState* currentState;
 	RenderState playState;

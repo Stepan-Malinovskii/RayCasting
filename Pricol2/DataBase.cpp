@@ -141,7 +141,7 @@ PlayerDef Data::getPlayerData()
 
 	int size = 0;
 	in.read(reinterpret_cast<char*>(&size), sizeof(size));
-
+	
 	plDef.gunsData.reserve(size);
 	for (int i = 0; i < size; i++)
 	{

@@ -10,6 +10,7 @@
 #include "UIManeger.h"
 #include "GunManager.h"
 #include "RenderState.h"
+#include "EventSystem.h"
 
 class Dialog
 {

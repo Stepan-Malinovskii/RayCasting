@@ -37,7 +37,7 @@ class Player
 {
 public:
 	Player(Enemy* sprite, PlayerDef def, Map* _nowMap);
-
+	~Player();
 	void setInventory(Inventory* invent);
 	void updateMouseData(sf::Vector2f mousePos, float deltaTime);
 	void checkBoost(bool isPressed, float deltaTime);

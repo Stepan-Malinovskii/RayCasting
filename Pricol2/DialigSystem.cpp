@@ -49,6 +49,17 @@ void Dialog::buy()
 	if (choose->cost > player->money) return;
 	
 	player->money -= choose->cost;
+
+	if (startKey == 402)
+	{
+		if (choose->id == -1)
+		{
+			auto& event = EventSystem::getInstance();
+			event.trigger("SWAPLOC", -1);
+			stop();
+		}
+	}
+
 	player->takeItem(choose);
 	choose = nullptr;
 
@@ -159,6 +170,15 @@ void Dialog::initTrade()
 		for (int i = 0; i < item.size(); i++)
 		{
 			title[i] = (Itemble*)item[i];
+		}
+	}
+	else if (startKey == 402)
+	{
+		auto item = weaponManager->getTravelItem();
+
+		for (int i = 0; i < item.size(); i++)
+		{
+			title[i] = item[i];
 		}
 	}
 

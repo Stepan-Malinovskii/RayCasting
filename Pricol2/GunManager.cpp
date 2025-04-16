@@ -5,6 +5,7 @@ WeaponManager::WeaponManager() : id{ 0 }
 	createImprovements();
 	createItems();
 	createGuns();
+	createTravel();
 	auto& event = EventSystem::getInstance();
 	event.subscribe<int>("SAVE", [=](const int& NON) {saveGun();});
 }
@@ -85,6 +86,19 @@ Gun* WeaponManager::getGunById(int id) { return dynamic_cast<Gun*>(itemble[id]);
 
 Itemble* WeaponManager::getItem(int index) { return itemble[index]; }
 
+std::vector<Itemble*> WeaponManager::getTravelItem()
+{
+	std::vector<Itemble*> result;
+	result.resize(travelItem.size());
+
+	for (const auto& tr: travelItem)
+	{
+		result.push_back(tr.get());
+	}
+
+	return result;
+}
+
 std::vector<Gun*> WeaponManager::getGuns()
 {
 	std::vector<Gun*> result;
@@ -122,6 +136,12 @@ std::vector<Item*> WeaponManager::getItems()
 	}
 
 	return result;
+}
+
+void WeaponManager::createTravel()
+{
+	travelItem.push_back(std::make_unique<Itemble>(L"Перемещение",
+		L"Перемещение на следующий уровень", 50, -1));
 }
 
 void WeaponManager::saveGun()
