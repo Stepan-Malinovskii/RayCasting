@@ -1,6 +1,11 @@
 #include "MapManager.h"
 
-MapManager::MapManager(sf::RenderWindow* _window) : window{ _window }, nowMap{ nullptr }, mapNumber{} {}
+MapManager::MapManager(sf::RenderWindow* _window) : 
+	window{ _window }, nowMap{ nullptr }, mapNumber{}, isBase{}
+{
+	auto& event = EventSystem::getInstance();
+	event.subscribe<int>("SAVE", [=](const int NON) { save(); });
+}
 
 MapManager::~MapManager()
 {
@@ -13,7 +18,9 @@ void MapManager::save()
 	if (!out.is_open()) return;
 	if (nowMap->grid.empty()) return;
 
-	out.write(reinterpret_cast<const char*>(&mapFileNames), sizeof(mapFileNames));
+	out.write(reinterpret_cast<const char*>(&mapNumber), sizeof(mapNumber));
+	out.write(reinterpret_cast<const char*>(&isBase), sizeof(isBase));
+
 	auto grid = nowMap->grid;
 	int h = grid.size();
 	int w = grid[0].size();
@@ -44,10 +51,19 @@ void MapManager::save()
 void MapManager::load(std::string fileName)
 {
 	std::ifstream in;
+
 	if (fileName == "") { in = std::ifstream{ "Data/current.map", std::ios::in | std::ios::binary }; }
-	else { in = std::ifstream{ fileName, std::ios::in | std::ios::binary }; }
+	else 
+	{ 
+		fileName = "Data/" + fileName;
+		in = std::ifstream{ fileName, std::ios::in | std::ios::binary}; 
+	}
+	
 	if (!in.is_open()) return;
 	nowMap = new Map();
+
+	in.read(reinterpret_cast<char*>(&mapNumber), sizeof(mapNumber));
+	in.read(reinterpret_cast<char*>(&isBase), sizeof(isBase));
 
 	int h = 0, w = 0;
 	in.read(reinterpret_cast<char*>(&w), sizeof(w));
@@ -79,23 +95,42 @@ void MapManager::load(std::string fileName)
 		in.read(reinterpret_cast<char*>(&nowMap->sprites[i]), sizeof(nowMap->sprites[i]));
 
 	in.close();
+
+	if (isBase) { SoundManager::playerMusic(Base); }
+	else { SoundManager::playerMusic(Level); }
 }
 
 std::pair<sf::Vector2f, sf::Vector2f> MapManager::nextLocation(int index)
 {
 	if (index == -1)
 	{
-		mapNumber++;
-		SoundManager::playerMusic(Level);
-		return generate();
+		if (isBase)
+		{
+			isBase = false;
+			mapNumber++;
+			SoundManager::playerMusic(Level);
+			generate();
+		}
+		else
+		{
+			loadBase();
+		}
 	}
 	else
 	{	
-		if (index == BASE_N) { SoundManager::playerMusic(Base); }
-		else { SoundManager::playerMusic(Level); }
-
-		load(mapFileNames[index]);
+		if (index == BASE_N)
+		{
+			loadBase();
+		}
+		else
+		{
+			isBase = false;
+			SoundManager::playerMusic(Level);
+			load(mapFileNames[index]);
+		}
 	}
+
+	return { startPos, endPos };
 }
 
 void MapManager::rewriteSprites(std::vector<std::shared_ptr<Sprite>>* sprs)
@@ -166,7 +201,25 @@ void MapManager::drawMap(int layerNumber)
 	}
 }
 
-std::pair<sf::Vector2f, sf::Vector2f> MapManager::generate()
+void MapManager::loadBase()
+{
+	auto tempN = mapNumber;
+	isBase = true;
+	SoundManager::playerMusic(Base);
+	mapNumber = tempN;
+	load(mapFileNames[BASE_N]);
+
+	for (auto n : nowMap->sprites)
+	{
+		if (n.spriteDefId == 0)
+		{
+			startPos = n.position;
+			break;
+		}
+	}
+}
+
+void MapManager::generate()
 {
 	Leaf* root = new Leaf({ 0,0 }, { SPACE_SIZE_W, SPACE_SIZE_H });
 	std::vector<Leaf*> tempLeaf;
@@ -213,7 +266,7 @@ std::pair<sf::Vector2f, sf::Vector2f> MapManager::generate()
 		}
 	}
 
-	auto stEnd = findStEnd(leafs);
+	findStEnd(leafs);
 
 	delete root;
 	delete nowMap;
@@ -226,7 +279,7 @@ std::pair<sf::Vector2f, sf::Vector2f> MapManager::generate()
 
 	for (int i = 0; i < enemyRooms.size(); i++)
 	{
-		if (enemyRooms[i].contains((sf::Vector2i)stEnd.first))
+		if (enemyRooms[i].contains((sf::Vector2i)startPos))
 		{
 			enemyRooms.erase(enemyRooms.begin() + i);
 			break;
@@ -273,11 +326,9 @@ std::pair<sf::Vector2f, sf::Vector2f> MapManager::generate()
 			nowMap->grid[h.top + 1][h.left][1] = 1;
 		}
 	}
-
-	return stEnd;
 }
 
-std::pair<sf::Vector2f, sf::Vector2f> MapManager::findStEnd(std::vector<Leaf*> leafs)
+void MapManager::findStEnd(std::vector<Leaf*> leafs)
 {
 	std::vector<sf::Vector2f> midPoint;
 	for (auto l : leafs)
@@ -300,12 +351,11 @@ std::pair<sf::Vector2f, sf::Vector2f> MapManager::findStEnd(std::vector<Leaf*> l
 			if (maxDist < dist)
 			{
 				maxDist = dist;
-				result.first = midPoint[i];
-				result.second = midPoint[j];
+				startPos = midPoint[i];
+				endPos = midPoint[j];
 			}
 		}
 	}
-	return result;
 }
 
 void MapManager::writeRoom(sf::IntRect rect, int layer, int value)

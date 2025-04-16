@@ -6,6 +6,7 @@
 #include "Leaf.h"
 #include "Resources.h"
 #include "SoundManager.h"
+#include "EventSystem.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 
 constexpr int ENEMY_LEVEL_COUNT = 40;
@@ -25,18 +26,22 @@ public:
 	void drawMap(int layer);
 	Map* getNowMap();
 private:
+	bool isBase;
 	int mapNumber;
 	Map* nowMap;
 	sf::RenderWindow* window;
+	sf::Vector2f startPos;
+	sf::Vector2f endPos;
 
-	std::pair<sf::Vector2f, sf::Vector2f> generate();
-	std::pair<sf::Vector2f, sf::Vector2f> findStEnd(std::vector<Leaf*> leafs);
+	void loadBase();
+	void generate();
+	void findStEnd(std::vector<Leaf*> leafs);
 	void writeRoom(sf::IntRect rect, int layer, int value);
 	void writeEnemy(std::vector<sf::IntRect> rooms);
 };
 
 static std::vector<std::string> mapFileNames{
-	"base1.map",
+	"base.map",
 	"arena1.map",
 	"arena2.map",
 	"arena3.map",

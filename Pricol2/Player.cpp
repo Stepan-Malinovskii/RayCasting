@@ -10,6 +10,12 @@ Player::Player(Enemy* _sprite, PlayerDef def, Map* _nowMap) :
 	boostSpeed{ 8.0f }, nowSpeed{ enemy->enemyDef.speed } 
 {
 	enemy->textSize = 104.0f;
+	auto& event = EventSystem::getInstance();
+	event.subscribe<int>("SAVE", [=](const int NON) 
+		{
+			auto& data = Data::getInstance();
+			data.savePlayerData(this);
+		});
 }
 
 Gun* Player::setGun(Gun* gun, int pos) 

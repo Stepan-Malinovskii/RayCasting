@@ -33,14 +33,11 @@ public:
 	void editor(); //Удалить после конца
 private:
 	void getInput(float deltaTime);
-	void update(float deltaT);
-	void render();
 	void initPlayer();
 	void swapLocation();
 
 	RenderState* currentState;
 	RenderState playState;
-	Data* data;
 	Inventory* invent;
 	Dialog* dialogSys;
 	sf::Vector2i screenMidlePos;

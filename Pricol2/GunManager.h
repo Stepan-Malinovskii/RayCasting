@@ -4,11 +4,12 @@
 
 #include "Weapon.h"
 #include "DataBase.h"
+#include "EventSystem.h"
 
 class WeaponManager
 {
 public:
-	WeaponManager(Data* data);
+	WeaponManager();
 	~WeaponManager() = default;
 	Gun* getGunByIndex(int index);
 	Gun* getGunById(int id);
@@ -16,15 +17,14 @@ public:
 	std::vector<Gun*> getGuns();
 	std::vector<Improve*> getImprovs();
 	std::vector<Item*> getItems();
-	void saveGun();
 	int id = 0;
 private:
 	std::map<int, Itemble*> itemble;
 	std::vector<std::unique_ptr<Improve>> improvements;
 	std::vector<std::unique_ptr<Item>> items;
 	std::vector<std::unique_ptr<Gun>> guns;
-	Data* data;
 
+	void saveGun();
 	void createImprovements();
 	void createGuns();
 	void createItems();

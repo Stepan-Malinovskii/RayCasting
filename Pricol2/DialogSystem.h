@@ -14,7 +14,7 @@
 class Dialog
 {
 public:
-	Dialog(sf::RenderWindow* _window, Data* _data, UIManager* _uiManager, 
+	Dialog(sf::RenderWindow* _window, UIManager* _uiManager, 
 		WeaponManager* _weaponManager);
 	void setPlayer(Player* _player);
 	RenderState* start(int key, std::wstring name = L"");
@@ -27,7 +27,6 @@ private:
 	RenderState dialogState;
 	bool isTrade;
 	std::wstring name;
-	Data* data;
 	Player* player;
 	int nowKey;
 	int startKey;

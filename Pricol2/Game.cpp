@@ -4,19 +4,18 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 	window{ _window }, mapManager{ _mapManager }
 {
 	screenMidlePos = { (int)(SCREEN_W / 2), (int)(SCREEN_H / 2) };
-	data = new Data();
-	weaponManager = new WeaponManager(data);
+	weaponManager = new WeaponManager();
 	renderer = new Renderer(window);
 	uiManager = new UIManager(window);
-	dialogSys = new Dialog(window, data, uiManager, weaponManager);
-	spManager = new SpriteManager(mapManager->getNowMap(), data, dialogSys);
+	dialogSys = new Dialog(window, uiManager, weaponManager);
+	spManager = new SpriteManager(mapManager->getNowMap(), dialogSys);
 	player = spManager->getPlayer();
 	invent = new Inventory(window, player, uiManager);
 	initPlayer();
 
-	auto a = data->getInvent();
+	auto& data = Data::getInstance();
 
-	for (auto b : a)
+	for (auto b : data.getInvent())
 	{
 		player->takeItem(weaponManager->getItem(b.first), b.second);
 	}
@@ -39,7 +38,6 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 
 Game::~Game()
 {
-	delete data;
 	delete dialogSys;
 	delete spManager;
 	delete weaponManager;
@@ -53,7 +51,8 @@ void Game::initPlayer()
 	player->kick = weaponManager->getGunByIndex(0);
 	player->setGun(weaponManager->getGunByIndex(1), 0);
 	player->nowHeal = invent->takeMaxHeal();
-	PlayerDef plDef = data->getPlayerData();
+	auto& data = Data::getInstance();
+	PlayerDef plDef = data.getPlayerData();
 
 	int i = 1;
 	for (auto it : plDef.gunsData)
@@ -72,7 +71,8 @@ void Game::editor()
 
 void Game::swapLocation()
 {
-	data->savePlayerData(player);
+	auto& data = Data::getInstance();
+	data.savePlayerData(player);
 	auto pair = mapManager->nextLocation();
 	player = spManager->resetMap(mapManager->getNowMap(), pair);
 	initPlayer();
@@ -81,10 +81,8 @@ void Game::swapLocation()
 void Game::save()
 {
 	mapManager->rewriteSprites(spManager->getDeteachSprite());
-	weaponManager->saveGun();
-	data->savePlayerData(player);
-	data->saveInvent(invent->getInventToSave());
-	mapManager->save();
+	auto& event = EventSystem::getInstance();
+	event.trigger<int>("SAVE", 0);
 }
 
 void Game::getInput(sf::Event event, float deltaTime)

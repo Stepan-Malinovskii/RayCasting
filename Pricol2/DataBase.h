@@ -14,8 +14,15 @@
 class Data
 {
 public:
-	Data();
-	~Data();
+	Data(const Data&) = delete;
+	Data& operator=(const Data&) = delete;
+
+	static Data& getInstance()
+	{
+		static Data instance;
+		return instance;
+	}
+
 	PlayerDef getPlayerData();
 	void savePlayerData(Player* player);
 
@@ -28,11 +35,11 @@ public:
 	std::vector<int> getKeys(int key);
 	std::pair<std::wstring, int> getText(int key);
 private:
-	std::vector<std::pair<int, std::vector<int>>>* key2key;
-	std::vector<std::tuple<int, std::wstring, int>>* key2text;
+	Data() = default;
+	~Data() = default;
 
-	void loadKeyData();
-	void loadTextData();
+	std::vector<std::pair<int, std::vector<int>>> loadKeyData();
+	std::vector<std::tuple<int, std::wstring, int>> loadTextData();
 };
 
 #endif // !DATA

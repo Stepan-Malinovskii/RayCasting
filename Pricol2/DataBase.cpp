@@ -1,25 +1,13 @@
 #include "DataBase.h"
 #pragma warning(disable : 4996)
-Data::Data()
-{
-	key2key = new std::vector<std::pair<int, std::vector<int>>>();
-	key2text = new std::vector<std::tuple<int, std::wstring, int>>();
 
-	loadKeyData();
-	loadTextData();
-}
-
-Data::~Data()
-{
-	delete key2key;
-	delete key2text;
-}
-
-void Data::loadKeyData()
+std::vector<std::pair<int, std::vector<int>>> Data::loadKeyData()
 {
 	std::wifstream fileIn("Data/KeyData.txt");
 	fileIn.imbue(std::locale(fileIn.getloc(), new std::codecvt_utf8<wchar_t>));
-	if (!fileIn.is_open()) return;
+	if (!fileIn.is_open()) return {};
+
+	std::vector<std::pair<int, std::vector<int>>> key2key;
 
 	std::wstring line;
 
@@ -36,17 +24,21 @@ void Data::loadKeyData()
 			keys.push_back(std::stoi(line.substr(0, j)));
 			line = line.substr(j + 1);
 		}
-		key2key->push_back({ fkey, keys });
+		key2key.push_back({ fkey, keys });
 	}
 
 	fileIn.close();
+
+	return key2key;
 }
 
-void Data::loadTextData()
+std::vector<std::tuple<int, std::wstring, int>> Data::loadTextData()
 {
 	std::wifstream fileIn("Data/TextData.txt");
 	fileIn.imbue(std::locale(fileIn.getloc(), new std::codecvt_utf8<wchar_t>));
-	if (!fileIn.is_open()) return;
+	if (!fileIn.is_open()) return {};
+
+	std::vector<std::tuple<int, std::wstring, int>> key2text;
 
 	std::wstring line, text;
 	while (std::getline(fileIn, line))
@@ -59,9 +51,12 @@ void Data::loadTextData()
 		text = line.substr(end + 2, st - end - 3);
 		end = line.rfind(L']');
 		int eKey = std::stoi(line.substr(st + 1, end - st - 1));
-		key2text->push_back({ fkey, text, eKey });
+		key2text.push_back({ fkey, text, eKey });
 	}
+
 	fileIn.close();
+
+	return key2text;
 }
 
 std::vector<std::pair<int, int>> Data::getInvent()
@@ -104,21 +99,25 @@ void Data::saveInvent(std::vector<std::pair<int, int>> inv)
 
 std::vector<int> Data::getKeys(int key)
 {
-	for (int i = 0; i < key2key->size(); i++)
+	auto key2key = loadKeyData();
+
+	for (int i = 0; i < key2key.size(); i++)
 	{
-		if (key == (*key2key)[i].first) {
-			return (*key2key)[i].second;
+		if (key == key2key[i].first) {
+			return key2key[i].second;
 		}
 	}
 }
 
 std::pair<std::wstring, int> Data::getText(int key)
 {
-	for (int i = 0; i < key2text->size(); i++)
+	auto key2text = loadTextData();
+
+	for (int i = 0; i < key2text.size(); i++)
 	{
-		if (key == std::get<0>((*key2text)[i]))
+		if (key == std::get<0>(key2text[i]))
 		{
-			return { std::get<1>((*key2text)[i]) ,std::get<2>((*key2text)[i]) };
+			return { std::get<1>(key2text[i]) ,std::get<2>(key2text[i]) };
 		}
 	}
 }
@@ -128,7 +127,7 @@ PlayerDef Data::getPlayerData()
 	std::ifstream in{ "Data/playerData.plr", std::ios::in | std::ios::binary };
 	if (!in.is_open()) return { 100, 100, 2, 2, 10, 50, 50, 500, 10000, 0, {} };
 
-	PlayerDef plDef{};
+	PlayerDef plDef{ /*180,180,7,7,0,0,0,500,1000,0, {}*/ };
 	in.read(reinterpret_cast<char*>(&plDef.maxHp), sizeof(plDef.maxHp));
 	in.read(reinterpret_cast<char*>(&plDef.nowHp), sizeof(plDef.nowHp));
 	in.read(reinterpret_cast<char*>(&plDef.maxEnergy), sizeof(plDef.maxEnergy));
@@ -140,9 +139,9 @@ PlayerDef Data::getPlayerData()
 	in.read(reinterpret_cast<char*>(&plDef.money), sizeof(plDef.money));
 	in.read(reinterpret_cast<char*>(&plDef.details), sizeof(plDef.details));
 
-	int size;
+	int size = 0;
 	in.read(reinterpret_cast<char*>(&size), sizeof(size));
-	
+
 	plDef.gunsData.reserve(size);
 	for (int i = 0; i < size; i++)
 	{
@@ -152,6 +151,7 @@ PlayerDef Data::getPlayerData()
 	}
 
 	in.close();
+
 	return plDef;
 }
 

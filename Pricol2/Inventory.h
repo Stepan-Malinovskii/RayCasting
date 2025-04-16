@@ -15,11 +15,11 @@ public:
 	Item* takeMaxHeal();
 	void takeItem(Itemble*, int cnt = 1);
 	void useItem(Itemble*, int cnt = 1);
-	std::vector<std::pair<int, int>> getInventToSave();
 	RenderState* useInvent();
 	void update();
 	void drawInvent();
 private:
+	std::vector<std::pair<int, int>> convert2save();
 	void initInv();
 	void checkChose();
 	void selectedItem();

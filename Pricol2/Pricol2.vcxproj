@@ -167,6 +167,7 @@
     <ClInclude Include="DataBase.h" />
     <ClInclude Include="DialogSystem.h" />
     <ClInclude Include="Editor.h" />
+    <ClInclude Include="EventSystem.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GunManager.h" />
     <ClInclude Include="Inventory.h" />

@@ -1,7 +1,7 @@
 #include "DialogSystem.h"
 
-Dialog::Dialog(sf::RenderWindow* _window, Data* _data, UIManager* _uiManager,
-	WeaponManager* _weaponManager) : window{ _window }, data{ _data },
+Dialog::Dialog(sf::RenderWindow* _window, UIManager* _uiManager,
+	WeaponManager* _weaponManager) : window{ _window },
 	uiManager{ _uiManager }, weaponManager{ _weaponManager }
 {
 	nowKey = 0;
@@ -116,13 +116,14 @@ void Dialog::init()
 
 void Dialog::initDialog()
 {
-	auto keys = data->getKeys(nowKey);
+	auto& data = Data::getInstance();
+	auto keys = data.getKeys(nowKey);
 
 	std::map<int, std::wstring, std::greater<int>> variants;
 
 	for (int i = 0; i < keys.size(); i++)
 	{
-		auto d = data->getText(keys[i]);
+		auto d = data.getText(keys[i]);
 		variants[d.second] = d.first;
 	}
 

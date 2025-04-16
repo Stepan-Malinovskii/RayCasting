@@ -3,8 +3,8 @@
 #define SQUARE(a) ((a) * (a))
 #define GETDIST(a,b) (SQUARE(a.x - b.x) + SQUARE(a.y - b.y))
 
-SpriteManager::SpriteManager(Map* _nowMap, Data* _data, Dialog* _dialogSys) : 
-	nowMap{ _nowMap }, dialogSys{ _dialogSys }, data{ _data }, id { 1 }
+SpriteManager::SpriteManager(Map* _nowMap, Dialog* _dialogSys) : 
+	nowMap{ _nowMap }, dialogSys{ _dialogSys }, id { 1 }
 {
 	allSprites = new std::vector<std::shared_ptr<Sprite>>();
 	init();
@@ -45,7 +45,8 @@ void SpriteManager::createEnemy(MapSprite mapSprite, SpriteDef def)
 
 	if (mapSprite.spriteDefId == 0)
 	{
-		PlayerDef plDef = data->getPlayerData();
+		auto& data = Data::getInstance();
+		PlayerDef plDef = data.getPlayerData();
 		enemy->id = 0;
 		enemy->enemyDef.maxHealpoint = plDef.maxHp;
 		enemy->spMap.nowHealPoint = plDef.nowHp;
@@ -78,7 +79,8 @@ void SpriteManager::createNpc(MapSprite mapSprite, SpriteDef def)
 
 void SpriteManager::createDefaultPlayer()
 {
-	PlayerDef plDef = data->getPlayerData();
+	auto& data = Data::getInstance();
+	PlayerDef plDef = data.getPlayerData();
 	auto def = spriteDefs[0];
 	auto enDef = enemyDef[0];
 	enDef.maxHealpoint = plDef.maxHp;

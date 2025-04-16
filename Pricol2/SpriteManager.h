@@ -12,7 +12,7 @@
 class SpriteManager
 {
 public:
-	SpriteManager(Map* _nowMap, Data* _data, Dialog* _dialogSys);
+	SpriteManager(Map* _nowMap, Dialog* _dialogSys);
 	~SpriteManager();
 	void update(float deltaTime);
 	Player* resetMap(Map* newMap, std::pair<sf::Vector2f, sf::Vector2f> mapPos);
@@ -32,7 +32,6 @@ private:
 	void init();
 
 	Dialog* dialogSys;
-	Data* data;
 	std::vector<std::shared_ptr<Sprite>>* allSprites;
 	std::vector<Enemy*> enemys;
 	std::unique_ptr<Player> player;

@@ -14,6 +14,13 @@ Inventory::Inventory(sf::RenderWindow* _window, Player* _player, UIManager* _uiM
 		drawInvent();
 		};
 	invetState = RenderState(updateF, drawF);
+
+	auto& event = EventSystem::getInstance();
+	event.subscribe<int>("SAVE", [=](const int NON)
+		{
+			auto& data = Data::getInstance();
+			data.saveInvent(convert2save());
+		});
 }
 
 Item* Inventory::takeMaxHeal()
@@ -53,7 +60,7 @@ void Inventory::useItem(Itemble* item, int cnt)
 	}
 }
 
-std::vector<std::pair<int, int>> Inventory::getInventToSave()
+std::vector<std::pair<int, int>> Inventory::convert2save()
 {
 	std::vector<std::pair<int, int>> inv;
 

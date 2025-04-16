@@ -1,11 +1,12 @@
 #include "GunManager.h"
 
-WeaponManager::WeaponManager(Data* _data) :
-	data{ _data }, id{ 0 }
+WeaponManager::WeaponManager() : id{ 0 }
 {
 	createImprovements();
 	createItems();
 	createGuns();
+	auto& event = EventSystem::getInstance();
+	event.subscribe<int>("SAVE", [=](const int& NON) {saveGun();});
 }
 
 void WeaponManager::createImprovements()
@@ -30,7 +31,8 @@ void  WeaponManager::createItems()
 
 void  WeaponManager::createGuns()
 {
-	auto gunsData = data->getGunData();
+	auto& data = Data::getInstance();
+	auto gunsData = data.getGunData();
 
 	for (int i = 0; i < gunsDef.size(); i++)
 	{
@@ -132,5 +134,6 @@ void WeaponManager::saveGun()
 		defs.push_back(gun->getGunData());
 	}
 
-	data->saveGunData(defs);
+	auto& data = Data::getInstance();
+	data.saveGunData(defs);
 }
