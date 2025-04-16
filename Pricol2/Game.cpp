@@ -20,7 +20,21 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 	{
 		player->takeItem(weaponManager->getItem(b.first), b.second);
 	}
-	player->enemy->spMap.nowHealPoint = 180.0f;
+
+	auto update = [=](float deltaTime) {
+		getInput(deltaTime);
+		spManager->update(deltaTime);
+		};
+	auto draw = [=]() {
+		renderer->Draw3DView(player, mapManager->getNowMap(), spManager->getDeteachSprite());
+		uiManager->drawPlayerUI(player);
+		};
+	playState = RenderState(update, draw);
+	currentState = &playState;
+
+	dialogSys->onDialogEnd = [=]() { currentState = &playState; };
+
+	player->enemy->spMap.nowHealPoint = 180.0f; // ÂÛĞÅÇÀÒÜ ÏÎÒÎÌ
 }
 
 Game::~Game()
@@ -56,10 +70,10 @@ void Game::editor()
 	initPlayer();
 }
 
-void Game::generate()
+void Game::swapLocation()
 {
 	data->savePlayerData(player);
-	auto pair = mapManager->generate();
+	auto pair = mapManager->nextLocation();
 	player = spManager->resetMap(mapManager->getNowMap(), pair);
 	initPlayer();
 }
@@ -75,17 +89,14 @@ void Game::save()
 
 void Game::getInput(sf::Event event, float deltaTime)
 {
-	if (dialogSys->isActive) return;
-
 	if (event.type == sf::Event::KeyPressed)
 	{
 		if (event.key.code == sf::Keyboard::Q)
 		{
-			invent->useInvent();
+			currentState = invent->useInvent();
+			if (!currentState) { currentState = &playState; }
 		}
 	}
-
-	if (invent->isOpen) { return; }
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{			
@@ -105,7 +116,7 @@ void Game::getInput(sf::Event event, float deltaTime)
 
 		if (event.key.code == sf::Keyboard::P)
 		{
-			generate();
+			swapLocation();
 		}
 	}
 }
@@ -134,7 +145,10 @@ void Game::getInput(float deltaTime)
 		if (sp != nullptr)
 		{
 			auto npc = spManager->getNpc(sp->id);
-			if (npc) npc->use();
+			if (npc)
+			{
+				currentState = dialogSys->start(npc->npcDefData.startKey, npc->spDef.name);
+			}
 		}
 	}
 
@@ -147,12 +161,6 @@ void Game::getInput(float deltaTime)
 	sf::Mouse::setPosition(screenMidlePos, *window);
 }
 
-void Game::update(float deltaTime)
-{
-	spManager->update(deltaTime);
-	SoundManager::update();
-}
-
 void Game::makeCycle(float deltaTime)
 {
 #ifdef NDEBUG
@@ -161,26 +169,7 @@ void Game::makeCycle(float deltaTime)
 
 	window->clear();
 
-	if (invent->isOpen)
-	{
-		invent->update();
-		invent->drawInvent();
-	}
-	else if (dialogSys->isActive)
-	{
-		dialogSys->update();
-		dialogSys->draw();
-	}
-	else
-	{
-		getInput(deltaTime);
-		update(deltaTime);
-		render();
-	}
-}
-
-void Game::render()
-{
-	renderer->Draw3DView(player, mapManager->getNowMap(), spManager->getDeteachSprite());
-	uiManager->drawPlayerUI(player);
+	currentState->update(deltaTime);
+	currentState->draw();
+	SoundManager::update();
 }

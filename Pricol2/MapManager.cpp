@@ -1,6 +1,6 @@
 #include "MapManager.h"
 
-MapManager::MapManager(sf::RenderWindow* _window) : window{ _window }, nowMap{ nullptr } {}
+MapManager::MapManager(sf::RenderWindow* _window) : window{ _window }, nowMap{ nullptr }, mapNumber{} {}
 
 MapManager::~MapManager()
 {
@@ -13,6 +13,7 @@ void MapManager::save()
 	if (!out.is_open()) return;
 	if (nowMap->grid.empty()) return;
 
+	out.write(reinterpret_cast<const char*>(&mapFileNames), sizeof(mapFileNames));
 	auto grid = nowMap->grid;
 	int h = grid.size();
 	int w = grid[0].size();
@@ -40,9 +41,11 @@ void MapManager::save()
 	out.close();
 }
 
-void MapManager::load()
+void MapManager::load(std::string fileName)
 {
-	std::ifstream in{ "Data/current.map", std::ios::in | std::ios::binary};
+	std::ifstream in;
+	if (fileName == "") { in = std::ifstream{ "Data/current.map", std::ios::in | std::ios::binary }; }
+	else { in = std::ifstream{ fileName, std::ios::in | std::ios::binary }; }
 	if (!in.is_open()) return;
 	nowMap = new Map();
 
@@ -76,6 +79,23 @@ void MapManager::load()
 		in.read(reinterpret_cast<char*>(&nowMap->sprites[i]), sizeof(nowMap->sprites[i]));
 
 	in.close();
+}
+
+std::pair<sf::Vector2f, sf::Vector2f> MapManager::nextLocation(int index)
+{
+	if (index == -1)
+	{
+		mapNumber++;
+		SoundManager::playerMusic(Level);
+		return generate();
+	}
+	else
+	{	
+		if (index == BASE_N) { SoundManager::playerMusic(Base); }
+		else { SoundManager::playerMusic(Level); }
+
+		load(mapFileNames[index]);
+	}
 }
 
 void MapManager::rewriteSprites(std::vector<std::shared_ptr<Sprite>>* sprs)
@@ -253,7 +273,6 @@ std::pair<sf::Vector2f, sf::Vector2f> MapManager::generate()
 			nowMap->grid[h.top + 1][h.left][1] = 1;
 		}
 	}
-
 
 	return stEnd;
 }

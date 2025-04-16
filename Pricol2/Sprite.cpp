@@ -213,8 +213,3 @@ Npc::Npc(SpriteDef _spDef, MapSprite _spMap, int _id, int npcDefId, Dialog* _dia
 {
 	textSize = texture->getSize().y;
 }
-
-void Npc::use()
-{
-	dialog->start(npcDefData.startKey, spDef.name);
-}

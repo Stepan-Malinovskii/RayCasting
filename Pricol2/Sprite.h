@@ -108,7 +108,6 @@ class Npc : public Sprite
 public:
 	Npc(SpriteDef spDef, MapSprite spMap, int _id, int npcId, Dialog* dialog);
 	Npc() = default;
-	void use();
 	NpcDef npcDefData;
 private:
 	Dialog* dialog;

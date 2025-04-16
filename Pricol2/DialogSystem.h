@@ -9,6 +9,7 @@
 #include "SFML/Window/Mouse.hpp"
 #include "UIManeger.h"
 #include "GunManager.h"
+#include "RenderState.h"
 
 class Dialog
 {
@@ -16,11 +17,14 @@ public:
 	Dialog(sf::RenderWindow* _window, Data* _data, UIManager* _uiManager, 
 		WeaponManager* _weaponManager);
 	void setPlayer(Player* _player);
-	void start(int key, std::wstring name = L"");
+	RenderState* start(int key, std::wstring name = L"");
 	void update();
 	void draw();
-	bool isActive;
+
+	std::function<void()> onDialogEnd;
 private:
+	bool isActive;
+	RenderState dialogState;
 	bool isTrade;
 	std::wstring name;
 	Data* data;

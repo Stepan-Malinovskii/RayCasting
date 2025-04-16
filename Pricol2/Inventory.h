@@ -5,6 +5,7 @@
 #include "UIManeger.h"
 #include "GunManager.h"
 #include "DataBase.h"
+#include "RenderState.h"
 
 class Inventory
 {
@@ -14,14 +15,10 @@ public:
 	Item* takeMaxHeal();
 	void takeItem(Itemble*, int cnt = 1);
 	void useItem(Itemble*, int cnt = 1);
-	std::vector < std::pair<int, int>> getInventToSave();
-
-	void useInvent();
+	std::vector<std::pair<int, int>> getInventToSave();
+	RenderState* useInvent();
 	void update();
 	void drawInvent();
-
-	bool isOpen;
-	Player* player;
 private:
 	void initInv();
 	void checkChose();
@@ -30,7 +27,11 @@ private:
 	void useSelectedItem(Item* item);
 	void useSelectedGun(Gun* gun);
 	void useSelectedImprove(Improve* improve);
+
+	bool isOpen;
+	Player* player;
 	int nowKey;
+	RenderState invetState;
 	Itemble* choose;
 	std::map<Itemble*, int> items;
 	UIManager* uiManager;

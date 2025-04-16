@@ -18,6 +18,8 @@
 #include "Inventory.h"
 #include "MapManager.h"
 #include "SoundManager.h"
+#include "RenderState.h"
+
 
 class Game
 {
@@ -34,8 +36,10 @@ private:
 	void update(float deltaT);
 	void render();
 	void initPlayer();
-	void generate();
+	void swapLocation();
 
+	RenderState* currentState;
+	RenderState playState;
 	Data* data;
 	Inventory* invent;
 	Dialog* dialogSys;

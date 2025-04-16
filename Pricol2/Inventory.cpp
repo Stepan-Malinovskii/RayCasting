@@ -6,6 +6,14 @@ Inventory::Inventory(sf::RenderWindow* _window, Player* _player, UIManager* _uiM
 	isOpen = false;
 	choose = nullptr;
 	nowKey = 0;
+
+	auto updateF = [=](float deltaTime) {
+		update();
+		};
+	auto drawF = [=]() {
+		drawInvent();
+		};
+	invetState = RenderState(updateF, drawF);
 }
 
 Item* Inventory::takeMaxHeal()
@@ -57,18 +65,21 @@ std::vector<std::pair<int, int>> Inventory::getInventToSave()
 	return inv;
 }
 
-void Inventory::useInvent() 
+RenderState* Inventory::useInvent() 
 { 
-	isOpen = !isOpen;
-	window->setMouseCursorVisible(isOpen);
-	if (!isOpen)
+	window->setMouseCursorVisible(!isOpen);
+	if (isOpen)
 	{
+		isOpen = false;
 		uiManager->deleteNow();
 		choose = nullptr;
+		return nullptr;
 	}
 	else
 	{
+		isOpen = true;
 		initInv();
+		return &invetState;
 	}
 }
 

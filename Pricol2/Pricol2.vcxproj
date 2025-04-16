@@ -177,6 +177,7 @@
     <ClInclude Include="Randomizer.h" />
     <ClInclude Include="Raycast.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="RenderState.h" />
     <ClInclude Include="Resources.h" />
     <ClInclude Include="sfmlExtantion.h" />
     <ClInclude Include="SoundManager.h" />
