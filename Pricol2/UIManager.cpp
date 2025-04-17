@@ -184,7 +184,7 @@ void UIManager::initTrade(std::map<int, Itemble*> variants, Player* player)
 	buttons.back().setFunc([=]() { keyButton = -100; });
 }
 
-void UIManager::initInvent(std::map<Itemble*, int> items, Itemble* choose)
+void UIManager::initInvent(std::map<Itemble*, int> items, Itemble* choose, Player* player)
 {
 	deleteNow();
 
@@ -272,12 +272,26 @@ void UIManager::initInvent(std::map<Itemble*, int> items, Itemble* choose)
 		}
 		else if (auto gun = dynamic_cast<Gun*>(choose); gun)
 		{
-			makeGroup.setString(L"Надеть вместо 1-го");
+			if (player->guns[1] != nullptr)
+			{
+				makeGroup.setString(L"Надеть вместо " + player->guns[1]->name);
+			}
+			else
+			{
+				makeGroup.setString(L"Надеть на первый слот");
+			}
 			buttons.push_back(Button(makeGroup));
 			buttons.back().setFunc([&]() { keyButton = 100;});
-
 			makeGroup.move({ 0, makeGroup.getSize().y + 5 });
-			makeGroup.setString(L"Надеть вместо 2-го");
+
+			if (player->guns[2] != nullptr)
+			{
+				makeGroup.setString(L"Надеть вместо " + player->guns[2]->name);
+			}
+			else
+			{
+				makeGroup.setString(L"Надеть на второй слот");
+			}
 			buttons.push_back(Button(makeGroup));
 			buttons.back().setFunc([&]() { keyButton = 101;});
 
@@ -299,14 +313,20 @@ void UIManager::initInvent(std::map<Itemble*, int> items, Itemble* choose)
 		}
 		else if (auto imp = dynamic_cast<Improve*>(choose); imp)
 		{
-			makeGroup.setString(L"Надеть на 1-ое");
-			buttons.push_back(Button(makeGroup));
-			buttons.back().setFunc([&]() { keyButton = 100;});
+			if (player->guns[1] != nullptr)
+			{
+				makeGroup.setString(L"Надеть на " + player->guns[1]->name);
+				buttons.push_back(Button(makeGroup));
+				buttons.back().setFunc([&]() { keyButton = 100;});
+				makeGroup.move({ 0, makeGroup.getSize().y + 5 });
+			}
 
-			makeGroup.move({ 0, makeGroup.getSize().y + 5 });
-			makeGroup.setString(L"Надеть на 2-ое");
-			buttons.push_back(Button(makeGroup));
-			buttons.back().setFunc([&]() { keyButton = 101;});
+			if (player->guns[2] != nullptr)
+			{
+				makeGroup.setString(L"Надеть на " + player->guns[2]->name);
+				buttons.push_back(Button(makeGroup));
+				buttons.back().setFunc([&]() { keyButton = 101;});
+			}
 
 			oss << choose->disc;
 		}

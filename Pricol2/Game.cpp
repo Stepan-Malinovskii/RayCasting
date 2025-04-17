@@ -36,12 +36,13 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 	auto& event = EventSystem::getInstance();
 	event.subscribe<int>("SWAPLOC", [=](const int levelN)
 		{
-			auto pair = mapManager->nextLocation();
+			auto pair = mapManager->nextLocation(levelN);
 			spManager->resetMap(mapManager->getNowMap(), pair);
 		}
 	);
 
 	player->enemy->spMap.nowHealPoint = 180.0f; // ÂÛĞÅÇÀÒÜ ÏÎÒÎÌ
+	player->money = 1000; // ÂÛĞÅÇÀÒÜ ÏÎÒÎÌ
 }
 
 Game::~Game()
@@ -113,7 +114,7 @@ void Game::getInput(sf::Event event, float deltaTime)
 		if (event.key.code == sf::Keyboard::P)
 		{
 			auto& event = EventSystem::getInstance();
-			event.trigger("SWAPLOC", -1);
+			event.trigger("SWAPLOC", BASE_N);
 		}
 	}
 }

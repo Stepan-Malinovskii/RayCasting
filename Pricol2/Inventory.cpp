@@ -92,7 +92,7 @@ RenderState* Inventory::useInvent()
 
 void Inventory::initInv()
 {
-	uiManager->initInvent(items, choose);
+	uiManager->initInvent(items, choose, player);
 }
 
 void Inventory::checkChose()

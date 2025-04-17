@@ -102,30 +102,34 @@ void MapManager::load(std::string fileName)
 
 std::pair<sf::Vector2f, sf::Vector2f> MapManager::nextLocation(int index)
 {
-	if (index == -1)
+	if (index == BASE_N)
 	{
-		if (isBase)
+		isBase = true;
+		auto tempN = mapNumber;
+		SoundManager::playerMusic(Base);
+		load(mapFileNames[BASE_N]);
+		mapNumber = tempN;
+
+		for (auto sp : nowMap->sprites)
 		{
-			isBase = false;
+			if (sp.spriteDefId == 0)
+			{
+				startPos = sp.position;
+				break;
+			}
+		}
+	}
+	else
+	{
+		isBase = false;
+		SoundManager::playerMusic(Level);
+		if (index == NEXT_LEVEL_N)
+		{
 			mapNumber++;
-			SoundManager::playerMusic(Level);
 			generate();
 		}
 		else
 		{
-			loadBase();
-		}
-	}
-	else
-	{	
-		if (index == BASE_N)
-		{
-			loadBase();
-		}
-		else
-		{
-			isBase = false;
-			SoundManager::playerMusic(Level);
 			load(mapFileNames[index]);
 		}
 	}
@@ -197,24 +201,6 @@ void MapManager::drawMap(int layerNumber)
 				spShape.rotate(sp.angle);
 				window->draw(spShape);
 			}
-		}
-	}
-}
-
-void MapManager::loadBase()
-{
-	auto tempN = mapNumber;
-	isBase = true;
-	SoundManager::playerMusic(Base);
-	mapNumber = tempN;
-	load(mapFileNames[BASE_N]);
-
-	for (auto n : nowMap->sprites)
-	{
-		if (n.spriteDefId == 0)
-		{
-			startPos = n.position;
-			break;
 		}
 	}
 }

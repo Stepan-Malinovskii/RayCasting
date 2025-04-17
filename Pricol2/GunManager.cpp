@@ -54,6 +54,18 @@ void  WeaponManager::createGuns()
 	}
 }
 
+void WeaponManager::createTravel()
+{
+	int tempId = id;
+	
+	for (int i = 0; i < travelerDefs.size(); i++)
+	{
+		travelItem.push_back(std::make_unique<Item>(travelerDefs[i], tempId));
+		itemble[id] = items.back().get();
+		id++;
+	}
+}
+
 Animator<sf::Texture*> WeaponManager::createAnimator(int gunIndex)
 {
 	return Animator<sf::Texture*>(&Resources::gunsBaseText[gunIndex], 
@@ -86,10 +98,9 @@ Gun* WeaponManager::getGunById(int id) { return dynamic_cast<Gun*>(itemble[id]);
 
 Itemble* WeaponManager::getItem(int index) { return itemble[index]; }
 
-std::vector<Itemble*> WeaponManager::getTravelItem()
+std::vector<Item*> WeaponManager::getTravelItem()
 {
-	std::vector<Itemble*> result;
-	result.resize(travelItem.size());
+	std::vector<Item*> result;
 
 	for (const auto& tr: travelItem)
 	{
@@ -102,7 +113,6 @@ std::vector<Itemble*> WeaponManager::getTravelItem()
 std::vector<Gun*> WeaponManager::getGuns()
 {
 	std::vector<Gun*> result;
-	result.reserve(guns.size());
 
 	for (const auto& gun : guns)
 	{
@@ -115,7 +125,6 @@ std::vector<Gun*> WeaponManager::getGuns()
 std::vector<Improve*> WeaponManager::getImprovs()
 {
 	std::vector<Improve*> result;
-	result.reserve(improvements.size());
 
 	for (const auto& improve : improvements)
 	{
@@ -136,12 +145,6 @@ std::vector<Item*> WeaponManager::getItems()
 	}
 
 	return result;
-}
-
-void WeaponManager::createTravel()
-{
-	travelItem.push_back(std::make_unique<Itemble>(L"Перемещение",
-		L"Перемещение на следующий уровень", 50, -1));
 }
 
 void WeaponManager::saveGun()

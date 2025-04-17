@@ -8,6 +8,7 @@
 #include "Player.h"
 #include "Map.h"
 #include "DataBase.h"
+#include "MapManager.h"
 
 class SpriteManager
 {

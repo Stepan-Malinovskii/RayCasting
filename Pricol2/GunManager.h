@@ -5,6 +5,7 @@
 #include "Weapon.h"
 #include "DataBase.h"
 #include "EventSystem.h"
+#include "MapManager.h"
 
 class WeaponManager
 {
@@ -14,7 +15,7 @@ public:
 	Gun* getGunByIndex(int index);
 	Gun* getGunById(int id);
 	Itemble* getItem(int id);
-	std::vector<Itemble*> getTravelItem();
+	std::vector<Item*> getTravelItem();
 	std::vector<Gun*> getGuns();
 	std::vector<Improve*> getImprovs();
 	std::vector<Item*> getItems();
@@ -24,7 +25,7 @@ private:
 	std::vector<std::unique_ptr<Improve>> improvements;
 	std::vector<std::unique_ptr<Item>> items;
 	std::vector<std::unique_ptr<Gun>> guns;
-	std::vector<std::unique_ptr<Itemble>> travelItem;
+	std::vector<std::unique_ptr<Item>> travelItem;
 
 	void createTravel();
 	void saveGun();
@@ -71,6 +72,14 @@ static std::vector<ImproveDef> improveDefs{
 	{ImproveType::Damage,  L"Пламягаситель", 1.3f, 250, L"+30% к урону"},
 	{ImproveType::Damage,  L"Упор", 1.4f, 350, L"+40% к урону"},
 	{ImproveType::Damage,  L"Приклад", 1.5f, 450, L"+50% к урону"}
+};
+
+static std::vector<ItemsDef> travelerDefs{
+	{ItemType::Travel, L"Проездной", NEXT_LEVEL_N, 1, 50,  L"Перемещение на следующий уровень"},
+	{ItemType::Travel, L"Проездной", ARENA_1_N, 1, 100, L"Перемещение на преобразоваетль 1"},
+	{ItemType::Travel, L"Проездной", ARENA_2_N, 1, 150, L"Перемещение на преобразоваетль 2"},
+	{ItemType::Travel, L"Проездной", ARENA_3_N, 1, 200, L"Перемещение на преобразоваетль 3"},
+	{ItemType::Travel, L"Проездной", BOSS_N,    1, 250, L"Поездка к боссу"}
 };
 
 #endif // !GMAG

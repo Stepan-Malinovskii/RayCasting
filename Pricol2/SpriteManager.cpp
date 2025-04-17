@@ -130,6 +130,12 @@ std::vector<std::shared_ptr<Sprite>>* SpriteManager::getDeteachSprite() { return
 
 void SpriteManager::update(float deltaTime)
 {
+	if (enemys.size() == 0)
+	{
+		auto& event = EventSystem::getInstance();
+		event.trigger<int>("SWAPLOC", BASE_N);
+	}
+
 	for (auto enemy : enemys)
 	{
 		enemy->update(deltaTime);

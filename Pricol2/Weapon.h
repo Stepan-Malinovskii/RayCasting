@@ -15,6 +15,7 @@
 #include "Animation.h"
 #include "Randomizer.h"
 #include "SoundManager.h"
+#include "EventSystem.h"
 
 class Gun;
 class Player;
@@ -55,7 +56,7 @@ struct ImproveDef
 
 enum ItemType
 {
-	MaxEnergy, MaxHeal, Heal, Armor, Patrons
+	MaxEnergy, MaxHeal, Heal, Armor, Patrons, Travel
 };
 
 struct ItemsDef
@@ -72,7 +73,6 @@ class Itemble
 {
 public:
 	Itemble(std::wstring name, std::wstring disc, int cost, int textureId);
-	Itemble() = default;
 	virtual ~Itemble() = default;
 	std::wstring name;
 	std::wstring disc;

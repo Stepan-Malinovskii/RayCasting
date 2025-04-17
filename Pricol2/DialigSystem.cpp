@@ -50,16 +50,6 @@ void Dialog::buy()
 	
 	player->money -= choose->cost;
 
-	if (startKey == 402)
-	{
-		if (choose->id == -1)
-		{
-			auto& event = EventSystem::getInstance();
-			event.trigger("SWAPLOC", -1);
-			stop();
-		}
-	}
-
 	player->takeItem(choose);
 	choose = nullptr;
 
@@ -75,22 +65,6 @@ void Dialog::check()
 	else
 	{
 		checkDialog();
-	}
-}
-
-void Dialog::checkTrade()
-{
-	if (nowKey == -100)
-	{
-		stop();
-	}
-	else if (nowKey == -200)
-	{
-		buy();
-	}
-	else
-	{
-		choose = title[nowKey];
 	}
 }
 
@@ -110,6 +84,22 @@ void Dialog::checkDialog()
 	else
 	{
 		init();
+	}
+}
+
+void Dialog::checkTrade()
+{
+	if (nowKey == -100)
+	{
+		stop();
+	}
+	else if (nowKey == -200)
+	{
+		buy();
+	}
+	else
+	{
+		choose = title[nowKey];
 	}
 }
 

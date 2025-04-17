@@ -60,7 +60,7 @@ type{ def.type }
 		setDelFunc([=](Gun* gun) {gun->maxImpRad = round(gun->maxImpRad * def.effect);
 		gun->nowRad = std::min(gun->maxImpRad, gun->nowRad);});
 	}
-	else
+	else if (type == Magazin)
 	{
 		setGetFunc([=](Gun* gun) {gun->maxCount = round(gun->maxCount * def.effect);
 		gun->nowCount = std::min(gun->maxCount, gun->nowCount);});
@@ -109,6 +109,14 @@ type{ def.type }, maxUsing{ def.maxUSing }
 	else if (def.type == Patrons)
 	{
 		setFunc([=](Player* pl) {pl->patrons += def.effect;});
+	}
+	else if (def.type == Travel)
+	{
+		setFunc([=](Player* pl) 
+			{
+				auto& event = EventSystem::getInstance();
+				event.trigger("SWAPLOC", def.effect);
+			});
 	}
 }
 

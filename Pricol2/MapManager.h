@@ -10,7 +10,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 
 constexpr int ENEMY_LEVEL_COUNT = 40;
-constexpr int BASE_N = 0, ARENA_1_N = 1, ARENA_2_N = 2, ARENA_3_N = 3, BOSS_N = 4;
+constexpr int NEXT_LEVEL_N = -1, BASE_N = 0, ARENA_1_N = 1, ARENA_2_N = 2, ARENA_3_N = 3, BOSS_N = 4;
 
 class MapManager
 {
@@ -21,7 +21,7 @@ public:
 	void save();
 	void load(std::string fileName = "");
 
-	std::pair<sf::Vector2f, sf::Vector2f> nextLocation(int index = -1);
+	std::pair<sf::Vector2f, sf::Vector2f> nextLocation(int index);
 	void rewriteSprites(std::vector<std::shared_ptr<Sprite>>* sprs);
 	void drawMap(int layer);
 	Map* getNowMap();
@@ -33,7 +33,6 @@ private:
 	sf::Vector2f startPos;
 	sf::Vector2f endPos;
 
-	void loadBase();
 	void generate();
 	void findStEnd(std::vector<Leaf*> leafs);
 	void writeRoom(sf::IntRect rect, int layer, int value);

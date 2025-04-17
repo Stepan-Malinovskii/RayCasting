@@ -67,13 +67,13 @@ public:
 	int money;
 	int details;
 	Item* nowHeal;
+	Gun* guns[3]{};
 private:
 	Inventory* invent;
 	bool isJump, jumpFlag;
 	Map* nowMap;
 	sf::Vector2f shakeDelta;
 	int nowGun;
-	Gun* guns[3]{};
 	float nowSpeed, boostSpeed, shakeTime;
 
 	void shakeCamera(float deltaTime, bool isRun);
