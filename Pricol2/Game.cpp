@@ -41,6 +41,9 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 		}
 	);
 
+	event.subscribe<int>("RESET_GAME", [=](const int NON) { currentState = &playState;
+	player->guns[1] = nullptr; player->guns[2] = nullptr; player->setGun(weaponManager->getGunById(2), 1);});
+
 	player->enemy->spMap.nowHealPoint = 180.0f; // ÂÛĞÅÇÀÒÜ ÏÎÒÎÌ
 	player->money = 1000; // ÂÛĞÅÇÀÒÜ ÏÎÒÎÌ
 }
@@ -139,11 +142,9 @@ void Game::getInput(float deltaTime)
 	if (GetAsyncKeyState('F')) { player->fire(); }
 	if (GetAsyncKeyState('E'))
 	{
-		Sprite* sp = player->dialog();
-		if (sp != nullptr)
+		if (Sprite* sp = player->dialog(); sp)
 		{
-			auto npc = spManager->getNpc(sp->id);
-			if (npc)
+			if (auto npc = spManager->getNpc(sp->id); npc)
 			{
 				currentState = dialogSys->start(npc->npcDefData.startKey, npc->spDef.name);
 			}
@@ -161,12 +162,6 @@ void Game::getInput(float deltaTime)
 
 void Game::makeCycle(float deltaTime)
 {
-#ifdef NDEBUG
-	deltaTime = std::min(deltaTime, 1.0f / 144.0f);
-#endif
-
-	window->clear();
-
 	currentState->update(deltaTime);
 	currentState->draw();
 	SoundManager::update();

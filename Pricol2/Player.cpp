@@ -10,12 +10,16 @@ Player::Player(Enemy* _sprite, PlayerDef def, Map* _nowMap) :
 	boostSpeed{ 8.0f }, nowSpeed{ enemy->enemyDef.speed } 
 {
 	enemy->textSize = 104.0f;
+
 	auto& event = EventSystem::getInstance();
 	event.subscribe<int>("SAVE", [=](const int NON) 
 		{
 			auto& data = Data::getInstance();
 			data.savePlayerData(this);
 		});
+	event.subscribe<int>("RESET_GAME", [=](const int NON) {
+		nowEnergy = 2.0f; maxEnergy = 2.0f; defence = 0.0f; nowStrenght = 0.0f; maxStrenght = 0.0f;
+		patrons = 500; money = 500; details = 0; nowHeal = nullptr; });
 }
 
 Player::~Player()

@@ -21,6 +21,7 @@ Inventory::Inventory(sf::RenderWindow* _window, Player* _player, UIManager* _uiM
 			auto& data = Data::getInstance();
 			data.saveInvent(convert2save());
 		});
+	event.subscribe<int>("RESET_GAME", [=](const int NON) { items.clear(); });
 }
 
 Item* Inventory::takeMaxHeal()

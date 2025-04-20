@@ -5,6 +5,10 @@ MapManager::MapManager(sf::RenderWindow* _window) :
 {
 	auto& event = EventSystem::getInstance();
 	event.subscribe<int>("SAVE", [=](const int NON) { save(); });
+
+	event.subscribe<int>("RESET_GAME", [=](const int NON) {
+		load(mapFileNames[BASE_N]);
+		mapNumber = 0; });
 }
 
 MapManager::~MapManager()
@@ -357,7 +361,9 @@ void MapManager::writeRoom(sf::IntRect rect, int layer, int value)
 
 void MapManager::writeEnemy(std::vector<sf::IntRect> rooms)
 {
-	int midleRoomCount = ENEMY_LEVEL_COUNT / rooms.size();
+	int midleRoomCount = std::min(ENEMY_LEVEL_COUNT, mapNumber * 7) / rooms.size();
+	int minEnemy = std::max((int)(mapNumber * 0.5f), 1);
+	int maxEnemy = std::min((int)(mapNumber * 1.3f), ENEMY_COUNT - 2);
 
 	for (auto r : rooms)
 	{
@@ -369,7 +375,7 @@ void MapManager::writeEnemy(std::vector<sf::IntRect> rooms)
 																midleRoomCount * 1.2f));
 		for (auto p : points)
 		{
-			auto index = Random::intRandom(1, ENEMY_COUNT - 2);
+			auto index = Random::intRandom(minEnemy, maxEnemy);
 			auto def = spriteDefs[index];
 			nowMap->setMapSprite({def.texture + 1, (sf::Vector2f)p, (float)Random::intRandom(0,180), enemyDef[index].maxHealpoint});
 		}

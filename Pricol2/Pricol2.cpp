@@ -106,6 +106,7 @@ int main()
 		deltaTime = gameClock.getElapsedTime().asSeconds();
 		gameClock.restart();
 	}
+
 	game->save();
 	return 0;
 }

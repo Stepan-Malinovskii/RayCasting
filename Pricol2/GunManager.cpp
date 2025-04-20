@@ -8,6 +8,13 @@ WeaponManager::WeaponManager() : id{ 0 }
 	createTravel();
 	auto& event = EventSystem::getInstance();
 	event.subscribe<int>("SAVE", [=](const int& NON) {saveGun();});
+	event.subscribe<int>("RESET_GAME", [=](const int& NON) {
+		for (int i = 0; i < guns.size(); i++)
+		{
+			guns[i]->deleteImprove(ImproveType::Damage);
+			guns[i]->deleteImprove(ImproveType::Spread);
+			guns[i]->deleteImprove(ImproveType::Magazin);
+		}});
 }
 
 void WeaponManager::createImprovements()
