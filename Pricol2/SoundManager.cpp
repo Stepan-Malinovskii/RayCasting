@@ -29,15 +29,15 @@ void SoundManager::playerMusic(MusicType type)
 {
 	std::string filePath = "Sound/background";
 
-	if (type == Menu)
+	if (type == MenuSound)
 	{
 		filePath += "1";
 	}
-	else if (type == Base)
+	else if (type == BaseSound)
 	{
 		filePath += "2";
 	}
-	else if (type == Level)
+	else if (type == LevelSound)
 	{
 		filePath += std::to_string(Random::intRandom(3, 9));
 	}

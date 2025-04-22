@@ -17,7 +17,10 @@ class Resources
 private:
 	static void loadGun(std::string baseName, int index);
 public:
-	static sf::Texture dialogBackround;
+	static sf::Texture dialogBackground;
+	static sf::Texture tradeBackground;
+	static sf::Texture menuBackground;
+	static sf::Texture inventoryBackground;
 	static sf::Texture textures;
 	static sf::Texture skyTextures;
 	static sf::Image textureImage;

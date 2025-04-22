@@ -107,6 +107,8 @@ void Dialog::checkTrade()
 
 void Dialog::init()
 {
+	uiManager->deleteNow();
+
 	if (isTrade) 
 	{
 		initTrade();
@@ -186,10 +188,7 @@ void Dialog::update()
 
 	if (isPress && !isMouseDown)
 	{
-		sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
-		sf::Vector2i worldPos = (sf::Vector2i)window->mapPixelToCoords(mousePos);
-
-		int key = uiManager->checkButton(worldPos);
+		int key = uiManager->checkButton();
 
 		if (key != -1)
 		{

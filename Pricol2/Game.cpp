@@ -7,6 +7,7 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 	weaponManager = new WeaponManager();
 	renderer = new Renderer(window);
 	uiManager = new UIManager(window);
+	menu = new Menu(window, uiManager);
 	dialogSys = new Dialog(window, uiManager, weaponManager);
 	spManager = new SpriteManager(mapManager->getNowMap(), dialogSys);
 	player = spManager->getPlayer();
@@ -25,7 +26,6 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 		uiManager->drawPlayerUI(player);
 		};
 	playState = RenderState(update, draw);
-	currentState = &playState;
 
 	auto& event = EventSystem::getInstance();
 	event.subscribe<int>("SWAPLOC", [=](const int levelN)
@@ -40,6 +40,8 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 
 	event.subscribe<RenderState*>("SWAPSTATE", [=](RenderState* state) { currentState = state ? state : &playState;});
 
+	menu->useMenu();
+
 	player->enemy->spMap.nowHealPoint = 180.0f; // ÂÛÐÅÇÀÒÜ ÏÎÒÎÌ
 	player->money = 1000; // ÂÛÐÅÇÀÒÜ ÏÎÒÎÌ
 }
@@ -51,6 +53,7 @@ Game::~Game()
 	delete weaponManager;
 	delete uiManager;
 	delete invent;
+	delete menu;
 }
 
 void Game::initPlayer()
@@ -73,7 +76,7 @@ void Game::initPlayer()
 
 void Game::editor()
 {
-	spManager->resetMap(mapManager->getNowMap(), { {2.0f, 2.0f}, {} });
+	spManager->resetMap(mapManager->getNowMap(), { {10.0f, 10.0f}, {} });
 }
 
 void Game::save()

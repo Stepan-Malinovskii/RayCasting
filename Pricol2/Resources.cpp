@@ -2,7 +2,10 @@
 #include <thread>
 
 sf::Texture Resources::textures{};
-sf::Texture Resources::dialogBackround{};
+sf::Texture Resources::dialogBackground{};
+sf::Texture Resources::tradeBackground{};
+sf::Texture Resources::menuBackground{};
+sf::Texture Resources::inventoryBackground{};
 sf::Image Resources::textureImage{};
 sf::Texture Resources::spriteIcon{};
 std::vector<sf::Texture> Resources::spritesTextures{};
@@ -50,7 +53,10 @@ void Resources::loadGun(std::string baseName, int index)
 void Resources::initResources()
 {
 	if (!textureImage.loadFromFile("Texture/wall_texture.png")) throw "TextureLoadError!";
-	if (!dialogBackround.loadFromFile("Texture/dialogBackground.png")) throw "TextureLoadError!";
+	if (!dialogBackground.loadFromFile("Texture/dialogBackground.png")) throw "TextureLoadError!";
+	if (!tradeBackground.loadFromFile("Texture/tradeBackground.png")) throw "TextureLoadError!";
+	if (!menuBackground.loadFromFile("Texture/menuBackground.png")) throw "TextureLoadError!";
+	if (!inventoryBackground.loadFromFile("Texture/inventoryBackground.png")) throw "TextureLoadError!";
 	if (!textures.loadFromFile("Texture/wall_texture.png")) throw "TextureLoadError!";
 	if (!skyTextures.loadFromFile("Texture/sky_texture.png")) throw "TextureLoadError!";
 	if (!spriteIcon.loadFromFile("Texture/enemysIcon.png")) throw "TextureLoadError!";

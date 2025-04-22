@@ -192,11 +192,9 @@ void Inventory::update()
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !isMouseDown)
 	{
-		sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
-
 		isMouseDown = true;
 
-		int key = uiManager->checkButton(mousePos);
+		int key = uiManager->checkButton();
 		if (key != -1)
 		{
 			nowKey = key;

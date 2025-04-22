@@ -100,8 +100,8 @@ void MapManager::load(std::string fileName)
 
 	in.close();
 
-	if (isBase) { SoundManager::playerMusic(Base); }
-	else { SoundManager::playerMusic(Level); }
+	if (isBase) { SoundManager::playerMusic(BaseSound); }
+	else { SoundManager::playerMusic(LevelSound); }
 }
 
 std::pair<sf::Vector2f, sf::Vector2f> MapManager::nextLocation(int index)
@@ -110,7 +110,7 @@ std::pair<sf::Vector2f, sf::Vector2f> MapManager::nextLocation(int index)
 	{
 		isBase = true;
 		auto tempN = mapNumber;
-		SoundManager::playerMusic(Base);
+		SoundManager::playerMusic(BaseSound);
 		load(mapFileNames[BASE_N]);
 		mapNumber = tempN;
 
@@ -126,7 +126,7 @@ std::pair<sf::Vector2f, sf::Vector2f> MapManager::nextLocation(int index)
 	else
 	{
 		isBase = false;
-		SoundManager::playerMusic(Level);
+		SoundManager::playerMusic(LevelSound);
 		if (index == NEXT_LEVEL_N)
 		{
 			mapNumber++;

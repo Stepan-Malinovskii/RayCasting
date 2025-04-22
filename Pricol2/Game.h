@@ -19,6 +19,7 @@
 #include "MapManager.h"
 #include "SoundManager.h"
 #include "RenderState.h"
+#include "Menu.h"
 
 
 class Game
@@ -35,6 +36,7 @@ private:
 	void getInput(float deltaTime);
 	void initPlayer();
 
+	Menu* menu;
 	RenderState* currentState;
 	RenderState playState;
 	Inventory* invent;
