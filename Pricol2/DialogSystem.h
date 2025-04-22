@@ -18,11 +18,9 @@ public:
 	Dialog(sf::RenderWindow* _window, UIManager* _uiManager, 
 		WeaponManager* _weaponManager);
 	void setPlayer(Player* _player);
-	RenderState* start(int key, std::wstring name = L"");
+	void start(int key, std::wstring name = L"");
 	void update();
 	void draw();
-
-	std::function<void()> onDialogEnd;
 private:
 	bool isActive;
 	RenderState dialogState;

@@ -22,14 +22,15 @@ Dialog::Dialog(sf::RenderWindow* _window, UIManager* _uiManager,
 
 void Dialog::setPlayer(Player* _player) { player = _player; }
 
-RenderState* Dialog::start(int key, std::wstring _name)
+void Dialog::start(int key, std::wstring _name)
 {
+	auto& event = EventSystem::getInstance();
+	event.trigger<RenderState*>("SWAPSTATE", &dialogState);
 	window->setMouseCursorVisible(true);
 	isActive = true;
 	name = _name;
 	nowKey = key;
 	init();
-	return &dialogState;
 }
 
 void Dialog::stop()
@@ -39,7 +40,8 @@ void Dialog::stop()
 	isTrade = false;
 	title.clear();
 	uiManager->deleteNow();
-	onDialogEnd();
+	auto& event = EventSystem::getInstance();
+	event.trigger<RenderState*>("SWAPSTATE", nullptr);
 }
 
 void Dialog::buy()

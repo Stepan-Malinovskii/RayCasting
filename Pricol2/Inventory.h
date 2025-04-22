@@ -15,7 +15,7 @@ public:
 	Item* takeMaxHeal();
 	void takeItem(Itemble*, int cnt = 1);
 	void useItem(Itemble*, int cnt = 1);
-	RenderState* useInvent();
+	void useInvent();
 	void update();
 	void drawInvent();
 private:

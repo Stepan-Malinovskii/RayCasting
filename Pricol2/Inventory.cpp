@@ -73,21 +73,23 @@ std::vector<std::pair<int, int>> Inventory::convert2save()
 	return inv;
 }
 
-RenderState* Inventory::useInvent() 
+void Inventory::useInvent() 
 { 
+	auto& event = EventSystem::getInstance();
+
 	window->setMouseCursorVisible(!isOpen);
 	if (isOpen)
 	{
+		event.trigger<RenderState*>("SWAPSTATE", nullptr);
 		isOpen = false;
 		uiManager->deleteNow();
 		choose = nullptr;
-		return nullptr;
 	}
 	else
 	{
+		event.trigger<RenderState*>("SWAPSTATE", &invetState);
 		isOpen = true;
 		initInv();
-		return &invetState;
 	}
 }
 
