@@ -9,7 +9,7 @@
 
 enum MusicType
 {
-	Menu, Base, Level
+	MenuSound, BaseSound, LevelSound
 };
 
 class SoundManager

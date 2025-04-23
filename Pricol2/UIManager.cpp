@@ -3,11 +3,7 @@
 #include <iomanip>
 #include <SFML/Graphics.hpp>
 
-UIManager::UIManager(sf::RenderWindow* _window)
-{
-	window = _window;
-	initPlayer();
-}
+UIManager::UIManager(sf::RenderWindow* _window) : window{ _window } {}
 
 std::wstring UIManager::splitText(std::wstring text, int maxLen, int textSize)
 {
@@ -41,10 +37,30 @@ std::wstring UIManager::splitText(std::wstring text, int maxLen, int textSize)
 	return result;
 }
 
+std::wstring UIManager::toMax(std::wstring str, float maxW, float textSize)
+{
+	sf::Text text(L"", Resources::UIFont, textSize);
+	std::wstring result = str;
+	while (true)
+	{
+		text.setString(result);
+
+		if (text.getLocalBounds().width > maxW)
+		{
+			break;
+		}
+
+		result += L" ";
+	}
+	return result;
+}
+
 void UIManager::initDialog(std::map<int, std::wstring, std::greater<int>> variants,
 	std::wstring npcName)
 {
-	deleteNow();
+	background = sf::Sprite(Resources::dialogBackground);
+	background.setScale({ SCREEN_W / Resources::dialogBackground.getSize().x,
+		SCREEN_H / Resources::dialogBackground.getSize().y });
 
 	sf::RectangleShape nameBase{ {DIALOG_W, TEXTSIZE + 10} };
 	nameBase.setFillColor(sf::Color(100, 100, 100));
@@ -79,27 +95,36 @@ void UIManager::initDialog(std::map<int, std::wstring, std::greater<int>> varian
 	}
 }
 
-std::wstring UIManager::toMax(std::wstring str, float maxW, float textSize)
+void UIManager::initMenu()
 {
-	sf::Text text(L"", Resources::UIFont, textSize);
-	std::wstring result = str;
-	while (true)
-	{
-		text.setString(result);
+	background = sf::Sprite(Resources::menuBackground);
+	background.setScale({ SCREEN_W / Resources::menuBackground.getSize().x,
+		SCREEN_H / Resources::menuBackground.getSize().y });
+	
+	sf::Text text(L"œ–ŒƒŒÀ∆»“‹ »√–”", Resources::UIFont, 50.0f);
+	sf::RectangleShape shape( {text.getLocalBounds().width + 20.0f, 60.0f});
+	shape.setFillColor(sf::Color(100, 100, 100));
+	Button button(Group(shape, text));
+	button.setPosition({ SCREEN_W / 2.0f, 2.0f * SCREEN_H / 3.0f - 35.0f });
+	button.setFunc([=]() { keyButton = 0;});
+	buttons.push_back(button);
 
-		if (text.getLocalBounds().width > maxW)
-		{
-			break;
-		}
+	button.setString(L"ÕŒ¬¿ﬂ »√–¿");
+	button.setPosition({ SCREEN_W / 2.0f, 2.0f * SCREEN_H / 3.0f + 35.0f });
+	button.setFunc([=]() { keyButton = 1;});
+	buttons.push_back(button);
 
-		result += L" ";
-	}
-	return result;
+	button.setString(L"¬€’Œƒ");
+	button.setPosition({ SCREEN_W / 2.0f, 2.0f * SCREEN_H / 3.0f + 105.0f });
+	button.setFunc([=]() { keyButton = 2;});
+	buttons.push_back(button);
 }
 
 void UIManager::initTrade(std::map<int, Itemble*> variants, Player* player)
 {
-	deleteNow();
+	background = sf::Sprite(Resources::tradeBackground);
+	background.setScale({ SCREEN_W / Resources::tradeBackground.getSize().x,
+		SCREEN_H / Resources::tradeBackground.getSize().y });
 
 	float interval = 5.0f;
 	float size = 44;
@@ -186,7 +211,9 @@ void UIManager::initTrade(std::map<int, Itemble*> variants, Player* player)
 
 void UIManager::initInvent(std::map<Itemble*, int> items, Itemble* choose, Player* player)
 {
-	deleteNow();
+	background = sf::Sprite(Resources::inventoryBackground);
+	background.setScale({ SCREEN_W / Resources::inventoryBackground.getSize().x,
+		SCREEN_H / Resources::inventoryBackground.getSize().y });
 
 	sf::RectangleShape baseShape({ DIALOG_W / 2 + 15, DIALOG_H + 10});
 	baseShape.setFillColor(sf::Color(70, 70, 70));
@@ -335,136 +362,19 @@ void UIManager::initInvent(std::map<Itemble*, int> items, Itemble* choose, Playe
 	}
 }
 
-void UIManager::initPlayer()
-{
-	playerUI = [&](Player* player)
-		{
-			sf::Text weaponInfo;
-
-			if (!player->kick->isCanUsed())
-			{
-				player->kick->drawWeapon(window, { 0,0 });
-			}
-			else
-			{
-				auto gun = player->getNowGun();
-				gun->drawWeapon(window, player->getDeltaShake());
-
-				if (gun->isReset)
-				{
-					weaponInfo = sf::Text(std::to_string(player->patrons), Resources::UIFont, 30);
-					auto b = weaponInfo.getLocalBounds();
-					weaponInfo.setOrigin({ b.width / 2, b.height / 2 });
-					weaponInfo.setPosition({ SCREEN_W / 2, SCREEN_H / 2 - weaponInfo.getCharacterSize() / 4 });
-					weaponInfo.setPosition({ SCREEN_W - b.width / 2 - 20, SCREEN_H - 30 });
-					weaponInfo.setFillColor({ 0, 0, 0 });
-					window->draw(weaponInfo);
-
-					weaponInfo.setString(std::to_string(gun->nowCount) + " / " + std::to_string(gun->maxCount));
-					b = weaponInfo.getLocalBounds();
-					weaponInfo.setOrigin({ b.width / 2, b.height / 2 });
-					weaponInfo.setPosition({ SCREEN_W / 2, SCREEN_H / 2 - weaponInfo.getCharacterSize() / 4 });
-					weaponInfo.setPosition({ SCREEN_W - b.width / 2 - 20, SCREEN_H - 60 });
-					window->draw(weaponInfo);
-				}
-			}
-			float baseX = 300;
-			sf::RectangleShape baseShape({ baseX, 40 });
-			baseShape.setFillColor({ 128, 128, 128 });
-			sf::Text text("", Resources::UIFont, 30);
-			Group group1(baseShape, text);
-			group1.setPosition({ 170, SCREEN_H - 120 });
-			window->draw(group1.shape);
-
-			Group group2(group1);
-			group2.setPosition({ group2.getPosition().x, group2.getPosition().y + 40 });
-			window->draw(group2.shape);
-
-			Group group3(group1);
-			group3.setPosition({ group3.getPosition().x, group3.getPosition().y + 80 });
-			window->draw(group3.shape);
-
-			std::wostringstream oss;
-			oss << std::fixed << std::setprecision(2) << player->enemy->spMap.nowHealPoint;
-			oss << " / ";
-			oss << std::fixed << std::setprecision(2) << player->enemy->enemyDef.maxHealpoint;
-			std::wstring str = oss.str();
-
-			group1.shape.setFillColor({ 255, 23, 23 });
-			float newXH = baseX * (player->enemy->spMap.nowHealPoint <= 0 ? 0 :
-				player->enemy->spMap.nowHealPoint) / player->enemy->enemyDef.maxHealpoint;
-			group1.shape.setSize({ newXH, 40 });
-			group1.setString(str);
-			window->draw(group1.shape);
-			window->draw(group1.text);
-
-			oss.str(L"");
-			oss.clear();
-			oss << std::fixed << std::setprecision(2) << player->nowStrenght;
-			oss << " / ";
-			oss << std::fixed << std::setprecision(2) << player->maxStrenght;
-			str = oss.str();
-
-			group2.shape.setFillColor({ 70, 130, 80 });
-			float newXD = baseX * player->nowStrenght / player->maxStrenght;
-			group2.shape.setSize({ newXD, 40 });
-			group2.setString(str);
-			window->draw(group2.shape);
-			window->draw(group2.text);
-
-			oss.str(L"");
-			oss.clear();
-			oss << std::fixed << std::setprecision(2) << player->nowEnergy;
-			oss << " / ";
-			oss << std::fixed << std::setprecision(2) << player->maxEnergy;
-			str = oss.str();
-
-			group3.shape.setFillColor({ 44, 148, 15 });
-			float newXB = baseX * player->nowEnergy / player->maxEnergy;
-			group3.shape.setSize({ newXB, 40 });
-			group3.setString(str);
-			window->draw(group3.shape);
-			window->draw(group3.text);
-
-			if (player->nowHeal)
-			{
-				sf::RectangleShape rect({ ICON_SIZE, ICON_SIZE });
-				rect.setTexture(&Resources::itembleIcon);
-				rect.setTextureRect({ {player->nowHeal->id * ICON_SIZE, 0},{ICON_SIZE, ICON_SIZE} });
-				auto b = rect.getLocalBounds();
-				rect.setOrigin({ b.width / 2, b.height / 2 });
-				if (weaponInfo.getString() != "")
-				{
-					rect.setPosition({ SCREEN_W - ICON_SIZE - weaponInfo.getLocalBounds().width,  SCREEN_H - ICON_SIZE / 2 });
-				}
-				else
-				{
-					rect.setPosition({ SCREEN_W - b.width / 2 - 20, SCREEN_H - ICON_SIZE / 2 });
-				}
-				window->draw(rect);
-			}
-
-			sf::CircleShape aim(player->getNowGun()->nowRad, 16);
-			aim.setOrigin({ aim.getRadius(), aim.getRadius() });
-			aim.setFillColor(sf::Color(0, 0, 0, 0));
-			aim.setOutlineColor(sf::Color::Black);
-			aim.setOutlineThickness(1.5f);
-			aim.setPosition({ SCREEN_W / 2, SCREEN_H / 2 });
-			window->draw(aim);
-		};
-}
-
 void UIManager::deleteNow() 
 { 
 	buttons.clear();
 	choseBut = nullptr;
 }
 
-int UIManager::checkButton(sf::Vector2i mousePos)
+int UIManager::checkButton()
 {
+	sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+	sf::Vector2i worldPos = (sf::Vector2i)window->mapPixelToCoords(mousePos);
 	for (int i = 0; i < buttons.size(); i++)
 	{
-		if (buttons[i].isClicked(mousePos))
+		if (buttons[i].isClicked(worldPos))
 		{
 			if (choseBut != nullptr) choseBut->setFillColor(sf::Color(50, 50, 50));
 			choseBut = &buttons[i];
@@ -478,10 +388,7 @@ int UIManager::checkButton(sf::Vector2i mousePos)
 
 void UIManager::drawNow()
 {
-	sf::Sprite back(Resources::dialogBackround);
-	back.setScale({ SCREEN_W / Resources::dialogBackround.getSize().x,
-		SCREEN_H / Resources::dialogBackround.getSize().y });
-	window->draw(back);
+	window->draw(background);
 	for (auto b : buttons)
 	{
 		window->draw(b);
@@ -490,5 +397,116 @@ void UIManager::drawNow()
 
 void UIManager::drawPlayerUI(Player* player)
 {
-	playerUI(player);
+	sf::Text weaponInfo;
+
+	if (!player->kick->isCanUsed())
+	{
+		player->kick->drawWeapon(window, { 0,0 });
+	}
+	else
+	{
+		auto gun = player->getNowGun();
+		gun->drawWeapon(window, player->getDeltaShake());
+
+		if (gun->isReset)
+		{
+			weaponInfo = sf::Text(std::to_string(player->patrons), Resources::UIFont, 30);
+			auto b = weaponInfo.getLocalBounds();
+			weaponInfo.setOrigin({ b.width / 2, b.height / 2 });
+			weaponInfo.setPosition({ SCREEN_W / 2, SCREEN_H / 2 - weaponInfo.getCharacterSize() / 4 });
+			weaponInfo.setPosition({ SCREEN_W - b.width / 2 - 20, SCREEN_H - 30 });
+			weaponInfo.setFillColor({ 0, 0, 0 });
+			window->draw(weaponInfo);
+
+			weaponInfo.setString(std::to_string(gun->nowCount) + " / " + std::to_string(gun->maxCount));
+			b = weaponInfo.getLocalBounds();
+			weaponInfo.setOrigin({ b.width / 2, b.height / 2 });
+			weaponInfo.setPosition({ SCREEN_W / 2, SCREEN_H / 2 - weaponInfo.getCharacterSize() / 4 });
+			weaponInfo.setPosition({ SCREEN_W - b.width / 2 - 20, SCREEN_H - 60 });
+			window->draw(weaponInfo);
+		}
+	}
+	float baseX = 300;
+	sf::RectangleShape baseShape({ baseX, 40 });
+	baseShape.setFillColor({ 128, 128, 128 });
+	sf::Text text("", Resources::UIFont, 30);
+	Group group1(baseShape, text);
+	group1.setPosition({ 170, SCREEN_H - 120 });
+	window->draw(group1.shape);
+
+	Group group2(group1);
+	group2.setPosition({ group2.getPosition().x, group2.getPosition().y + 40 });
+	window->draw(group2.shape);
+
+	Group group3(group1);
+	group3.setPosition({ group3.getPosition().x, group3.getPosition().y + 80 });
+	window->draw(group3.shape);
+
+	std::wostringstream oss;
+	oss << std::fixed << std::setprecision(2) << player->enemy->spMap.nowHealPoint;
+	oss << " / ";
+	oss << std::fixed << std::setprecision(2) << player->enemy->enemyDef.maxHealpoint;
+	std::wstring str = oss.str();
+
+	group1.shape.setFillColor({ 255, 23, 23 });
+	float newXH = baseX * (player->enemy->spMap.nowHealPoint <= 0 ? 0 :
+		player->enemy->spMap.nowHealPoint) / player->enemy->enemyDef.maxHealpoint;
+	group1.shape.setSize({ newXH, 40 });
+	group1.setString(str);
+	window->draw(group1.shape);
+	window->draw(group1.text);
+
+	oss.str(L"");
+	oss.clear();
+	oss << std::fixed << std::setprecision(2) << player->nowStrenght;
+	oss << " / ";
+	oss << std::fixed << std::setprecision(2) << player->maxStrenght;
+	str = oss.str();
+
+	group2.shape.setFillColor({ 70, 130, 80 });
+	float newXD = baseX * player->nowStrenght / player->maxStrenght;
+	group2.shape.setSize({ newXD, 40 });
+	group2.setString(str);
+	window->draw(group2.shape);
+	window->draw(group2.text);
+
+	oss.str(L"");
+	oss.clear();
+	oss << std::fixed << std::setprecision(2) << player->nowEnergy;
+	oss << " / ";
+	oss << std::fixed << std::setprecision(2) << player->maxEnergy;
+	str = oss.str();
+
+	group3.shape.setFillColor({ 44, 148, 15 });
+	float newXB = baseX * player->nowEnergy / player->maxEnergy;
+	group3.shape.setSize({ newXB, 40 });
+	group3.setString(str);
+	window->draw(group3.shape);
+	window->draw(group3.text);
+
+	if (player->nowHeal)
+	{
+		sf::RectangleShape rect({ ICON_SIZE, ICON_SIZE });
+		rect.setTexture(&Resources::itembleIcon);
+		rect.setTextureRect({ {player->nowHeal->id * ICON_SIZE, 0},{ICON_SIZE, ICON_SIZE} });
+		auto b = rect.getLocalBounds();
+		rect.setOrigin({ b.width / 2, b.height / 2 });
+		if (weaponInfo.getString() != "")
+		{
+			rect.setPosition({ SCREEN_W - ICON_SIZE - weaponInfo.getLocalBounds().width,  SCREEN_H - ICON_SIZE / 2 });
+		}
+		else
+		{
+			rect.setPosition({ SCREEN_W - b.width / 2 - 20, SCREEN_H - ICON_SIZE / 2 });
+		}
+		window->draw(rect);
+	}
+
+	sf::CircleShape aim(player->getNowGun()->nowRad, 16);
+	aim.setOrigin({ aim.getRadius(), aim.getRadius() });
+	aim.setFillColor(sf::Color(0, 0, 0, 0));
+	aim.setOutlineColor(sf::Color::Black);
+	aim.setOutlineThickness(1.5f);
+	aim.setPosition({ SCREEN_W / 2, SCREEN_H / 2 });
+	window->draw(aim);
 }

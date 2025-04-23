@@ -5,6 +5,10 @@ MapManager::MapManager(sf::RenderWindow* _window) :
 {
 	auto& event = EventSystem::getInstance();
 	event.subscribe<int>("SAVE", [=](const int NON) { save(); });
+
+	event.subscribe<int>("RESET_GAME", [=](const int NON) {
+		load(mapFileNames[BASE_N]);
+		mapNumber = 0; });
 }
 
 MapManager::~MapManager()
@@ -96,8 +100,8 @@ void MapManager::load(std::string fileName)
 
 	in.close();
 
-	if (isBase) { SoundManager::playerMusic(Base); }
-	else { SoundManager::playerMusic(Level); }
+	if (isBase) { SoundManager::playerMusic(BaseSound); }
+	else { SoundManager::playerMusic(LevelSound); }
 }
 
 std::pair<sf::Vector2f, sf::Vector2f> MapManager::nextLocation(int index)
@@ -106,7 +110,7 @@ std::pair<sf::Vector2f, sf::Vector2f> MapManager::nextLocation(int index)
 	{
 		isBase = true;
 		auto tempN = mapNumber;
-		SoundManager::playerMusic(Base);
+		SoundManager::playerMusic(BaseSound);
 		load(mapFileNames[BASE_N]);
 		mapNumber = tempN;
 
@@ -122,7 +126,7 @@ std::pair<sf::Vector2f, sf::Vector2f> MapManager::nextLocation(int index)
 	else
 	{
 		isBase = false;
-		SoundManager::playerMusic(Level);
+		SoundManager::playerMusic(LevelSound);
 		if (index == NEXT_LEVEL_N)
 		{
 			mapNumber++;
@@ -357,7 +361,9 @@ void MapManager::writeRoom(sf::IntRect rect, int layer, int value)
 
 void MapManager::writeEnemy(std::vector<sf::IntRect> rooms)
 {
-	int midleRoomCount = ENEMY_LEVEL_COUNT / rooms.size();
+	int midleRoomCount = std::min(ENEMY_LEVEL_COUNT, mapNumber * 7) / rooms.size();
+	int minEnemy = std::max((int)(mapNumber * 0.5f), 1);
+	int maxEnemy = std::min((int)(mapNumber * 1.3f), ENEMY_COUNT - 2);
 
 	for (auto r : rooms)
 	{
@@ -369,7 +375,7 @@ void MapManager::writeEnemy(std::vector<sf::IntRect> rooms)
 																midleRoomCount * 1.2f));
 		for (auto p : points)
 		{
-			auto index = Random::intRandom(1, ENEMY_COUNT - 2);
+			auto index = Random::intRandom(minEnemy, maxEnemy);
 			auto def = spriteDefs[index];
 			nowMap->setMapSprite({def.texture + 1, (sf::Vector2f)p, (float)Random::intRandom(0,180), enemyDef[index].maxHealpoint});
 		}

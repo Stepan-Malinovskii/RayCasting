@@ -3,8 +3,10 @@
 #define UIM
 
 #include "Player.h"
+#include "EventSystem.h"
 #include "sfmlExtantion.h"
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Window/Mouse.hpp>
 #include <vector>
 #include "Weapon.h"
 #include <map>
@@ -18,16 +20,17 @@ public:
 	void drawPlayerUI(Player* player);
 	void initDialog(std::map<int, std::wstring, std::greater<int>> variants,
 		std::wstring npcName);
+	void initMenu();
 	void initTrade(std::map<int, Itemble*> variants, Player* player);
 	void initInvent(std::map<Itemble*, int> items, Itemble* chose, Player* player);
 	void deleteNow();
 	void drawNow();
-	int checkButton(sf::Vector2i mousePos);
+	int checkButton();
 private:
-	void initPlayer();
 	std::wstring splitText(std::wstring text, int maxLen, int textSize);
 	std::wstring toMax(std::wstring str, float maxW, float textSize);
 	sf::RenderWindow* window;
+	sf::Sprite background;
 	Button* choseBut;
 	std::vector<Button> buttons;
 	int keyButton;

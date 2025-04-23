@@ -7,6 +7,7 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 	weaponManager = new WeaponManager();
 	renderer = new Renderer(window);
 	uiManager = new UIManager(window);
+	menu = new Menu(window, uiManager);
 	dialogSys = new Dialog(window, uiManager, weaponManager);
 	spManager = new SpriteManager(mapManager->getNowMap(), dialogSys);
 	player = spManager->getPlayer();
@@ -14,11 +15,7 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 	initPlayer();
 
 	auto& data = Data::getInstance();
-
-	for (auto b : data.getInvent())
-	{
-		player->takeItem(weaponManager->getItem(b.first), b.second);
-	}
+	for (auto b : data.getInvent()) { player->takeItem(weaponManager->getItem(b.first), b.second); }
 
 	auto update = [=](float deltaTime) {
 		getInput(deltaTime);
@@ -29,9 +26,6 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 		uiManager->drawPlayerUI(player);
 		};
 	playState = RenderState(update, draw);
-	currentState = &playState;
-
-	dialogSys->onDialogEnd = [=]() { currentState = &playState; };
 
 	auto& event = EventSystem::getInstance();
 	event.subscribe<int>("SWAPLOC", [=](const int levelN)
@@ -40,6 +34,13 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 			spManager->resetMap(mapManager->getNowMap(), pair);
 		}
 	);
+
+	event.subscribe<int>("RESET_GAME", [=](const int NON) { currentState = &playState;
+	player->guns[1] = nullptr; player->guns[2] = nullptr; player->setGun(weaponManager->getGunById(2), 1);});
+
+	event.subscribe<RenderState*>("SWAPSTATE", [=](RenderState* state) { currentState = state ? state : &playState;});
+
+	menu->useMenu();
 
 	player->enemy->spMap.nowHealPoint = 180.0f; // ÂÛÐÅÇÀÒÜ ÏÎÒÎÌ
 	player->money = 1000; // ÂÛÐÅÇÀÒÜ ÏÎÒÎÌ
@@ -52,6 +53,7 @@ Game::~Game()
 	delete weaponManager;
 	delete uiManager;
 	delete invent;
+	delete menu;
 }
 
 void Game::initPlayer()
@@ -74,7 +76,7 @@ void Game::initPlayer()
 
 void Game::editor()
 {
-	spManager->resetMap(mapManager->getNowMap(), { {2.0f, 2.0f}, {} });
+	spManager->resetMap(mapManager->getNowMap(), { {10.0f, 10.0f}, {} });
 }
 
 void Game::save()
@@ -90,8 +92,7 @@ void Game::getInput(sf::Event event, float deltaTime)
 	{
 		if (event.key.code == sf::Keyboard::Q)
 		{
-			currentState = invent->useInvent();
-			if (!currentState) { currentState = &playState; }
+			invent->useInvent();
 		}
 	}
 
@@ -139,13 +140,11 @@ void Game::getInput(float deltaTime)
 	if (GetAsyncKeyState('F')) { player->fire(); }
 	if (GetAsyncKeyState('E'))
 	{
-		Sprite* sp = player->dialog();
-		if (sp != nullptr)
+		if (Sprite* sp = player->dialog(); sp)
 		{
-			auto npc = spManager->getNpc(sp->id);
-			if (npc)
+			if (auto npc = spManager->getNpc(sp->id); npc)
 			{
-				currentState = dialogSys->start(npc->npcDefData.startKey, npc->spDef.name);
+				dialogSys->start(npc->npcDefData.startKey, npc->spDef.name);
 			}
 		}
 	}
@@ -161,12 +160,6 @@ void Game::getInput(float deltaTime)
 
 void Game::makeCycle(float deltaTime)
 {
-#ifdef NDEBUG
-	deltaTime = std::min(deltaTime, 1.0f / 144.0f);
-#endif
-
-	window->clear();
-
 	currentState->update(deltaTime);
 	currentState->draw();
 	SoundManager::update();

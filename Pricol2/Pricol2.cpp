@@ -17,7 +17,6 @@ int main()
 	editorWindow.setVisible(false);
 
 	State state = State::Game;
-
 	Resources::initResources();
 
 	std::unique_ptr<MapManager> mapManager = std::make_unique<MapManager>(&window);
@@ -102,10 +101,11 @@ int main()
 		}
 
 		window.display();
-		window.setTitle("Game " + std::to_string(1.0f / deltaTime));
+		window.setTitle("SOLDIER " + std::to_string(1.0f / deltaTime));
 		deltaTime = gameClock.getElapsedTime().asSeconds();
 		gameClock.restart();
 	}
+
 	game->save();
 	return 0;
 }

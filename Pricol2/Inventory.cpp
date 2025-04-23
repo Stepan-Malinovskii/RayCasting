@@ -21,6 +21,7 @@ Inventory::Inventory(sf::RenderWindow* _window, Player* _player, UIManager* _uiM
 			auto& data = Data::getInstance();
 			data.saveInvent(convert2save());
 		});
+	event.subscribe<int>("RESET_GAME", [=](const int NON) { items.clear(); });
 }
 
 Item* Inventory::takeMaxHeal()
@@ -72,21 +73,23 @@ std::vector<std::pair<int, int>> Inventory::convert2save()
 	return inv;
 }
 
-RenderState* Inventory::useInvent() 
+void Inventory::useInvent() 
 { 
+	auto& event = EventSystem::getInstance();
+
 	window->setMouseCursorVisible(!isOpen);
 	if (isOpen)
 	{
+		event.trigger<RenderState*>("SWAPSTATE", nullptr);
 		isOpen = false;
 		uiManager->deleteNow();
 		choose = nullptr;
-		return nullptr;
 	}
 	else
 	{
+		event.trigger<RenderState*>("SWAPSTATE", &invetState);
 		isOpen = true;
 		initInv();
-		return &invetState;
 	}
 }
 
@@ -189,11 +192,9 @@ void Inventory::update()
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !isMouseDown)
 	{
-		sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
-
 		isMouseDown = true;
 
-		int key = uiManager->checkButton(mousePos);
+		int key = uiManager->checkButton();
 		if (key != -1)
 		{
 			nowKey = key;
