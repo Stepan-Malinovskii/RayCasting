@@ -43,11 +43,11 @@ void SoundManager::playerMusic(MusicType type)
 	}
 	else if (type == StartIntro)
 	{
-		filePath = "Sound/startIntro";
+		filePath = "Sound/startIntroMusic";
 	}
 	else if (type == EndIntro)
 	{
-		filePath = "Sound/endIntro";
+		filePath = "Sound/endIntroMusic";
 	}
 
 	if (!music.openFromFile(filePath + ".ogg")) return;
