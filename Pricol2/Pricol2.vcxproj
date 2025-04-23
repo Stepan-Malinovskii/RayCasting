@@ -107,14 +107,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Stepan\Desktop\SFML-2.6.2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Include;.\HPP</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\Stepan\Desktop\SFML-2.6.2\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-audio-d.lib;sfml-system-d.lib;sfml-network-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-audio-d.lib;sfml-system-d.lib;sfml-network-d.lib;sfeMovie-d.lib;avcodec.lib;avformat.lib;avutil.lib;swscale.lib;avdevice.lib;swresample.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
@@ -126,7 +126,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Stepan\Desktop\SFML-2.6.2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Include;.\HPP</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -134,65 +134,65 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>sfml-window.lib;sfml-system.lib;sfml-audio.lib;sfml-network.lib;sfml-graphics.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sfml-window.lib;sfml-system.lib;sfml-audio.lib;sfml-network.lib;sfml-graphics.lib;sfeMovie.lib;avcodec.lib;avformat.lib;avutil.lib;swscale.lib;avdevice.lib;swresample.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
-      <AdditionalLibraryDirectories>C:\Users\Stepan\Desktop\SFML-2.6.2\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DataBase.cpp" />
-    <ClCompile Include="DialigSystem.cpp" />
-    <ClCompile Include="Editor.cpp" />
-    <ClCompile Include="Game.cpp" />
-    <ClCompile Include="GunManager.cpp" />
-    <ClCompile Include="Inventory.cpp" />
-    <ClCompile Include="Leaf.cpp" />
-    <ClCompile Include="Map.cpp" />
-    <ClCompile Include="MapManager.cpp" />
-    <ClCompile Include="Menu.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="Pricol2.cpp" />
-    <ClCompile Include="Randomizer.cpp" />
-    <ClCompile Include="Raycast.cpp" />
-    <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="Resources.cpp" />
-    <ClCompile Include="sfmlExtetion.cpp" />
-    <ClCompile Include="SoundManager.cpp" />
-    <ClCompile Include="Sprite.cpp" />
-    <ClCompile Include="SpriteManager.cpp" />
-    <ClCompile Include="UIManager.cpp" />
-    <ClCompile Include="Weapon.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Animation.h" />
-    <ClInclude Include="DataBase.h" />
-    <ClInclude Include="DialogSystem.h" />
-    <ClInclude Include="Editor.h" />
-    <ClInclude Include="EventSystem.h" />
-    <ClInclude Include="Game.h" />
-    <ClInclude Include="GunManager.h" />
-    <ClInclude Include="Inventory.h" />
-    <ClInclude Include="Leaf.h" />
-    <ClInclude Include="Map.h" />
-    <ClInclude Include="MapManager.h" />
-    <ClInclude Include="Menu.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="Randomizer.h" />
-    <ClInclude Include="Raycast.h" />
-    <ClInclude Include="Renderer.h" />
-    <ClInclude Include="RenderState.h" />
-    <ClInclude Include="Resources.h" />
-    <ClInclude Include="sfmlExtantion.h" />
-    <ClInclude Include="SoundManager.h" />
-    <ClInclude Include="Sprite.h" />
-    <ClInclude Include="SpriteManager.h" />
-    <ClInclude Include="UIManeger.h" />
-    <ClInclude Include="Weapon.h" />
+    <ClCompile Include="CPP\DataBase.cpp" />
+    <ClCompile Include="CPP\DialigSystem.cpp" />
+    <ClCompile Include="CPP\Editor.cpp" />
+    <ClCompile Include="CPP\Game.cpp" />
+    <ClCompile Include="CPP\GunManager.cpp" />
+    <ClCompile Include="CPP\Inventory.cpp" />
+    <ClCompile Include="CPP\Leaf.cpp" />
+    <ClCompile Include="CPP\Map.cpp" />
+    <ClCompile Include="CPP\MapManager.cpp" />
+    <ClCompile Include="CPP\Menu.cpp" />
+    <ClCompile Include="CPP\Player.cpp" />
+    <ClCompile Include="CPP\Pricol2.cpp" />
+    <ClCompile Include="CPP\Randomizer.cpp" />
+    <ClCompile Include="CPP\Raycast.cpp" />
+    <ClCompile Include="CPP\Renderer.cpp" />
+    <ClCompile Include="CPP\Resources.cpp" />
+    <ClCompile Include="CPP\sfmlExtetion.cpp" />
+    <ClCompile Include="CPP\SoundManager.cpp" />
+    <ClCompile Include="CPP\Sprite.cpp" />
+    <ClCompile Include="CPP\SpriteManager.cpp" />
+    <ClCompile Include="CPP\UIManager.cpp" />
+    <ClCompile Include="CPP\Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="KeyData.txt" />
     <Text Include="Readme.txt" />
     <Text Include="TextData.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="HPP\Animation.h" />
+    <ClInclude Include="HPP\DataBase.h" />
+    <ClInclude Include="HPP\DialogSystem.h" />
+    <ClInclude Include="HPP\Editor.h" />
+    <ClInclude Include="HPP\EventSystem.h" />
+    <ClInclude Include="HPP\Game.h" />
+    <ClInclude Include="HPP\GunManager.h" />
+    <ClInclude Include="HPP\Inventory.h" />
+    <ClInclude Include="HPP\Leaf.h" />
+    <ClInclude Include="HPP\Map.h" />
+    <ClInclude Include="HPP\MapManager.h" />
+    <ClInclude Include="HPP\Menu.h" />
+    <ClInclude Include="HPP\Player.h" />
+    <ClInclude Include="HPP\Randomizer.h" />
+    <ClInclude Include="HPP\Raycast.h" />
+    <ClInclude Include="HPP\Renderer.h" />
+    <ClInclude Include="HPP\RenderState.h" />
+    <ClInclude Include="HPP\Resources.h" />
+    <ClInclude Include="HPP\sfmlExtantion.h" />
+    <ClInclude Include="HPP\SoundManager.h" />
+    <ClInclude Include="HPP\Sprite.h" />
+    <ClInclude Include="HPP\SpriteManager.h" />
+    <ClInclude Include="HPP\UIManeger.h" />
+    <ClInclude Include="HPP\Weapon.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
