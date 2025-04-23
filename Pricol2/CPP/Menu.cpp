@@ -9,6 +9,7 @@ void Menu::start()
 	window->setMouseCursorVisible(true);
 	uiManager->initMenu();
 	event.trigger<RenderState*>("SWAPSTATE", &menuState);
+	SoundManager::playerMusic(MenuSound);
 }
 
 void Menu::stop()
