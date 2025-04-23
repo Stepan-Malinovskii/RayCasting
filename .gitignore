@@ -511,7 +511,6 @@ local.properties
 *.lai
 *.so
 *.so.*
-*.dll
 *.dylib
 
 # Qt-es
@@ -974,7 +973,6 @@ _deps
 *.lai
 *.la
 *.a
-*.lib
 
 # Executables
 *.exe
@@ -1008,7 +1006,6 @@ _deps
 *.lo
 
 # Shared objects (inc. Windows DLLs)
-*.dll
 *.so
 *.so.*
 *.dylib
