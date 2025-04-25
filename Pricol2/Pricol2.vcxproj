@@ -144,7 +144,7 @@
     <ClCompile Include="CPP\DialigSystem.cpp" />
     <ClCompile Include="CPP\Editor.cpp" />
     <ClCompile Include="CPP\Game.cpp" />
-    <ClCompile Include="CPP\GunManager.cpp" />
+    <ClCompile Include="CPP\ItemManager.cpp" />
     <ClCompile Include="CPP\Inventory.cpp" />
     <ClCompile Include="CPP\Leaf.cpp" />
     <ClCompile Include="CPP\Map.cpp" />
@@ -175,7 +175,7 @@
     <ClInclude Include="HPP\Editor.h" />
     <ClInclude Include="HPP\EventSystem.h" />
     <ClInclude Include="HPP\Game.h" />
-    <ClInclude Include="HPP\GunManager.h" />
+    <ClInclude Include="HPP\ItemManager.h" />
     <ClInclude Include="HPP\Inventory.h" />
     <ClInclude Include="HPP\Leaf.h" />
     <ClInclude Include="HPP\Map.h" />

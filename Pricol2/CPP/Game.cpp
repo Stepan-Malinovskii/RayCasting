@@ -4,7 +4,7 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 	window{ _window }, mapManager{ _mapManager }
 {
 	screenMidlePos = { (int)(SCREEN_W / 2), (int)(SCREEN_H / 2) };
-	weaponManager = new WeaponManager();
+	weaponManager = new ItemManager();
 	renderer = new Renderer(window);
 	uiManager = new UIManager(window);
 	menu = new Menu(window, uiManager, mapManager->mapNumber == 0);

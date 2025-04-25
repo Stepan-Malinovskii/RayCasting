@@ -3,7 +3,7 @@
 #define INVENT
 
 #include "UIManeger.h"
-#include "GunManager.h"
+#include "ItemManager.h"
 #include "DataBase.h"
 #include "RenderState.h"
 

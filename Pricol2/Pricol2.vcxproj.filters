@@ -27,7 +27,7 @@
     <ClCompile Include="CPP\Game.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="CPP\GunManager.cpp">
+    <ClCompile Include="CPP\ItemManager.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="CPP\Inventory.cpp">
@@ -112,7 +112,7 @@
     <ClInclude Include="HPP\Game.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="HPP\GunManager.h">
+    <ClInclude Include="HPP\ItemManager.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="HPP\Inventory.h">

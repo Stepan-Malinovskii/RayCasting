@@ -7,11 +7,11 @@
 #include "EventSystem.h"
 #include "MapManager.h"
 
-class WeaponManager
+class ItemManager
 {
 public:
-	WeaponManager();
-	~WeaponManager() = default;
+	ItemManager();
+	~ItemManager() = default;
 	Gun* getGunByIndex(int index);
 	Gun* getGunById(int id);
 	Itemble* getItem(int id);

@@ -1,6 +1,6 @@
-#include "GunManager.h"
+#include "ItemManager.h"
 
-WeaponManager::WeaponManager() : id{ 0 }
+ItemManager::ItemManager() : id{ 0 }
 {
 	createImprovements();
 	createItems();
@@ -17,7 +17,7 @@ WeaponManager::WeaponManager() : id{ 0 }
 		}});
 }
 
-void WeaponManager::createImprovements()
+void ItemManager::createImprovements()
 {
 	for (int i = 0; i < improveDefs.size(); i++)
 	{
@@ -27,7 +27,7 @@ void WeaponManager::createImprovements()
 	}
 }
 
-void  WeaponManager::createItems()
+void  ItemManager::createItems()
 {
 	for (int i = 0; i < itemsDefs.size(); i++)
 	{
@@ -37,7 +37,7 @@ void  WeaponManager::createItems()
 	}
 }
 
-void  WeaponManager::createGuns()
+void  ItemManager::createGuns()
 {
 	auto& data = Data::getInstance();
 	auto gunsData = data.getGunData();
@@ -61,10 +61,10 @@ void  WeaponManager::createGuns()
 	}
 }
 
-void WeaponManager::createTravel()
+void ItemManager::createTravel()
 {
 	int tempId = id;
-	
+
 	for (int i = 0; i < travelerDefs.size(); i++)
 	{
 		travelItem.push_back(std::make_unique<Item>(travelerDefs[i], tempId));
@@ -73,14 +73,14 @@ void WeaponManager::createTravel()
 	}
 }
 
-Animator<sf::Texture*> WeaponManager::createAnimator(int gunIndex)
+Animator<sf::Texture*> ItemManager::createAnimator(int gunIndex)
 {
-	return Animator<sf::Texture*>(&Resources::gunsBaseText[gunIndex], 
+	return Animator<sf::Texture*>(&Resources::gunsBaseText[gunIndex],
 		{ createAnimation(&Resources::gunsFireAnim[gunIndex], gunsDef[gunIndex].shutTime)
 		, createAnimation(&Resources::gunsResetAnim[gunIndex], gunsDef[gunIndex].resetTime) });
 }
 
-Animation<sf::Texture*> WeaponManager::createAnimation(std::vector<sf::Texture>* frames, float duration)
+Animation<sf::Texture*> ItemManager::createAnimation(std::vector<sf::Texture>* frames, float duration)
 {
 	Animation<sf::Texture*> anim;
 	int count = frames->size();
@@ -98,18 +98,18 @@ Animation<sf::Texture*> WeaponManager::createAnimation(std::vector<sf::Texture>*
 	return anim;
 }
 
-Gun* WeaponManager::getGunByIndex(int index) { return index >= 0 && index < guns.size() ? 
+Gun* ItemManager::getGunByIndex(int index) { return index >= 0 && index < guns.size() ?
 	guns[index].get(): throw "Invalid index"; }
 
-Gun* WeaponManager::getGunById(int id) { return dynamic_cast<Gun*>(itemble[id]); }
+Gun* ItemManager::getGunById(int id) { return dynamic_cast<Gun*>(itemble[id]); }
 
-Itemble* WeaponManager::getItem(int index) { return itemble[index]; }
+Itemble* ItemManager::getItem(int index) { return itemble[index]; }
 
-std::vector<Item*> WeaponManager::getTravelItem()
+std::vector<Item*> ItemManager::getTravelItem()
 {
 	std::vector<Item*> result;
 
-	for (const auto& tr: travelItem)
+	for (const auto& tr : travelItem)
 	{
 		result.push_back(tr.get());
 	}
@@ -117,7 +117,7 @@ std::vector<Item*> WeaponManager::getTravelItem()
 	return result;
 }
 
-std::vector<Gun*> WeaponManager::getGuns()
+std::vector<Gun*> ItemManager::getGuns()
 {
 	std::vector<Gun*> result;
 
@@ -129,7 +129,7 @@ std::vector<Gun*> WeaponManager::getGuns()
 	return result;
 }
 
-std::vector<Improve*> WeaponManager::getImprovs()
+std::vector<Improve*> ItemManager::getImprovs()
 {
 	std::vector<Improve*> result;
 
@@ -141,7 +141,7 @@ std::vector<Improve*> WeaponManager::getImprovs()
 	return result;
 }
 
-std::vector<Item*> WeaponManager::getItems()
+std::vector<Item*> ItemManager::getItems()
 {
 	std::vector<Item*> result;
 	result.reserve(items.size());
@@ -154,7 +154,7 @@ std::vector<Item*> WeaponManager::getItems()
 	return result;
 }
 
-void WeaponManager::saveGun()
+void ItemManager::saveGun()
 {
 	std::vector<GunData> defs;
 	defs.reserve(guns.size());

@@ -8,7 +8,7 @@
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "SFML/Window/Mouse.hpp"
 #include "UIManeger.h"
-#include "GunManager.h"
+#include "ItemManager.h"
 #include "RenderState.h"
 #include "EventSystem.h"
 
@@ -16,7 +16,7 @@ class Dialog
 {
 public:
 	Dialog(sf::RenderWindow* _window, UIManager* _uiManager, 
-		WeaponManager* _weaponManager);
+		ItemManager* _weaponManager);
 	void setPlayer(Player* _player);
 	void start(int key, std::wstring name = L"");
 	void update();
@@ -29,7 +29,7 @@ private:
 	int nowKey;
 	int startKey;
 	UIManager* uiManager;
-	WeaponManager* weaponManager;
+	ItemManager* weaponManager;
 	sf::RenderWindow* window;
 
 	Itemble* choose;

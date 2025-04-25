@@ -113,7 +113,7 @@ void SpriteManager::resetMap(Map* newMap, std::pair<sf::Vector2f, sf::Vector2f> 
 {
 	nowMap = newMap;
 	init();
-	//player->enemy->spMap.position = mapPos.first;
+	player->enemy->spMap.position = mapPos.first;
 	player->setNemMap(newMap);
 }
 

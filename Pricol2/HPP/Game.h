@@ -13,7 +13,7 @@
 #include "Player.h"
 #include "Renderer.h"
 #include "SpriteManager.h"
-#include "GunManager.h"
+#include "ItemManager.h"
 #include "UIManeger.h"
 #include "Inventory.h"
 #include "MapManager.h"
@@ -44,7 +44,7 @@ private:
 	sf::Vector2i screenMidlePos;
 	SpriteManager* spManager;
 	UIManager* uiManager;
-	WeaponManager* weaponManager;
+	ItemManager* weaponManager;
 	Player* player;
 	Renderer* renderer;
 	MapManager* mapManager;

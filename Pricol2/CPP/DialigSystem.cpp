@@ -1,7 +1,7 @@
 #include "DialogSystem.h"
 
 Dialog::Dialog(sf::RenderWindow* _window, UIManager* _uiManager,
-	WeaponManager* _weaponManager) : window{ _window },
+	ItemManager* _weaponManager) : window{ _window },
 	uiManager{ _uiManager }, weaponManager{ _weaponManager }
 {
 	nowKey = 0;
