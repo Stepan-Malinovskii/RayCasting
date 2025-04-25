@@ -7,16 +7,34 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <thread>
-
+#include <queue>
 #include "Player.h"
 #include "Map.h"
 #include "Sprite.h"
 #include "Raycast.h"
 #include "Resources.h"
 
-constexpr int THREAD_COUNT = 10, MAX_DETH = 64;
+constexpr int MAX_DETH = 64;
 constexpr float PLAYER_FOV = 60.0f, CAMERA_Z = SCREEN_H / 2.0f,
 ASPECT = SCREEN_W / SCREEN_H * 0.5f, BRIGHTNESTDIST = MAX_DETH / 7.0f;
+
+class ThreadPool
+{
+public:
+	ThreadPool(int threadCount);
+	~ThreadPool();
+	void addTask(std::function<void()> task);
+	void waitAll();
+	int getThreadCount();
+private:
+	std::vector<std::thread> workers;
+	std::queue<std::function<void()>> tasks;
+	std::mutex queueMutex;
+	std::condition_variable condition;
+	bool stop = false;
+	size_t activeTasks = 0;
+	std::condition_variable completionCondition;
+};
 
 class Renderer
 {
@@ -37,7 +55,7 @@ private:
 	sf::VertexArray spriteColumns{ sf::Lines };
 	float* distanceBuffer;
 
-	std::vector<std::thread> threads;
+	ThreadPool threads;
 
 	void DrawFloor(sf::Vector2f& rayDirLeft, sf::Vector2f& rayDirRight, sf::Vector2f& rayPos, 
 		Player* player, Map* map, int startH, int endH);

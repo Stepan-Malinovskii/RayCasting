@@ -22,7 +22,6 @@ public:
 	void update();
 	void draw();
 private:
-	bool isActive;
 	RenderState dialogState;
 	bool isTrade;
 	std::wstring name;

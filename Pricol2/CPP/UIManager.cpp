@@ -95,7 +95,7 @@ void UIManager::initDialog(std::map<int, std::wstring, std::greater<int>> varian
 	}
 }
 
-void UIManager::initMenu()
+void UIManager::initMenu(bool isStart)
 {
 	background = sf::Sprite(Resources::menuBackground);
 	background.setScale({ SCREEN_W / Resources::menuBackground.getSize().x,
@@ -107,7 +107,7 @@ void UIManager::initMenu()
 	Button button(Group(shape, text));
 	button.setPosition({ SCREEN_W / 2.0f, 2.0f * SCREEN_H / 3.0f - 35.0f });
 	button.setFunc([=]() { keyButton = 0;});
-	buttons.push_back(button);
+	if (!isStart) buttons.push_back(button);
 
 	button.setString(L"ÕŒ¬¿ﬂ »√–¿");
 	button.setPosition({ SCREEN_W / 2.0f, 2.0f * SCREEN_H / 3.0f + 35.0f });

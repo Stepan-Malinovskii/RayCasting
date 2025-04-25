@@ -17,6 +17,7 @@ Player::Player(Enemy* _sprite, PlayerDef def, Map* _nowMap) :
 			auto& data = Data::getInstance();
 			data.savePlayerData(this);
 		});
+
 	event.subscribe<int>("RESET_GAME", [=](const int NON) {
 		nowEnergy = 2.0f; maxEnergy = 2.0f; defence = 0.0f; nowStrenght = 0.0f; maxStrenght = 0.0f;
 		patrons = 500; money = 500; details = 0; nowHeal = nullptr; enemy->enemyDef.maxHealpoint = 100.0f; enemy->spMap.nowHealPoint = 100.0f; });

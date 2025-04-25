@@ -76,13 +76,13 @@ std::vector<std::pair<int, int>> Inventory::convert2save()
 void Inventory::useInvent() 
 { 
 	auto& event = EventSystem::getInstance();
+	uiManager->deleteNow();
 
 	window->setMouseCursorVisible(!isOpen);
 	if (isOpen)
 	{
 		event.trigger<RenderState*>("SWAPSTATE", nullptr);
 		isOpen = false;
-		uiManager->deleteNow();
 		choose = nullptr;
 	}
 	else

@@ -9,12 +9,13 @@
 class Menu
 {
 public:
-	Menu(sf::RenderWindow* _window, UIManager* _uiManager);
+	Menu(sf::RenderWindow* _window, UIManager* _uiManager, bool isStart);
 	void start();
 	void stop();
 	void draw();
 	void update();
 private:
+	bool isStart;
 	sf::RenderWindow* window;
 	UIManager* uiManager;
 	RenderState menuState;

@@ -6,7 +6,6 @@ Dialog::Dialog(sf::RenderWindow* _window, UIManager* _uiManager,
 {
 	nowKey = 0;
 	startKey = 0;
-	isActive = false;
 	isTrade = false;
 	choose = nullptr;
 	player = nullptr;
@@ -27,7 +26,6 @@ void Dialog::start(int key, std::wstring _name)
 	auto& event = EventSystem::getInstance();
 	event.trigger<RenderState*>("SWAPSTATE", &dialogState);
 	window->setMouseCursorVisible(true);
-	isActive = true;
 	name = _name;
 	nowKey = key;
 	init();
@@ -36,7 +34,6 @@ void Dialog::start(int key, std::wstring _name)
 void Dialog::stop()
 {
 	window->setMouseCursorVisible(false);
-	isActive = false;
 	isTrade = false;
 	title.clear();
 	uiManager->deleteNow();

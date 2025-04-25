@@ -20,7 +20,7 @@ public:
 	void drawPlayerUI(Player* player);
 	void initDialog(std::map<int, std::wstring, std::greater<int>> variants,
 		std::wstring npcName);
-	void initMenu();
+	void initMenu(bool isStart);
 	void initTrade(std::map<int, Itemble*> variants, Player* player);
 	void initInvent(std::map<Itemble*, int> items, Itemble* chose, Player* player);
 	void deleteNow();

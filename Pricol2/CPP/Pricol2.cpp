@@ -27,13 +27,13 @@ int main()
 		movie.play();
 		SoundManager::playerMusic(StartIntro);
 
-		while (movie.getStatus() == sfe::Status::Playing)
+		/*while (movie.getStatus() == sfe::Status::Playing)
 		{
 			window.clear();	
 			movie.update();
 			window.draw(movie);
 			window.display();
-		}
+		}*/
 
 		window.clear();
 		});

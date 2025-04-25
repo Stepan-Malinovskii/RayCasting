@@ -1,13 +1,13 @@
 #include "Menu.h"
 
-Menu::Menu(sf::RenderWindow* _window, UIManager* _uiManager) : uiManager{_uiManager}, window{_window},
-menuState{ [=](float deltaTime) {update();}, [=]() {draw();} } {}
+Menu::Menu(sf::RenderWindow* _window, UIManager* _uiManager, bool _isStart) : uiManager{_uiManager}, window{_window},
+isStart{ _isStart }, menuState {[=](float deltaTime) {update();}, [=]() {draw();}} {}
 
 void Menu::start()
 {
 	auto& event = EventSystem::getInstance();
 	window->setMouseCursorVisible(true);
-	uiManager->initMenu();
+	uiManager->initMenu(isStart);
 	event.trigger<RenderState*>("SWAPSTATE", &menuState);
 	SoundManager::playerMusic(MenuSound);
 }

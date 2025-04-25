@@ -27,8 +27,8 @@ public:
 	void drawMap(int layer);
 	Map* getNowMap();
 	bool isBase;
-private:
 	int mapNumber;
+private:
 	Map* nowMap;
 	sf::RenderWindow* window;
 	sf::Vector2f startPos;

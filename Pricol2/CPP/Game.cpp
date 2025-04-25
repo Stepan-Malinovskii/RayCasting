@@ -7,7 +7,7 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 	weaponManager = new WeaponManager();
 	renderer = new Renderer(window);
 	uiManager = new UIManager(window);
-	menu = new Menu(window, uiManager);
+	menu = new Menu(window, uiManager, mapManager->mapNumber == 0);
 	dialogSys = new Dialog(window, uiManager, weaponManager);
 	spManager = new SpriteManager(mapManager->getNowMap(), dialogSys);
 	player = spManager->getPlayer();
@@ -36,7 +36,8 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 	);
 
 	event.subscribe<int>("RESET_GAME", [=](const int NON) { currentState = &playState;
-	player->guns[1] = nullptr; player->guns[2] = nullptr; player->setGun(weaponManager->getGunById(2), 1);});
+	player->guns[1] = nullptr; player->guns[2] = nullptr; 
+	player->setGun(weaponManager->getGunByIndex(2), 1);});
 
 	event.subscribe<RenderState*>("SWAPSTATE", [=](RenderState* state) {
 		if (state)
@@ -53,7 +54,7 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 	menu->start();
 
 	//player->enemy->spMap.nowHealPoint = 100.0f; // ÂÛĞÅÇÀÒÜ ÏÎÒÎÌ
-	player->money = 1000; // ÂÛĞÅÇÀÒÜ ÏÎÒÎÌ
+	//player->money = 1000; // ÂÛĞÅÇÀÒÜ ÏÎÒÎÌ
 }
 
 Game::~Game()

@@ -1,13 +1,68 @@
 #include "Renderer.h"
 #include <SFML/Graphics/RectangleShape.hpp>
 
-Renderer::Renderer(sf::RenderWindow* _window)
+ThreadPool::ThreadPool(int threadCount)
 {
-	window = _window;
+	for (size_t i = 0; i < threadCount; ++i)
+	{
+		workers.emplace_back([this]() {
+			while (true) 
+			{
+				std::function<void()> task;
+				{
+					std::unique_lock<std::mutex> lock(queueMutex);
+					condition.wait(lock, [this]() { return stop || !tasks.empty(); });
+					if (stop && tasks.empty()) return;
+					task = std::move(tasks.front());
+					tasks.pop();
+					++activeTasks;
+				}
+				task();
+				{
+					std::unique_lock<std::mutex> lock(queueMutex);
+					--activeTasks;
+					if (activeTasks == 0) { completionCondition.notify_all(); }
+				}
+			}});
+	}
+}
+
+ThreadPool::~ThreadPool()
+{
+	{
+		std::unique_lock<std::mutex> lock(queueMutex);
+		stop = true;
+	}
+	condition.notify_all();
+	for (auto& worker : workers) 
+	{
+		if (worker.joinable()) worker.join();
+	}
+}
+
+void ThreadPool::addTask(std::function<void()> task)
+{
+	{
+		std::unique_lock<std::mutex> lock(queueMutex);
+		tasks.push(std::move(task));
+	}
+	condition.notify_one();
+}
+
+void ThreadPool::waitAll()
+{
+	std::unique_lock<std::mutex> lock(queueMutex);
+	completionCondition.wait(lock, [this]() { return activeTasks == 0; });
+}
+
+int ThreadPool::getThreadCount() { return workers.size(); }
+
+Renderer::Renderer(sf::RenderWindow* _window) : 
+	window{_window}, threads{ (int)std::thread::hardware_concurrency() - 2 }
+{
 	Init();
 	screenPixels = new uint8_t[(int)SCREEN_H * (int)SCREEN_W * 4]();
 	distanceBuffer = new float[(int)SCREEN_W + 1] {};
-	threads = std::vector<std::thread>(THREAD_COUNT);
 }
 
 Renderer::~Renderer()
@@ -33,29 +88,26 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<
 	//FloorPart
 	sf::Vector2f rayDirLeft{ pDirection - cameraPlane },
 		rayDirRight{ pDirection + cameraPlane };
+	int threadCount = threads.getThreadCount() - 1;
+	for (int cnt = 0; cnt < threadCount; cnt++)
+	{
+		threads.addTask([&, cnt] ()
+			{
+				int start = (int)((SCREEN_H / threadCount * cnt));
+				int end = (int)((SCREEN_H / threadCount * (cnt + 1)));
+				DrawFloor(rayDirLeft, rayDirRight, rayPos, player, map, start, end);
+			});
+	}
 
-	auto floor_func = [&](int thread_id)
-		{
-			int start = (int)((SCREEN_H / (THREAD_COUNT - 1) * thread_id));
-			int end = (int)((SCREEN_H / (THREAD_COUNT - 1) * (thread_id + 1)));
-			DrawFloor(rayDirLeft, rayDirRight, rayPos, player, map, start, end );
-		};
 	//SpritePart
 	auto comperer = [player](const std::shared_ptr<Sprite> a, const std::shared_ptr<Sprite> b)
 		{
 			return COMPARER(a->spMap.position, b->spMap.position, player->enemy->spMap.position);
 		};
+	
 
-	auto sprite_func = [&]() {
-		std::sort(sprites->begin(), sprites->end(), comperer);
-		};
-
-	for (int cnt = 0; cnt < THREAD_COUNT - 1; cnt++)
-	{
-		threads[cnt] = std::thread(floor_func, cnt);
-	}
-
-	threads[THREAD_COUNT - 1] = std::thread(sprite_func);
+	threads.addTask([&]() {
+		std::sort(sprites->begin(), sprites->end(), comperer);});
 
 	//SkyPart
 	sf::Vector2u skyTextureSize = Resources::skyTextures.getSize();
@@ -113,10 +165,7 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<
 	}
 
 	//ThreadPart
-	for (int cnt = 0; cnt < THREAD_COUNT; cnt++)
-	{
-		threads[cnt].join();
-	}
+	threads.waitAll();
 
 	//DrawPart
 	floorTexture.update(screenPixels);
@@ -252,4 +301,3 @@ void Renderer::DrawFloor(sf::Vector2f& rayDirLeft, sf::Vector2f& rayDirRight, sf
 
 	}
 }
-
