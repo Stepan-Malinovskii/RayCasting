@@ -1,15 +1,34 @@
 #include "Menu.h"
 
-Menu::Menu(sf::RenderWindow* _window, UIManager* _uiManager, bool _isStart) : uiManager{_uiManager}, window{_window},
-isStart{ _isStart }, menuState {[=](float deltaTime) {update();}, [=]() {draw();}} {}
+Menu::Menu(sf::RenderWindow* _window, UIManager* _uiManager) : 
+	uiManager{_uiManager}, window{_window}, isKeyPressed{false},
+	startMenuState{[=](float deltaTime) {updateStartMenu();}, [=]() {draw();}},
+	gameMenuState{[=](float deltaTime) {updateGameMenu();},[=]() {draw();} },
+	settingState{ [=](float deltaTime) {updateSetting();}, [=]() {draw();} } {}
 
-void Menu::start()
+void Menu::initStartMenu()
 {
 	auto& event = EventSystem::getInstance();
 	window->setMouseCursorVisible(true);
-	uiManager->initMenu(isStart);
-	event.trigger<RenderState*>("SWAPSTATE", &menuState);
+	uiManager->initStartMenu();
+	event.trigger<RenderState*>("SWAP_STATE", &startMenuState);
 	SoundManager::playerMusic(MenuSound);
+}
+
+void Menu::initGameMenu()
+{
+	auto& event = EventSystem::getInstance();
+	window->setMouseCursorVisible(true);
+	uiManager->initGameMenu();
+	event.trigger<RenderState*>("SWAP_STATE", &gameMenuState);
+}
+
+void Menu::initSetting()
+{
+	auto& event = EventSystem::getInstance();
+	window->setMouseCursorVisible(true);
+	uiManager->initSetting();
+	event.trigger<RenderState*>("SWAP_STATE", &settingState);
 }
 
 void Menu::stop()
@@ -17,14 +36,22 @@ void Menu::stop()
 	auto& event = EventSystem::getInstance();
 	window->setMouseCursorVisible(false);
 	uiManager->deleteNow();
-	event.trigger<RenderState*>("SWAPSTATE", nullptr);
+	event.trigger<RenderState*>("SWAP_STATE", nullptr);
 }
 
 void Menu::draw() { uiManager->drawNow(); }
 
-void Menu::update()
+void Menu::updateStartMenu()
 {
-	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left)) return;
+	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	{
+		isKeyPressed = false;
+		return;
+	}
+
+	if (isKeyPressed) return;
+
+	isKeyPressed = true;
 
 	int key = uiManager->checkButton();
 
@@ -42,4 +69,67 @@ void Menu::update()
 	}
 
 	stop();
+}
+
+void Menu::updateGameMenu()
+{
+	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	{
+		isKeyPressed = false;
+		return;
+	}
+
+	if (isKeyPressed) return;
+
+	isKeyPressed = true;
+
+	int key = uiManager->checkButton();
+
+	if (key == -1) return;
+
+	if (key == 0)
+	{
+		stop();
+	}
+	else if (key == 1)
+	{
+		uiManager->deleteNow();
+		initSetting();
+	}
+	else if (key == 2)
+	{
+		auto& event = EventSystem::getInstance();
+		event.trigger<int>("SAVE", 0);
+		uiManager->deleteNow();
+		initStartMenu();
+	}
+}
+
+void Menu::updateSetting()
+{
+	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	{
+		isKeyPressed = false;
+		return;
+	}
+
+	if (isKeyPressed) return;
+
+	isKeyPressed = true;
+
+	int key = uiManager->checkButton();
+
+	if (key == -1) return;
+
+	if (key == 0) 
+	{
+		uiManager->deleteNow();
+		initGameMenu();
+	}
+	else if (key == 1)
+	{
+		SoundManager::updateVolume();
+		uiManager->deleteNow();
+		uiManager->initSetting();
+	}
 }

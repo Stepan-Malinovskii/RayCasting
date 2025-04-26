@@ -1,5 +1,6 @@
 #include "SoundManager.h"
 #include "Randomizer.h"
+#include "DataBase.h"
 
 SoundManager::SoundManager() {}
 
@@ -7,7 +8,7 @@ std::vector<std::unique_ptr<sf::Sound>> SoundManager::sounds{};
 
 sf::Music SoundManager::music{};
 
-void SoundManager::playSound(sf::SoundBuffer& buffer, float volume, bool isLoop)
+void SoundManager::playSound(sf::SoundBuffer& buffer, bool isLoop)
 {
 	for (int i = 0; i < sounds.size(); i++)
 	{
@@ -19,9 +20,11 @@ void SoundManager::playSound(sf::SoundBuffer& buffer, float volume, bool isLoop)
 		}	
 	}
 
+	auto& state = GameState::getInstance();
+
 	sounds.push_back(std::make_unique<sf::Sound>(buffer));
 	sounds.back()->setLoop(isLoop);
-	sounds.back()->setVolume(volume);
+	sounds.back()->setVolume(state.data.effectVolume);
 	sounds.back()->play();
 }
 
@@ -50,8 +53,11 @@ void SoundManager::playerMusic(MusicType type)
 		filePath = "Sound/endIntroMusic";
 	}
 
+	auto& state = GameState::getInstance();
+
 	if (!music.openFromFile(filePath + ".ogg")) return;
 	music.setLoop(true);
+	music.setVolume(state.data.soundVolume);
 	music.play();
 }
 
@@ -80,6 +86,18 @@ void SoundManager::update()
 		{
 			i++;
 		}
+	}
+}
+
+void SoundManager::updateVolume()
+{
+	auto& state = GameState::getInstance();
+
+	music.setVolume(state.data.soundVolume);
+
+	for (int i = 0; i < sounds.size(); i++)
+	{
+		sounds[i]->setVolume(state.data.effectVolume);
 	}
 }
 

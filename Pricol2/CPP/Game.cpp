@@ -1,21 +1,21 @@
 #include "Game.h"
 
 Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
-	window{ _window }, mapManager{ _mapManager }
+	window{ _window }, mapManager{ _mapManager }, isKeyPressed{false}
 {
 	screenMidlePos = { (int)(SCREEN_W / 2), (int)(SCREEN_H / 2) };
-	weaponManager = new ItemManager();
+	itemManager = new ItemManager();
 	renderer = new Renderer(window);
 	uiManager = new UIManager(window);
-	menu = new Menu(window, uiManager, mapManager->mapNumber == 0);
-	dialogSys = new Dialog(window, uiManager, weaponManager);
+	menu = new Menu(window, uiManager);
+	dialogSys = new Dialog(window, uiManager, itemManager);
 	spManager = new SpriteManager(mapManager->getNowMap(), dialogSys);
 	player = spManager->getPlayer();
 	invent = new Inventory(window, player, uiManager);
 	initPlayer();
 
 	auto& data = Data::getInstance();
-	for (auto b : data.getInvent()) { player->takeItem(weaponManager->getItem(b.first), b.second); }
+	for (auto b : data.getInvent()) { player->takeItem(itemManager->getItem(b.first), b.second); }
 
 	auto update = [=](float deltaTime) {
 		getInput(deltaTime);
@@ -36,10 +36,10 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 	);
 
 	event.subscribe<int>("RESET_GAME", [=](const int NON) { currentState = &playState;
-	player->guns[1] = nullptr; player->guns[2] = nullptr; 
-	player->setGun(weaponManager->getGunByIndex(2), 1);});
+	player->guns[1] = nullptr; player->guns[2] = nullptr;
+	player->setGun(itemManager->getGunByIndex(2), 1);});
 
-	event.subscribe<RenderState*>("SWAPSTATE", [=](RenderState* state) {
+	event.subscribe<RenderState*>("SWAP_STATE", [=](RenderState* state) {
 		if (state)
 		{
 			currentState = state;
@@ -47,11 +47,13 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 		else
 		{
 			currentState = &playState;
-			if (mapManager->isBase) { SoundManager::playerMusic(BaseSound); }
+			auto& state = GameState::getInstance();
+			SoundManager::stopAllSound();
+			if (state.data.isLevelBase) { SoundManager::playerMusic(BaseSound); }
 			else { SoundManager::playerMusic(LevelSound); }
 		}});
 
-	menu->start();
+	menu->initStartMenu();
 
 	//player->enemy->spMap.nowHealPoint = 100.0f; // ÂÛÐÅÇÀÒÜ ÏÎÒÎÌ
 	//player->money = 1000; // ÂÛÐÅÇÀÒÜ ÏÎÒÎÌ
@@ -61,7 +63,7 @@ Game::~Game()
 {
 	delete dialogSys;
 	delete spManager;
-	delete weaponManager;
+	delete itemManager;
 	delete uiManager;
 	delete invent;
 	delete menu;
@@ -70,8 +72,8 @@ Game::~Game()
 void Game::initPlayer()
 {
 	player->setInventory(invent);
-	player->kick = weaponManager->getGunByIndex(0);
-	player->setGun(weaponManager->getGunByIndex(1), 0);
+	player->kick = itemManager->getGunByIndex(0);
+	player->setGun(itemManager->getGunByIndex(1), 0);
 	player->nowHeal = invent->takeMaxHeal();
 	auto& data = Data::getInstance();
 	PlayerDef plDef = data.getPlayerData();
@@ -79,7 +81,7 @@ void Game::initPlayer()
 	int i = 1;
 	for (auto it : plDef.gunsData)
 	{
-		player->setGun(weaponManager->getGunById(it), i++);
+		player->setGun(itemManager->getGunById(it), i++);
 	}
 
 	dialogSys->setPlayer(player);
@@ -105,19 +107,7 @@ void Game::getInput(sf::Event event, float deltaTime)
 		{
 			invent->useInvent();
 		}
-	}
 
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-	{			
-		player->fire(0);
-	}
-	if (event.type == sf::Event::MouseWheelScrolled)
-	{
-		player->swapGun(event.mouseWheelScroll.delta > 0);
-	}
-
-	if (event.type == sf::Event::KeyPressed)
-	{
 		if (event.key.code == sf::Keyboard::H)
 		{
 			player->heal();
@@ -126,8 +116,18 @@ void Game::getInput(sf::Event event, float deltaTime)
 		if (event.key.code == sf::Keyboard::P)
 		{
 			auto& event = EventSystem::getInstance();
-			event.trigger("SWAPLOC", BASE_N);
+			event.trigger<int>("SWAPLOC", BASE_N);
 		}
+
+		if (event.key.code == sf::Keyboard::Escape)
+		{
+			menu->initGameMenu();
+		}
+	}
+
+	if (event.type == sf::Event::MouseWheelScrolled)
+	{
+		player->swapGun(event.mouseWheelScroll.delta > 0);
 	}
 }
 
@@ -158,6 +158,11 @@ void Game::getInput(float deltaTime)
 				dialogSys->start(npc->npcDefData.startKey, npc->spDef.name);
 			}
 		}
+	}
+
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	{
+		player->fire(0);
 	}
 
 	sf::Vector2i mousePos = sf::Mouse::getPosition(*window);

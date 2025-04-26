@@ -14,6 +14,7 @@ ItemManager::ItemManager() : id{ 0 }
 			guns[i]->deleteImprove(ImproveType::Damage);
 			guns[i]->deleteImprove(ImproveType::Spread);
 			guns[i]->deleteImprove(ImproveType::Magazin);
+			guns[i]->nowCount = guns[i]->maxCount;
 		}});
 }
 

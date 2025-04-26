@@ -25,15 +25,18 @@ int main()
 		if (!movie.openFromFile("Sound/startIntroVideo.mp4")) return;
 		movie.fit(0, 0, window.getSize().x, window.getSize().y);
 		movie.play();
+		auto& state = GameState::getInstance();
+		state.data.isFirstGame = false;
+		SoundManager::stopAllSound();
 		SoundManager::playerMusic(StartIntro);
 
-		while (movie.getStatus() == sfe::Status::Playing)
+		/*while (movie.getStatus() == sfe::Status::Playing) // Вернуть в итоговой версии
 		{
 			window.clear();	
 			movie.update();
 			window.draw(movie);
 			window.display();
-		}
+		}*/
 
 		window.clear();
 		});

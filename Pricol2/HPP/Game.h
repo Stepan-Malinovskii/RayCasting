@@ -21,7 +21,6 @@
 #include "RenderState.h"
 #include "Menu.h"
 
-
 class Game
 {
 public:
@@ -36,6 +35,7 @@ private:
 	void getInput(float deltaTime);
 	void initPlayer();
 
+	bool isKeyPressed;
 	Menu* menu;
 	RenderState* currentState;
 	RenderState playState;
@@ -44,7 +44,7 @@ private:
 	sf::Vector2i screenMidlePos;
 	SpriteManager* spManager;
 	UIManager* uiManager;
-	ItemManager* weaponManager;
+	ItemManager* itemManager;
 	Player* player;
 	Renderer* renderer;
 	MapManager* mapManager;

@@ -6,6 +6,7 @@
 #include "Leaf.h"
 #include "Resources.h"
 #include "SoundManager.h"
+#include "DataBase.h"
 #include "EventSystem.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -26,8 +27,6 @@ public:
 	sf::Vector2f getStartPosition();
 	void drawMap(int layer);
 	Map* getNowMap();
-	bool isBase;
-	int mapNumber;
 private:
 	Map* nowMap;
 	sf::RenderWindow* window;

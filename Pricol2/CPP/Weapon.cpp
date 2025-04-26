@@ -180,7 +180,7 @@ int Gun::resetPatron(int count)
 	}
 
 	nowTimeBetwenReset = 0;
-	SoundManager::playSound(Resources::gunsResetSound[gunId], 30);
+	SoundManager::playSound(Resources::gunsResetSound[gunId]);
 	startAnimation(1);
 	return count;
 }
@@ -189,7 +189,7 @@ void Gun::ussing(Enemy* sp, float dist)
 {
 	if (nowCount == 0 && isReset)
 	{
-		SoundManager::playSound(Resources::gunCantShoutSound, 60);
+		SoundManager::playSound(Resources::gunCantShoutSound);
 		return;
 	}
 	else if (isCanUsed() && (nowTimeBetwenReset >= timeBetwenReset || !isReset))
@@ -203,7 +203,7 @@ void Gun::ussing(Enemy* sp, float dist)
 		}
 
 		nowCount--;
-		SoundManager::playSound(Resources::gunsShutSound[gunId], 30);
+		SoundManager::playSound(Resources::gunsShutSound[gunId]);
 		startAnimation(0);
 	}
 }

@@ -4,6 +4,7 @@
 
 #include "Player.h"
 #include "EventSystem.h"
+#include "DataBase.h"
 #include "sfmlExtantion.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Mouse.hpp>
@@ -20,7 +21,9 @@ public:
 	void drawPlayerUI(Player* player);
 	void initDialog(std::map<int, std::wstring, std::greater<int>> variants,
 		std::wstring npcName);
-	void initMenu(bool isStart);
+	void initStartMenu();
+	void initGameMenu();
+	void initSetting();
 	void initTrade(std::map<int, Itemble*> variants, Player* player);
 	void initInvent(std::map<Itemble*, int> items, Itemble* chose, Player* player);
 	void deleteNow();

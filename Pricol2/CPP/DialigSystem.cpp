@@ -24,7 +24,7 @@ void Dialog::setPlayer(Player* _player) { player = _player; }
 void Dialog::start(int key, std::wstring _name)
 {
 	auto& event = EventSystem::getInstance();
-	event.trigger<RenderState*>("SWAPSTATE", &dialogState);
+	event.trigger<RenderState*>("SWAP_STATE", &dialogState);
 	window->setMouseCursorVisible(true);
 	name = _name;
 	nowKey = key;
@@ -38,7 +38,7 @@ void Dialog::stop()
 	title.clear();
 	uiManager->deleteNow();
 	auto& event = EventSystem::getInstance();
-	event.trigger<RenderState*>("SWAPSTATE", nullptr);
+	event.trigger<RenderState*>("SWAP_STATE", nullptr);
 }
 
 void Dialog::buy()

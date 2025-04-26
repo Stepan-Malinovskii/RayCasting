@@ -122,6 +122,28 @@ std::pair<std::wstring, int> Data::getText(int key)
 	}
 }
 
+GameStateData Data::getGameState()
+{
+	std::ifstream in{ "Data/gameState.state", std::ios::in | std::ios::binary };
+	if (!in.is_open()) return { true, 50, 50, 0, true };
+
+	GameStateData data;
+	in.read(reinterpret_cast<char*>(&data), sizeof(data));
+
+	in.close();
+
+	return data;
+}
+
+void Data::saveGameState(GameStateData data)
+{
+	std::ofstream out{ "Data/gameState.state", std::ios::out | std::ios::binary };
+	if (!out.is_open()) return;
+
+	out.write(reinterpret_cast<const char*>(&data), sizeof(data));
+	out.close();
+}
+
 PlayerDef Data::getPlayerData()
 {
 	std::ifstream in{ "Data/playerData.plr", std::ios::in | std::ios::binary };

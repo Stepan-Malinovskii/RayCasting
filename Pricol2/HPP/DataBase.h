@@ -11,6 +11,15 @@
 #include <codecvt>
 #include <locale>
 
+struct GameStateData
+{
+	bool isFirstGame;
+	int effectVolume;
+	int soundVolume;
+	int levelNumber;
+	bool isLevelBase;
+};
+
 class Data
 {
 public:
@@ -22,6 +31,9 @@ public:
 		static Data instance;
 		return instance;
 	}
+
+	GameStateData getGameState();
+	void saveGameState(GameStateData data);
 
 	PlayerDef getPlayerData();
 	void savePlayerData(Player* player);
@@ -40,6 +52,32 @@ private:
 
 	std::vector<std::pair<int, std::vector<int>>> loadKeyData();
 	std::vector<std::tuple<int, std::wstring, int>> loadTextData();
+};
+
+class GameState
+{
+public:
+	GameState(const GameState&) = delete;
+	GameState& operator=(const GameState&) = delete;
+
+	static GameState& getInstance()
+	{
+		static GameState instanceGame;
+		return instanceGame;
+	}
+
+	GameStateData data;
+private:
+	GameState()
+	{
+		auto& dataBase = Data::getInstance();
+		data = dataBase.getGameState();
+	}
+	~GameState()
+	{
+		auto& dataBase = Data::getInstance();
+		dataBase.saveGameState(data);
+	}
 };
 
 #endif // !DATA

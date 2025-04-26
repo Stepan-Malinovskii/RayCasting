@@ -8,6 +8,8 @@
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Text.hpp>
+#include <SFML/Window/Keyboard.hpp>
+#include <Windows.h>
 #include <functional>
 #include "Resources.h"
 #include "SoundManager.h"

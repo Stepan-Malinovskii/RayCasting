@@ -95,7 +95,7 @@ void UIManager::initDialog(std::map<int, std::wstring, std::greater<int>> varian
 	}
 }
 
-void UIManager::initMenu(bool isStart)
+void UIManager::initStartMenu()
 {
 	background = sf::Sprite(Resources::menuBackground);
 	background.setScale({ SCREEN_W / Resources::menuBackground.getSize().x,
@@ -107,7 +107,8 @@ void UIManager::initMenu(bool isStart)
 	Button button(Group(shape, text));
 	button.setPosition({ SCREEN_W / 2.0f, 2.0f * SCREEN_H / 3.0f - 35.0f });
 	button.setFunc([=]() { keyButton = 0;});
-	if (!isStart) buttons.push_back(button);
+	auto& state = GameState::getInstance();
+	if (!state.data.isFirstGame) buttons.push_back(button);
 
 	button.setString(L"ÕŒ¬¿ﬂ »√–¿");
 	button.setPosition({ SCREEN_W / 2.0f, 2.0f * SCREEN_H / 3.0f + 35.0f });
@@ -118,6 +119,80 @@ void UIManager::initMenu(bool isStart)
 	button.setPosition({ SCREEN_W / 2.0f, 2.0f * SCREEN_H / 3.0f + 105.0f });
 	button.setFunc([=]() { keyButton = 2;});
 	buttons.push_back(button);
+}
+
+void UIManager::initGameMenu()
+{
+	background = sf::Sprite(Resources::inventoryBackground);
+	background.setScale({ SCREEN_W / Resources::inventoryBackground.getSize().x,
+		SCREEN_H / Resources::inventoryBackground.getSize().y });
+
+	sf::Text text(L"œ–ŒƒŒÀ∆»“‹", Resources::UIFont, 50.0f);
+	sf::RectangleShape shape({ text.getLocalBounds().width + 20.0f, 60.0f });
+	shape.setFillColor(sf::Color(100, 100, 100));
+	Button button(Group(shape, text));
+	button.setPosition({ SCREEN_W / 2.0f, 2.0f * SCREEN_H / 3.0f - 35.0f });
+	button.setFunc([=]() { keyButton = 0; });
+	buttons.push_back(button);
+
+	button.setString(L"Õ¿—“–Œ… »");
+	button.setPosition({ SCREEN_W / 2.0f, 2.0f * SCREEN_H / 3.0f + 35.0f });
+	button.setFunc([=]() { keyButton = 1;});
+	buttons.push_back(button);
+
+	button.setString(L"¬€’Œƒ");
+	button.setPosition({ SCREEN_W / 2.0f, 2.0f * SCREEN_H / 3.0f + 105.0f });
+	button.setFunc([=]() { keyButton = 2;});
+	buttons.push_back(button);
+}
+
+void UIManager::initSetting()
+{
+	background = sf::Sprite(Resources::inventoryBackground);
+	background.setScale({ SCREEN_W / Resources::inventoryBackground.getSize().x,
+		SCREEN_H / Resources::inventoryBackground.getSize().y });
+
+	sf::Text text(L"¬€’Œƒ", Resources::UIFont, 50.0f);
+	sf::RectangleShape exitShape({ text.getLocalBounds().width + 20.0f, 60.0f });
+	exitShape.setFillColor(sf::Color(100, 100, 100));
+	Button button(Group(exitShape, text));
+	button.setPosition({ SCREEN_W / 2.0f, 80.0f });
+	button.setFunc([=]() { keyButton = 0; });
+	buttons.push_back(button);
+
+	sf::Text funcText(L"+", Resources::UIFont, 50.0f);
+	sf::RectangleShape funcShape({ 60.0f, 60.0f });
+	funcShape.setFillColor(sf::Color(50, 50, 50));
+	Button funcButton(Group(funcShape, funcText));
+	
+	auto& state = GameState::getInstance();
+
+	text.setString(L"√–ŒÃ Œ—“‹ ≈‘‘≈ “Œ¬: " + std::to_wstring(state.data.effectVolume));
+	sf::RectangleShape shape({ text.getLocalBounds().width + 20.0f, 60.0f });
+	shape.setFillColor(sf::Color(100, 100, 100));
+	button = Button(Group(shape, text));
+	button.setPosition({ SCREEN_W / 2.0f, SCREEN_H / 2.0f - 35.0f });
+	buttons.push_back(button);
+	funcButton.setPosition({ button.getPosition().x + button.getSize().x / 2 + 30.0f, button.getPosition().y });
+	funcButton.setFunc([&]() {state.data.effectVolume++;keyButton = 1;});
+	buttons.push_back(funcButton);
+	funcButton.setPosition({ button.getPosition().x - button.getSize().x / 2 - 30.0f, button.getPosition().y });
+	funcButton.setFunc([&]() {state.data.effectVolume--;keyButton = 1;});
+	funcButton.setString(L"-");
+	buttons.push_back(funcButton);
+
+	button.setString(L"√–ŒÃ Œ—“‹ Ã”«€ »: " + std::to_wstring(state.data.soundVolume));
+	button.setPosition({ SCREEN_W / 2.0f, SCREEN_H / 2.0f + 35.0f });
+	buttons.push_back(button);
+	funcButton.setString(L"+");
+	funcButton.setPosition({ button.getPosition().x + button.getSize().x / 2 + 30.0f, button.getPosition().y });
+	funcButton.setFunc([&]() {state.data.soundVolume++;keyButton = 1;});
+	buttons.push_back(funcButton);
+	funcButton.setPosition({ button.getPosition().x - button.getSize().x / 2 - 30.0f, button.getPosition().y });
+	funcButton.setFunc([&]() {state.data.soundVolume--; keyButton = 1;});
+	funcButton.setString(L"-");
+	buttons.push_back(funcButton);
+	
 }
 
 void UIManager::initTrade(std::map<int, Itemble*> variants, Player* player)

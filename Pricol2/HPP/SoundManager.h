@@ -16,10 +16,11 @@ class SoundManager
 {
 public:
 	SoundManager();
-	static void playSound(sf::SoundBuffer& buffer, float volume = 100, bool isLoop = false);
+	static void playSound(sf::SoundBuffer& buffer, bool isLoop = false);
 	static void playerMusic(MusicType type);
 	static void stopAllSound();
-	static void update();	
+	static void update();
+	static void updateVolume();
 private:
 	static std::vector<std::unique_ptr<sf::Sound>> sounds;
 	static sf::Music music;

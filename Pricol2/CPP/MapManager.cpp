@@ -1,14 +1,16 @@
 #include "MapManager.h"
 
 MapManager::MapManager(sf::RenderWindow* _window) : 
-	window{ _window }, nowMap{ nullptr }, mapNumber{}, isBase{}
+	window{ _window }, nowMap{ nullptr }
 {
 	auto& event = EventSystem::getInstance();
 	event.subscribe<int>("SAVE", [=](const int NON) { save(); });
 
 	event.subscribe<int>("RESET_GAME", [=](const int NON) {
 		load(mapFileNames[BASE_N]);
-		mapNumber = 0; });
+		auto& state = GameState::getInstance(); 
+		state.data.isLevelBase = true; 
+		state.data.levelNumber = 0; });
 }
 
 MapManager::~MapManager()
@@ -21,9 +23,6 @@ void MapManager::save()
 	std::ofstream out{ "Data/current.map", std::ios::out | std::ios::binary};
 	if (!out.is_open()) return;
 	if (nowMap->grid.empty()) return;
-
-	out.write(reinterpret_cast<const char*>(&mapNumber), sizeof(mapNumber));
-	out.write(reinterpret_cast<const char*>(&isBase), sizeof(isBase));
 
 	auto grid = nowMap->grid;
 	int h = grid.size();
@@ -62,12 +61,8 @@ void MapManager::load(std::string fileName)
 		fileName = "Data/" + fileName;
 		in = std::ifstream{ fileName, std::ios::in | std::ios::binary };
 	}
-
 	if (!in.is_open()) return;
 	nowMap = new Map();
-
-	in.read(reinterpret_cast<char*>(&mapNumber), sizeof(mapNumber));
-	in.read(reinterpret_cast<char*>(&isBase), sizeof(isBase));
 
 	int h = 0, w = 0;
 	in.read(reinterpret_cast<char*>(&w), sizeof(w));
@@ -103,13 +98,12 @@ void MapManager::load(std::string fileName)
 
 std::pair<sf::Vector2f, sf::Vector2f> MapManager::nextLocation(int index)
 {
+	auto& state = GameState::getInstance();
 	if (index == BASE_N)
 	{
-		isBase = true;
-		auto tempN = mapNumber;
+		state.data.isLevelBase = true;
 		SoundManager::playerMusic(BaseSound);
 		load(mapFileNames[BASE_N]);
-		mapNumber = tempN;
 
 		for (auto sp : nowMap->sprites)
 		{
@@ -122,11 +116,11 @@ std::pair<sf::Vector2f, sf::Vector2f> MapManager::nextLocation(int index)
 	}
 	else
 	{
-		isBase = false;
+		state.data.isLevelBase = false;
 		SoundManager::playerMusic(LevelSound);
 		if (index == NEXT_LEVEL_N)
 		{
-			mapNumber++;
+			state.data.levelNumber++;
 			generate();
 		}
 		else
@@ -360,9 +354,10 @@ void MapManager::writeRoom(sf::IntRect rect, int layer, int value)
 
 void MapManager::writeEnemy(std::vector<sf::IntRect> rooms)
 {
-	int midleRoomCount = std::min(ENEMY_LEVEL_COUNT, mapNumber * 7) / rooms.size();
-	int minEnemy = std::max((int)(mapNumber * 0.5f), 1);
-	int maxEnemy = std::min((int)(mapNumber * 1.3f), ENEMY_COUNT - 2);
+	auto& state = GameState::getInstance();
+	int midleRoomCount = std::min(ENEMY_LEVEL_COUNT, state.data.levelNumber * 7) / rooms.size();
+	int minEnemy = std::max((int)(state.data.levelNumber * 0.5f), 1);
+	int maxEnemy = std::min((int)(state.data.levelNumber * 1.3f), ENEMY_COUNT - 2);
 
 	for (auto r : rooms)
 	{

@@ -81,13 +81,13 @@ void Inventory::useInvent()
 	window->setMouseCursorVisible(!isOpen);
 	if (isOpen)
 	{
-		event.trigger<RenderState*>("SWAPSTATE", nullptr);
+		event.trigger<RenderState*>("SWAP_STATE", nullptr);
 		isOpen = false;
 		choose = nullptr;
 	}
 	else
 	{
-		event.trigger<RenderState*>("SWAPSTATE", &invetState);
+		event.trigger<RenderState*>("SWAP_STATE", &invetState);
 		isOpen = true;
 		initInv();
 	}

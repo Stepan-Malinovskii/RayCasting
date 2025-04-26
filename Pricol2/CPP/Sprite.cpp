@@ -141,7 +141,7 @@ void Enemy::takeDamage(float damage)
 	if (state == Dead) return;
 
 	spMap.nowHealPoint -= damage;
-	SoundManager::playSound(Resources::takeDamage, 40);
+	SoundManager::playSound(Resources::takeDamage);
 
 	isDamaged = true;
 	timeAtecked = 0;

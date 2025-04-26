@@ -9,15 +9,21 @@
 class Menu
 {
 public:
-	Menu(sf::RenderWindow* _window, UIManager* _uiManager, bool isStart);
-	void start();
+	Menu(sf::RenderWindow* _window, UIManager* _uiManager);
+	void initStartMenu();
+	void initGameMenu();
+	void initSetting();
 	void stop();
 	void draw();
-	void update();
+	void updateStartMenu();
+	void updateGameMenu();
+	void updateSetting();
 private:
-	bool isStart;
+	bool isKeyPressed;
 	sf::RenderWindow* window;
 	UIManager* uiManager;
-	RenderState menuState;
+	RenderState startMenuState;
+	RenderState gameMenuState;
+	RenderState settingState;
 };
 #endif // !MENU
