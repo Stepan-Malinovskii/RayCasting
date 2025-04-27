@@ -30,8 +30,8 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 	auto& event = EventSystem::getInstance();
 	event.subscribe<int>("SWAPLOC", [=](const int levelN)
 		{
-			auto pair = mapManager->nextLocation(levelN);
-			spManager->resetMap(mapManager->getNowMap(), pair);
+			sf::Vector2f pos = mapManager->nextLocation(levelN);
+			spManager->resetMap(mapManager->getNowMap(), pos);
 		}
 	);
 
@@ -89,7 +89,7 @@ void Game::initPlayer()
 
 void Game::editor()
 {
-	spManager->resetMap(mapManager->getNowMap(), { {mapManager->getStartPosition()}, {} });
+	spManager->resetMap(mapManager->getNowMap(), {0.0f, 0.0f});
 }
 
 void Game::save()

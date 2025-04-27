@@ -75,6 +75,14 @@ void Dialog::checkDialog()
 	}
 	else if (nowKey >= 400)
 	{
+		if (nowKey == 777)
+		{
+			stop();
+			auto& event = EventSystem::getInstance();
+			event.trigger<int>("SWAPLOC", BASE_N);
+			return;
+		}
+
 		isTrade = true;
 		startKey = nowKey;
 		nowKey = 0;

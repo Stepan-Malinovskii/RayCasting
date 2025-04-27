@@ -164,11 +164,6 @@
     <ClCompile Include="CPP\Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="KeyData.txt" />
-    <Text Include="Readme.txt" />
-    <Text Include="TextData.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="HPP\Animation.h" />
     <ClInclude Include="HPP\DataBase.h" />
     <ClInclude Include="HPP\DialogSystem.h" />
@@ -193,6 +188,10 @@
     <ClInclude Include="HPP\SpriteManager.h" />
     <ClInclude Include="HPP\UIManeger.h" />
     <ClInclude Include="HPP\Weapon.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Data\KeyData.txt" />
+    <Text Include="Data\TextData.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

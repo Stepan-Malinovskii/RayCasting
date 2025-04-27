@@ -67,7 +67,7 @@ int main()
 			}
 			else if (event.type == sf::Event::KeyPressed)
 			{
-				if (event.key.code == sf::Keyboard::Escape)
+				if (event.key.code == sf::Keyboard::RControl)
 				{
 					if (state == State::Editor)
 					{

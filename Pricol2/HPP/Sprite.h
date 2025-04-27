@@ -114,7 +114,7 @@ private:
 };
 
 static std::vector<NpcDef> npcDef = {
-	{1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1} };
+	{1}, {2}, {2}, {2}, {2}, {2}, {2}, {2}, {2}, {2}, {2}, {2}, {2}, {2} };
 
 static std::vector<EnemyDef> enemyDefs = {
 	{true,  0.0f,  0.0f,  0,  0.0f, 5.0f, 0.0f },
@@ -148,12 +148,13 @@ static std::vector<SpriteDef> spriteDefs = {
 	{ L"Мега бабл",     SpriteType::Enemy,   1.0f,  10, true},
 	{ L"Мать",          SpriteType::Enemy,   1.0f,  11, true},
 	{ L"Boss",          SpriteType::Enemy,   1.0f,  12, true},
-	{ L"Петрович",      SpriteType::NPC,     1.0f,  13, true},
-	{ L"Молотов",       SpriteType::NPC,     1.0f,  14, true},
-	{ L"Роман",         SpriteType::NPC,     1.0f,  15, true},
-	{ L"Ванька",        SpriteType::NPC,     1.0f,  16, true},
-	{ L"Тихон",         SpriteType::NPC,     1.0f,  17, true},
-	{ L"Виктор",        SpriteType::NPC,     1.0f,  18, true} 
+	{ L"Портал",        SpriteType::NPC,     1.0f,  13, true},
+	{ L"Петрович",      SpriteType::NPC,     1.0f,  14, true},
+	{ L"Молотов",       SpriteType::NPC,     1.0f,  15, true},
+	{ L"Роман",         SpriteType::NPC,     1.0f,  16, true},
+	{ L"Ванька",        SpriteType::NPC,     1.0f,  17, true},
+	{ L"Тихон",         SpriteType::NPC,     1.0f,  18, true},
+	{ L"Виктор",        SpriteType::NPC,     1.0f,  19, true} 
 };
 
 #endif // !SPRITE

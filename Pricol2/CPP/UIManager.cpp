@@ -153,25 +153,25 @@ void UIManager::initSetting()
 		SCREEN_H / Resources::inventoryBackground.getSize().y });
 
 	sf::Text text(L"¬€’Œƒ", Resources::UIFont, 50.0f);
-	sf::RectangleShape exitShape({ text.getLocalBounds().width + 20.0f, 60.0f });
-	exitShape.setFillColor(sf::Color(100, 100, 100));
-	Button button(Group(exitShape, text));
+	sf::RectangleShape shape({ text.getLocalBounds().width + 20.0f, 60.0f });
+	shape.setFillColor(sf::Color(100, 100, 100));
+	Button button(Group(shape, text));
 	button.setPosition({ SCREEN_W / 2.0f, 80.0f });
 	button.setFunc([=]() { keyButton = 0; });
 	buttons.push_back(button);
 
-	sf::Text funcText(L"+", Resources::UIFont, 50.0f);
+	text.setString(L"+");
 	sf::RectangleShape funcShape({ 60.0f, 60.0f });
 	funcShape.setFillColor(sf::Color(50, 50, 50));
-	Button funcButton(Group(funcShape, funcText));
+	Button funcButton(Group(funcShape, text));
 	
 	auto& state = GameState::getInstance();
 
 	text.setString(L"√–ŒÃ Œ—“‹ ≈‘‘≈ “Œ¬: " + std::to_wstring(state.data.effectVolume));
-	sf::RectangleShape shape({ text.getLocalBounds().width + 20.0f, 60.0f });
+	shape = sf::RectangleShape({ text.getLocalBounds().width + 20.0f, 60.0f });
 	shape.setFillColor(sf::Color(100, 100, 100));
 	button = Button(Group(shape, text));
-	button.setPosition({ SCREEN_W / 2.0f, SCREEN_H / 2.0f - 35.0f });
+	button.setPosition({ SCREEN_W / 2.0f, 150.0f});
 	buttons.push_back(button);
 	funcButton.setPosition({ button.getPosition().x + button.getSize().x / 2 + 30.0f, button.getPosition().y });
 	funcButton.setFunc([&]() {state.data.effectVolume++;keyButton = 1;});
@@ -182,7 +182,7 @@ void UIManager::initSetting()
 	buttons.push_back(funcButton);
 
 	button.setString(L"√–ŒÃ Œ—“‹ Ã”«€ »: " + std::to_wstring(state.data.soundVolume));
-	button.setPosition({ SCREEN_W / 2.0f, SCREEN_H / 2.0f + 35.0f });
+	button.setPosition({ SCREEN_W / 2.0f, 220.0f});
 	buttons.push_back(button);
 	funcButton.setString(L"+");
 	funcButton.setPosition({ button.getPosition().x + button.getSize().x / 2 + 30.0f, button.getPosition().y });
@@ -193,6 +193,49 @@ void UIManager::initSetting()
 	funcButton.setString(L"-");
 	buttons.push_back(funcButton);
 	
+	funcButton.setFunc(nullptr);
+	shape = sf::RectangleShape({shape.getSize().x / 2, 30.0f});
+	shape.setFillColor(sf::Color(100, 100, 100));
+	text = sf::Text(L"", Resources::UIFont, 20.0f);
+	button = Button(Group(shape, text));
+	funcShape.setSize({ 30.0f, 30.0f });
+	funcButton = Button(Group(funcShape, text));
+	sf::Vector2f pos{ SCREEN_W / 2.0f - shape.getSize().x / 2 - 15.0f, 280.0f };
+
+	std::vector<std::pair<std::wstring, std::wstring>> keys = {
+		{L"A", L"Move left"},
+		{L"D", L"Move right"},
+		{L"W", L"Move forward"}, 
+		{L"Scroll", L"To swap gun"}, 
+		{L"E", L"To interact"},
+		{L"F", L"To break door"},
+		{L"Q", L"To open inventory"},
+		{L"H", L"To healing"},
+		{L"Space", L"To jump"},
+		{L"Shift", L"To run"},
+		{L"LMB", L"To fire"},
+		{L"ESC", L"To open menu"},
+		};
+
+	for (int i = 0; i < keys.size(); i++)
+	{
+		button.setString(keys[i].second);
+		funcButton.setString(keys[i].first);
+		button.setPosition(pos);
+		funcButton.setPosition({ pos.x - button.getSize().x / 2 - funcShape.getSize().x / 2, pos.y });
+		buttons.push_back(button);
+		buttons.push_back(funcButton);
+
+		if (i % 2 == 0)
+		{
+			pos.x += shape.getSize().x + 15.0f + funcButton.getSize().x; 
+		}
+		else
+		{
+			pos.x -= shape.getSize().x + 15.0f + funcButton.getSize().x;
+			pos.y += 40.0f;
+		}
+	}
 }
 
 void UIManager::initTrade(std::map<int, Itemble*> variants, Player* player)

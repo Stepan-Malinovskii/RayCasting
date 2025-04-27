@@ -109,11 +109,15 @@ void SpriteManager::createDefaultPlayer()
 	allSprites->push_back(std::move(enemy));
 }
 
-void SpriteManager::resetMap(Map* newMap, std::pair<sf::Vector2f, sf::Vector2f> mapPos)
+void SpriteManager::resetMap(Map* newMap, sf::Vector2f pos)
 {
 	nowMap = newMap;
 	init();
-	player->enemy->spMap.position = mapPos.first;
+
+	if (pos.x != 0.0f && pos.y != 0) // Убрать проверку потом 
+	{
+		player->enemy->spMap.position = pos;
+	}
 	player->setNemMap(newMap);
 }
 
@@ -130,12 +134,6 @@ std::vector<std::shared_ptr<Sprite>>* SpriteManager::getDeteachSprite() { return
 
 void SpriteManager::update(float deltaTime)
 {
-	/*if (enemys.size() == 0)
-	{
-		auto& event = EventSystem::getInstance();
-		event.trigger<int>("SWAPLOC", BASE_N);
-	}*/
-
 	for (auto enemy : enemys)
 	{
 		enemy->update(deltaTime);

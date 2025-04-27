@@ -83,17 +83,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="KeyData.txt">
-      <Filter>Файлы ресурсов</Filter>
-    </Text>
-    <Text Include="Readme.txt">
-      <Filter>Файлы ресурсов</Filter>
-    </Text>
-    <Text Include="TextData.txt">
-      <Filter>Файлы ресурсов</Filter>
-    </Text>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="HPP\Animation.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
@@ -166,5 +155,13 @@
     <ClInclude Include="HPP\Weapon.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Data\KeyData.txt">
+      <Filter>Файлы ресурсов</Filter>
+    </Text>
+    <Text Include="Data\TextData.txt">
+      <Filter>Файлы ресурсов</Filter>
+    </Text>
   </ItemGroup>
 </Project>

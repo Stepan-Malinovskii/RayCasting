@@ -16,7 +16,7 @@ public:
 	SpriteManager(Map* _nowMap, Dialog* _dialogSys);
 	~SpriteManager();
 	void update(float deltaTime);
-	void resetMap(Map* newMap, std::pair<sf::Vector2f, sf::Vector2f> mapPos);
+	void resetMap(Map* newMap, sf::Vector2f playerPos);
 	Player* getPlayer();
 	Npc* getNpc(int id);
 	std::vector<std::shared_ptr<Sprite>>* getDeteachSprite();

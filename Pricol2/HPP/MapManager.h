@@ -22,7 +22,7 @@ public:
 	void save();
 	void load(std::string fileName = "");
 
-	std::pair<sf::Vector2f, sf::Vector2f> nextLocation(int index);
+	sf::Vector2f nextLocation(int index);
 	void rewriteSprites(std::vector<std::shared_ptr<Sprite>>* sprs);
 	sf::Vector2f getStartPosition();
 	void drawMap(int layer);

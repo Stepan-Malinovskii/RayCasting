@@ -54,7 +54,6 @@ void MapManager::save()
 void MapManager::load(std::string fileName)
 {
 	std::ifstream in;
-
 	if (fileName == "") { in = std::ifstream{ "Data/current.map", std::ios::in | std::ios::binary }; }
 	else
 	{
@@ -62,6 +61,7 @@ void MapManager::load(std::string fileName)
 		in = std::ifstream{ fileName, std::ios::in | std::ios::binary };
 	}
 	if (!in.is_open()) return;
+
 	nowMap = new Map();
 
 	int h = 0, w = 0;
@@ -96,7 +96,7 @@ void MapManager::load(std::string fileName)
 	in.close();
 }
 
-std::pair<sf::Vector2f, sf::Vector2f> MapManager::nextLocation(int index)
+sf::Vector2f MapManager::nextLocation(int index)
 {
 	auto& state = GameState::getInstance();
 	if (index == BASE_N)
@@ -104,7 +104,7 @@ std::pair<sf::Vector2f, sf::Vector2f> MapManager::nextLocation(int index)
 		state.data.isLevelBase = true;
 		SoundManager::playerMusic(BaseSound);
 		load(mapFileNames[BASE_N]);
-
+		endPos = {0.0f, 0.0f};
 		for (auto sp : nowMap->sprites)
 		{
 			if (sp.spriteDefId == 0)
@@ -129,7 +129,7 @@ std::pair<sf::Vector2f, sf::Vector2f> MapManager::nextLocation(int index)
 		}
 	}
 
-	return { startPos, endPos };
+	return startPos;
 }
 
 void MapManager::rewriteSprites(std::vector<std::shared_ptr<Sprite>>* sprs)
@@ -365,15 +365,17 @@ void MapManager::writeEnemy(std::vector<sf::IntRect> rooms)
 		r.left += 2;
 		r.height -= 4;
 		r.width -= 4;
-		auto points = Random::uniquePoints(r, Random::intRandom(midleRoomCount * 0.8f, 
-																midleRoomCount * 1.2f));
+		auto points = Random::uniquePoints(r, Random::intRandom(midleRoomCount * 0.8f,
+			midleRoomCount * 1.2f));
 		for (auto p : points)
 		{
 			auto index = Random::intRandom(minEnemy, maxEnemy);
 			auto def = spriteDefs[index];
-			nowMap->setMapSprite({def.texture + 1, (sf::Vector2f)p, (float)Random::intRandom(0,180), enemyDefs[index].maxHealpoint});
+			nowMap->setMapSprite({ def.texture + 1, (sf::Vector2f)p, (float)Random::intRandom(0,180), enemyDefs[index].maxHealpoint });
 		}
 	}
+
+	nowMap->setMapSprite({ 14, endPos, 0.0f, 100.0f });
 }
 
 Map* MapManager::getNowMap() { return nowMap; }
