@@ -43,8 +43,8 @@ void Weapon::startAnimation(int number)
 Itemble::Itemble(std::wstring _name, std::wstring _disc, int _cost, int _textureId) :
 	name{ _name }, disc{ _disc }, cost{ _cost }, id{ _textureId } {}
 
-Improve::Improve(ImproveDef def, int id) : Itemble(def.name, def.disc, def.cost, id),
-type{ def.type }
+Improve::Improve(ImproveDef def) : 
+	Itemble(def.name, def.disc, def.cost, def.id), type{ def.type }
 {
 	if (type == Damage)
 	{
@@ -74,7 +74,7 @@ void Improve::setGetFunc(std::function<void(Gun* gun)> _setEffect) { getImprove 
 
 void Improve::setDelFunc(std::function<void(Gun* gun)> _delEffect) { deleteImprove = _delEffect; }
 
-Item::Item(ItemsDef def, int id) : Itemble(def.name, def.disc, def.cost, id),
+Item::Item(ItemsDef def) : Itemble(def.name, def.disc, def.cost, def.id),
 type{ def.type }, maxUsing{ def.maxUSing }
 {
 	if (def.type == Heal)
@@ -110,22 +110,14 @@ type{ def.type }, maxUsing{ def.maxUSing }
 	{
 		setFunc([=](Player* pl) {pl->patrons += def.effect;});
 	}
-	else if (def.type == Travel)
-	{
-		setFunc([=](Player* pl) 
-			{
-				auto& event = EventSystem::getInstance();
-				event.trigger("SWAPLOC", def.effect);
-			});
-	}
 }
 
 void Item::setFunc(std::function<void(Player* sprite)> _useFunc) { useFunc = _useFunc; }
 
 void Item::useItem(Player* sprite) { useFunc(sprite); }
 
-Gun::Gun(GunDef def, bool _isReset, int id, int _gunId) : Weapon(def.shutTime, def.maxDist),
-Itemble(def.name, def.disc, def.cost, id),
+Gun::Gun(GunDef def, bool _isReset, int _gunId) : Weapon(def.shutTime, def.maxDist),
+Itemble(def.name, def.disc, def.cost, def.id),
 damage{ def.damage }, maxCount{ def.maxCount }, nowCount{ def.nowCount },
 nowTimeBetwenReset{ def.resetTime }, timeBetwenReset{ def.resetTime }, isReset{ _isReset }, gunId{ _gunId }
 {

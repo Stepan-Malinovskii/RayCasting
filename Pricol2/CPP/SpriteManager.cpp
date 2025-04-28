@@ -3,8 +3,8 @@
 #define SQUARE(a) ((a) * (a))
 #define GETDIST(a,b) (SQUARE(a.x - b.x) + SQUARE(a.y - b.y))
 
-SpriteManager::SpriteManager(Map* _nowMap, Dialog* _dialogSys) : 
-	nowMap{ _nowMap }, dialogSys{ _dialogSys }, id { 1 }
+SpriteManager::SpriteManager(Map* _nowMap, UIManager* _uiManager, ItemManager* _itemManager) : 
+	nowMap{ _nowMap }, uiManager{ _uiManager }, itemManager{ _itemManager }, id {1}
 {
 	allSprites = new std::vector<std::shared_ptr<Sprite>>();
 	init();
@@ -17,8 +17,8 @@ void SpriteManager::init()
 	while (i < allSprites->size())
 	{
 		if ((*allSprites)[i]->id != 0)
-		{ 
-			(*allSprites)[i].reset(); 
+		{
+			(*allSprites)[i].reset();
 			allSprites->erase(allSprites->begin() + i);
 		}
 		else
@@ -29,12 +29,32 @@ void SpriteManager::init()
 
 	enemys.clear();
 
-	for (auto sp : nowMap->getMapSprites()) {
-		createSpriteFromMapSprite(sp);
+	auto& data = Data::getInstance();
+	PlayerDef plDef = data.getPlayerData();
+
+	if (!player)
+	{
+		bool flag = false;
+		for (auto sp : nowMap->getMapSprites())
+		{
+			if (sp.spriteDefId == 0)
+			{
+				auto def = spriteDefs[sp.spriteDefId];
+				createPlayer(sp, def, plDef);
+				flag = true;
+				break;
+			}
+		}
+
+		if (!flag)
+		{
+			createDefaultPlayer(plDef);
+		}
 	}
 
-	if (!player) {
-		createDefaultPlayer();
+
+	for (auto sp : nowMap->getMapSprites()) {
+		createSpriteFromMapSprite(sp);
 	}
 }
 
@@ -49,31 +69,19 @@ void SpriteManager::createSpriteFromMapSprite(MapSprite mapSprite)
 
 void SpriteManager::createEnemy(MapSprite mapSprite, SpriteDef def)
 {
-	auto enemy = std::make_shared<Enemy>(def, mapSprite, enemyDefs[mapSprite.spriteDefId], id);
+	if (mapSprite.spriteDefId == 0) return;
 
-	if (mapSprite.spriteDefId == 0 && !player)
+	auto enemy = std::make_shared<Enemy>(def, mapSprite, enemyDefs[mapSprite.spriteDefId], id);
+	
+	if (enemy->spMap.nowHealPoint <= 0.0f)
 	{
-		auto& data = Data::getInstance();
-		PlayerDef plDef = data.getPlayerData();
-		enemy->id = 0;
-		enemy->enemyDef.maxHealpoint = plDef.maxHp;
-		enemy->spMap.nowHealPoint = plDef.nowHp;
-		player = std::make_unique<Player>(enemy.get(), plDef, nowMap);
-		player->patrons = plDef.countpantrons;
-		nowMap->setupBlockmap(enemy.get());
+		enemy->changeState(Dead);
 	}
-	else if (mapSprite.spriteDefId != 0)
+	else
 	{
-		if (enemy->spMap.nowHealPoint <= 0.0f)
-		{
-			enemy->changeState(Dead);
-		}
-		else
-		{
-			enemy->changeState(Stay);
-			enemys.push_back(enemy.get());
-			nowMap->setupBlockmap(enemy.get());
-		}
+		enemy->changeState(Stay);
+		enemys.push_back(enemy.get());
+		nowMap->setupBlockmap(enemy.get());
 	}
 
 	allSprites->push_back(std::move(enemy));
@@ -81,14 +89,54 @@ void SpriteManager::createEnemy(MapSprite mapSprite, SpriteDef def)
 
 void SpriteManager::createNpc(MapSprite mapSprite, SpriteDef def)
 {
-	allSprites->push_back(std::make_shared<Npc>(Npc(def, mapSprite, id, mapSprite.spriteDefId - ENEMY_COUNT, dialogSys)));
+	auto npcDef = npcDefs[mapSprite.spriteDefId - ENEMY_COUNT];
+	if (npcDef.type == Trader)
+	{
+		TraderDef tradeDef;
+		for (auto t : traderDefs)
+		{
+			if (t.startKey == npcDef.startKey)
+			{
+				tradeDef = t;
+				break;
+			}
+		}
+
+		allSprites->push_back(std::make_shared<TradeNpc>(TradeNpc(def, mapSprite, tradeDef, itemManager, 
+			uiManager, player.get(), id)));
+	}
+	else if (npcDef.type == Traveler)
+	{
+		allSprites->push_back(std::make_shared<TravelerNpc>(TravelerNpc(def, mapSprite, npcDef, uiManager, itemManager, player.get(), id)));
+	}
+	else if (npcDef.type == Changer)
+	{
+		allSprites->push_back(std::make_shared<ChangerNpc>(ChangerNpc(def, mapSprite, npcDef, uiManager, itemManager, player.get(), id)));
+	}
+	else
+	{
+		allSprites->push_back(std::make_shared<Npc>(Npc(def, mapSprite, uiManager, player.get(), npcDef, id)));
+	}
+
 	nowMap->setupBlockmap(allSprites->back().get());
 }
 
-void SpriteManager::createDefaultPlayer()
+void SpriteManager::createPlayer(MapSprite mapSprite, SpriteDef def, PlayerDef plDef)
 {
-	auto& data = Data::getInstance();
-	PlayerDef plDef = data.getPlayerData();
+	auto enemy = std::make_shared<Enemy>(def, mapSprite, enemyDefs[mapSprite.spriteDefId], id);
+
+	enemy->id = 0;
+	enemy->enemyDef.maxHealpoint = plDef.maxHp;
+	enemy->spMap.nowHealPoint = plDef.nowHp;
+	player = std::make_unique<Player>(enemy.get(), plDef, nowMap);
+	player->patrons = plDef.countpantrons;
+	nowMap->setupBlockmap(enemy.get());
+
+	allSprites->push_back(std::move(enemy));
+}
+
+void SpriteManager::createDefaultPlayer(PlayerDef plDef)
+{
 	auto def = spriteDefs[0];
 	auto enDef = enemyDefs[0];
 	enDef.maxHealpoint = plDef.maxHp;
@@ -229,7 +277,7 @@ bool SpriteManager::isEnemyHit(Enemy* enemy)
 void SpriteManager::killEnemy(Enemy* enem)
 {
 	enem->changeState(Dead);
-	player->money += Random::intRandom((int)(enem->enemyDef.midleDrop * 0.8f), (int)(enem->enemyDef.midleDrop * 1.2f));
+	player->details += Random::intRandom((int)(enem->enemyDef.midleDrop * 0.8f), (int)(enem->enemyDef.midleDrop * 1.2f));
 	nowMap->deleteInBlockMap(enem);
 
 	for (int i = 0; i < enemys.size(); i++)

@@ -1,11 +1,12 @@
 #include "ItemManager.h"
 
-ItemManager::ItemManager() : id{ 0 }
+ItemManager::ItemManager()
 {
 	createImprovements();
 	createItems();
 	createGuns();
-	createTravel();
+	createTraveler();
+
 	auto& event = EventSystem::getInstance();
 	event.subscribe<int>("SAVE", [=](const int& NON) {saveGun();});
 	event.subscribe<int>("RESET_GAME", [=](const int& NON) {
@@ -22,9 +23,8 @@ void ItemManager::createImprovements()
 {
 	for (int i = 0; i < improveDefs.size(); i++)
 	{
-		improvements.push_back(std::make_unique<Improve>(improveDefs[i], id));
-		itemble[id] = improvements.back().get();
-		id++;
+		improvements.push_back(std::make_unique<Improve>(Improve(improveDefs[i])));
+		itemble[improveDefs[i].id] = improvements.back().get();
 	}
 }
 
@@ -32,9 +32,18 @@ void  ItemManager::createItems()
 {
 	for (int i = 0; i < itemsDefs.size(); i++)
 	{
-		items.push_back(std::make_unique<Item>(itemsDefs[i], id));
-		itemble[id] = items.back().get();
-		id++;
+		items.push_back(std::make_unique<Item>(Item(itemsDefs[i])));
+		itemble[itemsDefs[i].id] = items.back().get();
+	}
+}
+
+void ItemManager::createTraveler()
+{
+	for (int i = 0; i < travelerDefs.size(); i++)
+	{
+		items.push_back(std::make_unique<Item>(Item(travelerDefs[i])));
+		itemble[travelerDefs[i].id] = items.back().get();
+		items.back()->id = travelerDefs[0].id;
 	}
 }
 
@@ -48,29 +57,15 @@ void  ItemManager::createGuns()
 		GunDef def = gunsDef[i];
 		def.nowCount = gunsData[i].nowCount;
 
-		guns.push_back(std::make_unique<Gun>(def, i > 1, id, i));
+		guns.push_back(std::make_unique<Gun>(Gun(def, i > 1, i)));
 		guns.back()->setAnimator(std::move(createAnimator(i)));
 
-		itemble[id] = guns.back().get();
+		itemble[def.id] = guns.back().get();
 
 		for (auto im : gunsData[i].improveId)
 		{
 			guns.back()->trySetImprove(improvements[im].get());
 		}
-
-		id++;
-	}
-}
-
-void ItemManager::createTravel()
-{
-	int tempId = id;
-
-	for (int i = 0; i < travelerDefs.size(); i++)
-	{
-		travelItem.push_back(std::make_unique<Item>(travelerDefs[i], tempId));
-		itemble[id] = items.back().get();
-		id++;
 	}
 }
 
@@ -104,56 +99,7 @@ Gun* ItemManager::getGunByIndex(int index) { return index >= 0 && index < guns.s
 
 Gun* ItemManager::getGunById(int id) { return dynamic_cast<Gun*>(itemble[id]); }
 
-Itemble* ItemManager::getItem(int index) { return itemble[index]; }
-
-std::vector<Item*> ItemManager::getTravelItem()
-{
-	std::vector<Item*> result;
-
-	for (const auto& tr : travelItem)
-	{
-		result.push_back(tr.get());
-	}
-
-	return result;
-}
-
-std::vector<Gun*> ItemManager::getGuns()
-{
-	std::vector<Gun*> result;
-
-	for (const auto& gun : guns)
-	{
-		result.push_back(gun.get());
-	}
-
-	return result;
-}
-
-std::vector<Improve*> ItemManager::getImprovs()
-{
-	std::vector<Improve*> result;
-
-	for (const auto& improve : improvements)
-	{
-		result.push_back(improve.get());
-	}
-
-	return result;
-}
-
-std::vector<Item*> ItemManager::getItems()
-{
-	std::vector<Item*> result;
-	result.reserve(items.size());
-
-	for (const auto& item : items)
-	{
-		result.push_back(item.get());
-	}
-
-	return result;
-}
+Itemble* ItemManager::getItemble(int id) { return itemble[id]; }
 
 void ItemManager::saveGun()
 {

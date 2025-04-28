@@ -322,9 +322,47 @@ void UIManager::initTrade(std::map<int, Itemble*> variants, Player* player)
 
 	g3.setString(L"В\nЫ\nХ\nО\nД");
 	g3.setPosition({ (SCREEN_W + DIALOG_W) / 2 + g3.getSize().x , SCREEN_H - g3.getSize().y/2 - 5});
-	
 	buttons.push_back(Button(g3));
 	buttons.back().setFunc([=]() { keyButton = -100; });
+}
+
+void UIManager::initChanger(int coef, Player* player)
+{
+	background = sf::Sprite(Resources::tradeBackground);
+	background.setScale({ SCREEN_W / Resources::tradeBackground.getSize().x,
+		SCREEN_H / Resources::tradeBackground.getSize().y });
+
+	sf::Text text(L"Баланс: " + std::to_wstring(player->money) + L" | Запчасти: " + std::to_wstring(player->details), Resources::UIFont, 50.0f);
+	sf::RectangleShape shape({ text.getLocalBounds().width + 10.0f, text.getLocalBounds().height + 10.0f });
+	shape.setFillColor(sf::Color(70, 70, 70));
+	shape.setPosition({ SCREEN_W / 2, shape.getSize().y + 10.0f });
+	Button button(Group(shape, text));
+	buttons.push_back(button);
+
+	text.setString(L"Текущий курс: 1 деталь к " + std::to_wstring(coef) + L" монетам");
+	shape.setSize({ text.getLocalBounds().width + 10.0f, text.getLocalBounds().height + 10.0f });
+	shape.move({ 0, shape.getSize().y + 5.0f });
+	button = Button(Group(shape, text));
+	buttons.push_back(button);
+
+	text.setString(L"Производится обмен 10 деталей сразу");
+	shape.setSize({ text.getLocalBounds().width + 10.0f, text.getLocalBounds().height + 10.0f });
+	shape.move({ 0, shape.getSize().y + 5.0f });
+	button = Button(Group(shape, text));
+	buttons.push_back(button);
+
+	text.setString(L"О\nБ\nМ\nЕ\nН\nЯ\nТ\nЬ");
+	shape.setSize({ text.getLocalBounds().width + 10.0f, text.getLocalBounds().height + 10.0f });
+	shape.setPosition({ shape.getSize().x + 5.0f, SCREEN_H / 2});
+	button = Button(Group(shape, text));
+	button.setFunc([=]() { keyButton = -200; });
+	buttons.push_back(button);
+
+	text.setString(L"В\nЫ\nХ\nО\nД");
+	shape.setPosition({ SCREEN_W - shape.getSize().x - 5.0f, SCREEN_H / 2 });
+	button = Button(Group(shape, text));
+	button.setFunc([=]() { keyButton = -100; });
+	buttons.push_back(button);
 }
 
 void UIManager::initInvent(std::map<Itemble*, int> items, Itemble* choose, Player* player)

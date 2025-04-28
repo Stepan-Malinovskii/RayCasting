@@ -163,5 +163,8 @@
     <Text Include="Data\TextData.txt">
       <Filter>Файлы ресурсов</Filter>
     </Text>
+    <Text Include="Data\КЛЮЧИ.txt">
+      <Filter>Файлы ресурсов</Filter>
+    </Text>
   </ItemGroup>
 </Project>

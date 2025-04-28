@@ -9,13 +9,13 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 	uiManager = new UIManager(window);
 	menu = new Menu(window, uiManager);
 	dialogSys = new Dialog(window, uiManager, itemManager);
-	spManager = new SpriteManager(mapManager->getNowMap(), dialogSys);
+	spManager = new SpriteManager(mapManager->getNowMap(), uiManager, itemManager);
 	player = spManager->getPlayer();
 	invent = new Inventory(window, player, uiManager);
 	initPlayer();
 
 	auto& data = Data::getInstance();
-	for (auto b : data.getInvent()) { player->takeItem(itemManager->getItem(b.first), b.second); }
+	for (auto b : data.getInvent()) { player->takeItem(itemManager->getItemble(b.first), b.second); }
 
 	auto update = [=](float deltaTime) {
 		getInput(deltaTime);
@@ -155,7 +155,7 @@ void Game::getInput(float deltaTime)
 		{
 			if (auto npc = spManager->getNpc(sp->id); npc)
 			{
-				dialogSys->start(npc->npcDefData.startKey, npc->spDef.name);
+				dialogSys->start(npc);
 			}
 		}
 	}

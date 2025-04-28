@@ -15,8 +15,9 @@ constexpr float PI = 3.14159265359f, TRIGER_DIST_MAX = 80, TRIGER_DIST_MIN = 40;
 constexpr int ENEMY_COUNT = 14;
 
 class Map;
-class Sprite;
-class Dialog;
+class Player;
+class UIManager;
+class ItemManager;
 
 enum class SpriteType
 {
@@ -26,6 +27,11 @@ enum class SpriteType
 enum EnemyState
 {
 	Stay, Run, Attack, Killes, Dead
+};
+
+enum NpcType
+{
+	Dilog, Trader, Traveler, Changer, Quest, Mechenick, Portal
 };
 
 struct MapSprite
@@ -58,7 +64,14 @@ struct EnemyDef
 
 struct NpcDef
 {
+	NpcType type;
 	int startKey;
+};
+
+struct TraderDef
+{
+	int startKey;
+	std::vector<int> title;
 };
 
 class Sprite
@@ -81,7 +94,7 @@ class Enemy : public Sprite
 {
 public:
 	Enemy(SpriteDef spDef, MapSprite spMap, EnemyDef enemyDef, int id);
-	~Enemy() = default;
+	virtual ~Enemy() = default;
 	std::pair<int, bool> getTextIndex() override;
 	void update(float deltaTime);
 	void move(Map* map, sf::Vector2f move);
@@ -106,15 +119,88 @@ private:
 class Npc : public Sprite
 {
 public:
-	Npc(SpriteDef spDef, MapSprite spMap, int _id, int npcId, Dialog* dialog);
+	Npc(SpriteDef spDef, MapSprite spMap, UIManager* uiManager, Player* player, NpcDef npcDef, int _id);
 	Npc() = default;
+	virtual ~Npc() = default;
+	void setEndFunc(std::function<void()> _endFunc);
+	virtual void init();
+	virtual void stop();
+	virtual void use();
+	virtual void update(int chooseKey);
+protected:
+	virtual void check();
+
+	int nowKey;
+	std::function<void()> endFunc;
+	Player* player;
+	UIManager* uiManager;
 	NpcDef npcDefData;
-private:
-	Dialog* dialog;
 };
 
-static std::vector<NpcDef> npcDef = {
-	{1}, {2}, {2}, {2}, {2}, {2}, {2}, {2}, {2}, {2}, {2}, {2}, {2}, {2} };
+class FuncNpc : public Npc
+{
+public:
+	FuncNpc(SpriteDef spDef, MapSprite spMap, NpcDef npcDef, ItemManager* itemManager, 
+		UIManager* uiManager, Player* player, int id);
+
+	virtual void init() override = 0;
+	void stop() override;
+	virtual void use() override = 0;
+	void update(int chooseKey) override;
+protected:
+	void check() override;
+
+	ItemManager* itemManager;
+	int choose;
+	bool isFunc;
+};
+
+class TradeNpc : public FuncNpc
+{
+public:
+	TradeNpc(SpriteDef spDef, MapSprite spMap, TraderDef tradeDef,
+		ItemManager* itemManager, UIManager* uiManager, Player* player, int _id);
+	void init() override;
+	void use() override;
+private:
+
+	TraderDef tradeDef;
+};
+
+class TravelerNpc : public FuncNpc
+{
+public:
+	TravelerNpc(SpriteDef spDef, MapSprite spMap, NpcDef npcDef, 
+		UIManager* uiManager, ItemManager* itemManager, Player* player, int _id);
+	void init() override;
+	void use() override;
+};
+
+class ChangerNpc : public FuncNpc
+{
+public:
+	ChangerNpc(SpriteDef spDef, MapSprite spMap, NpcDef npcDef, UIManager* uiManager, 
+		ItemManager* itemManager, Player* player, int _id);
+	void init() override;
+	void use() override;
+private:
+	int coef;
+};
+
+static std::vector<NpcDef> npcDefs = {
+	{Portal, 1},
+	{Trader, 4},
+	{Trader, 5},
+	{Changer, 3},
+	{Traveler, 2},
+	{Quest, 6},
+	{Mechenick, 7}
+};
+
+static std::vector<TraderDef> traderDefs = {
+	{4, {9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}},
+	{5, {24, 25, 26, 27, 28, 29, 0, 1, 2, 3, 4, 5, 6, 7, 8}}
+};
 
 static std::vector<EnemyDef> enemyDefs = {
 	{true,  0.0f,  0.0f,  0,  0.0f, 5.0f, 0.0f },

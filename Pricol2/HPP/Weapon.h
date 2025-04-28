@@ -22,6 +22,7 @@ class Player;
 
 struct GunDef
 {
+	int id;
 	int damage;
 	int maxCount;
 	int nowCount;
@@ -47,6 +48,7 @@ enum ImproveType
 
 struct ImproveDef
 {
+	int id;
 	ImproveType type;
 	std::wstring name;
 	float effect;
@@ -56,11 +58,12 @@ struct ImproveDef
 
 enum ItemType
 {
-	MaxEnergy, MaxHeal, Heal, Armor, Patrons, Travel
+	MaxEnergy, MaxHeal, Heal, Armor, Patrons
 };
 
 struct ItemsDef
 {
+	int id;
 	ItemType type;
 	std::wstring name;
 	int effect;
@@ -83,7 +86,7 @@ public:
 class Item : public Itemble
 {
 public:
-	Item(ItemsDef def, int id);
+	Item(ItemsDef def);
 	Item() = default;
 	void setFunc(std::function<void(Player* player)> _useFunc);
 	void useItem(Player* sprite);
@@ -95,7 +98,7 @@ public:
 class Improve : public Itemble
 {
 public:
-	Improve(ImproveDef def, int id);
+	Improve(ImproveDef def);
 	Improve() = default;
 	void setGetFunc(std::function<void(Gun* gun)> setEffect);
 	void setDelFunc(std::function<void(Gun* gun)> delEffect);
@@ -109,20 +112,15 @@ class Weapon
 public:
 	Weapon(float _timeBetewen, float maxDist);
 	Weapon() = default;
-
+	virtual ~Weapon() = default;
 	virtual void update(float dt);
-
 	virtual void drawWeapon(sf::RenderTarget* window, sf::Vector2f delta);
-
 	virtual bool isCanUsed();
-
 	virtual void setAnimator(Animator<sf::Texture*>&& anim);
 
 	float maxDist;
 protected:
-
 	virtual void startAnimation(int number);
-
 	virtual void ussing(Enemy* sp, float dist) = 0;
 
 	Animator<sf::Texture*> weaponAnimator;
@@ -132,7 +130,7 @@ protected:
 class Gun : public Weapon, public Itemble
 {
 public:
-	Gun(GunDef def, bool isReset, int id, int dunId);
+	Gun(GunDef def, bool isReset, int dunId);
 	Gun() = default;
 
 	Improve* trySetImprove(Improve* improve);

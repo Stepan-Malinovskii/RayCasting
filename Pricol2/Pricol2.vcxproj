@@ -192,6 +192,7 @@
   <ItemGroup>
     <Text Include="Data\KeyData.txt" />
     <Text Include="Data\TextData.txt" />
+    <Text Include="Data\КЛЮЧИ.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

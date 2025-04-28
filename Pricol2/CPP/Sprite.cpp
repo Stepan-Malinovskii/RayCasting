@@ -1,6 +1,8 @@
 #include "Sprite.h"
-#include "DialogSystem.h"
+#include "UIManeger.h"
+#include "ItemManager.h"
 #include "Map.h"
+#include "Player.h"
 
 Sprite::Sprite(SpriteDef _spDef, MapSprite _spMap, int _id) :
 	spDef{ _spDef }, spMap{ _spMap }, id{ _id }
@@ -208,8 +210,210 @@ bool Enemy::checkCollision(Map* map, sf::Vector2f newPos, bool xAxis)
 	return false;
 }
 
-Npc::Npc(SpriteDef _spDef, MapSprite _spMap, int _id, int npcDefId, Dialog* _dialog) :
-	Sprite(_spDef, _spMap, _id), npcDefData{ npcDef[npcDefId] }, dialog{ _dialog }
+Npc::Npc(SpriteDef _spDef, MapSprite _spMap, UIManager* _uiManager, Player* _player, NpcDef npcDef, int _id) :
+	Sprite(_spDef, _spMap, _id), npcDefData{ npcDef }, player{ _player }, uiManager {_uiManager}, nowKey{ npcDef.startKey }
+{ textSize = texture->getSize().y; }
+
+void Npc::setEndFunc(std::function<void()> _endFunc) { endFunc = _endFunc; }
+
+void Npc::init()
 {
-	textSize = texture->getSize().y;
+	uiManager->deleteNow();
+
+	auto& data = Data::getInstance();
+	auto keys = data.getKeys(nowKey);
+
+	std::map<int, std::wstring, std::greater<int>> variants;
+
+	for (int i = 0; i < keys.size(); i++)
+	{
+		auto d = data.getText(keys[i]);
+		variants[d.second] = d.first;
+	}
+
+	uiManager->initDialog(variants, spDef.name);
+}
+
+void Npc::stop()
+{
+	uiManager->deleteNow();
+	nowKey = npcDefData.startKey;
+	endFunc();
+	endFunc = nullptr;
+}
+
+void Npc::use() {}
+
+void Npc::update(int chooseKey)
+{
+	nowKey = chooseKey;
+	check();
+}
+
+void Npc::check()
+{
+	if (nowKey == 0)
+	{
+		stop();
+	}
+	else
+	{
+		init();
+	}
+}
+
+FuncNpc::FuncNpc(SpriteDef spDef, MapSprite spMap, NpcDef npcDef, ItemManager* _itemManager,
+	UIManager* uiManager, Player* _player, int _id) :
+	Npc(spDef, spMap, uiManager, _player, npcDef, _id), isFunc{false}, choose{-1}, itemManager{_itemManager}{}
+
+void FuncNpc::stop()
+{
+	Npc::stop();
+
+	isFunc = false;
+	choose = -1;
+}
+
+void FuncNpc::update(int chooseKey)
+{
+	nowKey = chooseKey;
+
+	if (nowKey == 999)
+	{
+		isFunc = true;
+		init();
+		return;
+	}
+
+	if (!isFunc)
+	{
+		Npc::check();
+	}
+	else
+	{
+		check();
+	}
+}
+
+void FuncNpc::check()
+{
+	if (nowKey == -100)
+	{
+		stop();
+	}
+	else if (nowKey == -200)
+	{
+		use();
+	}
+	else
+	{
+		choose = nowKey;
+	}
+}
+
+TradeNpc::TradeNpc(SpriteDef spDef, MapSprite spMap, TraderDef _tradeDef,
+	ItemManager* _itemManager, UIManager* uiManager, Player* _player, int _id) : 
+	FuncNpc(spDef, spMap, NpcDef{Trader, _tradeDef.startKey}, _itemManager, uiManager, _player, _id), tradeDef{_tradeDef} {}
+
+void TradeNpc::init()
+{
+	if (!isFunc)
+	{
+		Npc::init();
+	}
+	else
+	{
+		uiManager->deleteNow();
+
+		auto result = std::map<int, Itemble*>();
+		for (int i = 0; i < tradeDef.title.size(); i++)
+		{
+			result[tradeDef.title[i]] = itemManager->getItemble(tradeDef.title[i]);
+		}
+
+		uiManager->initTrade(result, player);
+	}
+}
+
+void TradeNpc::use()
+{
+	if (choose == -1) return;
+
+	Itemble* res = itemManager->getItemble(choose);
+
+	if (res->cost > player->money) return;
+
+	player->money -= res->cost;
+	player->takeItem(res);
+
+	choose = -1;
+
+	init();
+}
+
+TravelerNpc::TravelerNpc(SpriteDef spDef, MapSprite spMap, NpcDef npcDef, 
+	UIManager* uiManager, ItemManager* _itemManager, Player* _player, int _id) :
+	FuncNpc(spDef, spMap, npcDef, _itemManager, uiManager, _player, _id) {}
+
+void TravelerNpc::init()
+{
+	if (!isFunc)
+	{
+		Npc::init();
+	}
+	else
+	{
+		uiManager->deleteNow();
+
+		auto result = std::map<int, Itemble*>();
+		for (int i = 0; i < travelerDefs.size(); i++)
+		{
+			result[i] = itemManager->getItemble(travelerDefs[i].id);
+		}
+
+		uiManager->initTrade(result, player);
+	}
+}
+
+void TravelerNpc::use()
+{
+	if (choose == -1) return;
+
+	if (travelerDefs[choose].cost > player->money) return;
+
+	player->money -= travelerDefs[choose].cost;
+
+	int temp = travelerDefs[choose].effect;
+	stop();
+
+	auto& event = EventSystem::getInstance();
+	event.trigger<int>("SWAPLOC", temp);
+}
+
+ChangerNpc::ChangerNpc(SpriteDef spDef, MapSprite spMap, NpcDef npcDef, 
+	UIManager* uiManager, ItemManager* itemManager, Player* _player, int _id) : 
+	FuncNpc(spDef, spMap, npcDef, itemManager, uiManager, _player, _id), coef{ Random::intRandom(2, 5) } {}
+
+void ChangerNpc::init()
+{
+	if (!isFunc)
+	{
+		Npc::init();
+	}
+	else
+	{
+		uiManager->deleteNow();
+
+		uiManager->initChanger(coef, player);
+	}
+}
+
+void ChangerNpc::use()
+{
+	if (player->details - 10 < 0) return;
+
+	player->details -= 10;
+	player->money += 10 * coef;
+
+	init();
 }

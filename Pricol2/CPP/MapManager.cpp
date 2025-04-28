@@ -93,6 +93,18 @@ void MapManager::load(std::string fileName)
 	for (int i = 0; i < nowMap->sprites.size(); i++)
 		in.read(reinterpret_cast<char*>(&nowMap->sprites[i]), sizeof(nowMap->sprites[i]));
 
+	/*for (int i = 0; i < nowMap->sprites.size();)
+	{
+		if (nowMap->sprites[i].spriteDefId == 0)
+		{
+			nowMap->sprites.erase(nowMap->sprites.begin() + i);
+		}
+		else
+		{
+			i++;
+		}
+	}*/
+
 	in.close();
 }
 
@@ -355,9 +367,9 @@ void MapManager::writeRoom(sf::IntRect rect, int layer, int value)
 void MapManager::writeEnemy(std::vector<sf::IntRect> rooms)
 {
 	auto& state = GameState::getInstance();
-	int midleRoomCount = std::min(ENEMY_LEVEL_COUNT, state.data.levelNumber * 7) / rooms.size();
-	int minEnemy = std::max((int)(state.data.levelNumber * 0.5f), 1);
-	int maxEnemy = std::min((int)(state.data.levelNumber * 1.3f), ENEMY_COUNT - 2);
+	int midleRoomCount = std::min(ENEMY_LEVEL_COUNT, (state.data.levelNumber + 1) * 7) / rooms.size();
+	int minEnemy = std::max((int)((state.data.levelNumber + 1) * 0.5f), 1);
+	int maxEnemy = std::min((int)((state.data.levelNumber + 1) * 1.3f), ENEMY_COUNT - 2);
 
 	for (auto r : rooms)
 	{

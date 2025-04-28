@@ -25,6 +25,7 @@ public:
 	void initGameMenu();
 	void initSetting();
 	void initTrade(std::map<int, Itemble*> variants, Player* player);
+	void initChanger(int coef, Player* player);
 	void initInvent(std::map<Itemble*, int> items, Itemble* chose, Player* player);
 	void deleteNow();
 	void drawNow();

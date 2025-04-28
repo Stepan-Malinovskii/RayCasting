@@ -18,30 +18,17 @@ public:
 	Dialog(sf::RenderWindow* _window, UIManager* _uiManager, 
 		ItemManager* _weaponManager);
 	void setPlayer(Player* _player);
-	void start(int key, std::wstring name = L"");
-	void update();
-	void draw();
+	void start(Npc* npc);
 private:
 	RenderState dialogState;
-	bool isTrade;
-	std::wstring name;
+	Npc* npc;
 	Player* player;
-	int nowKey;
-	int startKey;
 	UIManager* uiManager;
 	ItemManager* weaponManager;
 	sf::RenderWindow* window;
 
-	Itemble* choose;
-	std::map<int, Itemble*> title;
-
-	void buy();
-	void check();
-	void checkTrade();
-	void checkDialog();
-	void init();
-	void initTrade();
-	void initDialog();
+	void update();
+	void draw();
 	void stop();
 };
 

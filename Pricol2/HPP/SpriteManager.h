@@ -13,7 +13,7 @@
 class SpriteManager
 {
 public:
-	SpriteManager(Map* _nowMap, Dialog* _dialogSys);
+	SpriteManager(Map* _nowMap, UIManager* uiManager, ItemManager* _itemManager);
 	~SpriteManager();
 	void update(float deltaTime);
 	void resetMap(Map* newMap, sf::Vector2f playerPos);
@@ -26,13 +26,15 @@ private:
 	EnemyState determineNewState(Enemy* enemy, float distance);
 	void createSpriteFromMapSprite(MapSprite mapSprite);
 	void createEnemy(MapSprite mapSprite, SpriteDef def);
+	void createPlayer(MapSprite mapSprite, SpriteDef def, PlayerDef plDef);
 	void createNpc(MapSprite mapSprite, SpriteDef );
-	void createDefaultPlayer();
+	void createDefaultPlayer(PlayerDef plDef);
 	void aiControler(float deltaTime);
 	bool isEnemyHit(Enemy* enemy);
 	void init();
 
-	Dialog* dialogSys;
+	UIManager* uiManager;
+	ItemManager* itemManager;
 	std::vector<std::shared_ptr<Sprite>>* allSprites;
 	std::vector<Enemy*> enemys;
 	std::unique_ptr<Player> player;
