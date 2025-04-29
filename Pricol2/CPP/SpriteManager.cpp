@@ -113,6 +113,14 @@ void SpriteManager::createNpc(MapSprite mapSprite, SpriteDef def)
 	{
 		allSprites->push_back(std::make_shared<ChangerNpc>(ChangerNpc(def, mapSprite, npcDef, uiManager, itemManager, player.get(), id)));
 	}
+	else if (npcDef.type == Portal)
+	{
+		allSprites->push_back(std::make_shared<PortalNpc>(PortalNpc(def, mapSprite, npcDef, uiManager, itemManager, player.get(), id)));
+	}
+	else if (npcDef.type == Mechanic)
+	{
+		allSprites->push_back(std::make_shared<MechanicNpc>(MechanicNpc(def, mapSprite, npcDef, uiManager, itemManager, player.get(), id)));
+	}
 	else
 	{
 		allSprites->push_back(std::make_shared<Npc>(Npc(def, mapSprite, uiManager, player.get(), npcDef, id)));

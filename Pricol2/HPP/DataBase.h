@@ -18,6 +18,7 @@ struct GameStateData
 	int soundVolume;
 	int levelNumber;
 	bool isLevelBase;
+	int changerCoef;
 };
 
 class Data

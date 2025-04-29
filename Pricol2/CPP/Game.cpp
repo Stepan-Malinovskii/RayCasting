@@ -30,13 +30,15 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 	auto& event = EventSystem::getInstance();
 	event.subscribe<int>("SWAPLOC", [=](const int levelN)
 		{
+			auto& state = GameState::getInstance();
+			state.data.changerCoef = Random::intRandom(2, 5);
 			sf::Vector2f pos = mapManager->nextLocation(levelN);
 			spManager->resetMap(mapManager->getNowMap(), pos);
 		}
 	);
 
 	event.subscribe<int>("RESET_GAME", [=](const int NON) { currentState = &playState;
-	player->guns[1] = nullptr; player->guns[2] = nullptr;
+	player->guns[1] = nullptr; player->guns[2] = nullptr; invent->takeItem(itemManager->getGunByIndex(2), 1);
 	player->setGun(itemManager->getGunByIndex(2), 1);});
 
 	event.subscribe<RenderState*>("SWAP_STATE", [=](RenderState* state) {

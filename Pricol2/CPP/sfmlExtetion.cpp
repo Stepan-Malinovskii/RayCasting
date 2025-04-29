@@ -23,7 +23,7 @@ void Button::setPosition(sf::Vector2f pos) { group.setPosition(pos); }
 
 bool Button::isClicked(sf::Vector2i& mousePos)
 {
-	if (fn == NULL) return false;
+	if (!fn) return false;
 
 	sf::Vector2f pos = group.getPosition();
 	sf::Vector2f size = { group.getSize().x * group.shape.getScale().x, group.getSize().y * group.shape.getScale().y };
@@ -37,10 +37,7 @@ bool Button::isClicked(sf::Vector2i& mousePos)
 	return false;
 }
 
-void Button::setFunc(std::function<void()>&& _fn)
-{
-	fn = _fn;
-}
+void Button::setFunc(std::function<void()>&& _fn) { fn = _fn; }
 
 void Button::setTexture(sf::Texture* text)
 {
@@ -54,7 +51,7 @@ void Button::setTextureRect(sf::IntRect rect)
 
 void Button::use()
 {
-	if (fn != NULL)
+	if (fn)
 	{
 		fn();
 		SoundManager::playSound(Resources::buttonClick);

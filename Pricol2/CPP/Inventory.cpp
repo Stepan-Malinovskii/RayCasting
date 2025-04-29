@@ -95,6 +95,7 @@ void Inventory::useInvent()
 
 void Inventory::initInv()
 {
+	uiManager->deleteNow();
 	uiManager->initInvent(items, choose, player);
 }
 
@@ -119,6 +120,7 @@ void Inventory::selectedItem()
 	else if (auto improve = dynamic_cast<Improve*>(choose); improve) 
 	{ useSelectedImprove(improve); }
 	
+	uiManager->deleteNow();
 	choose = nullptr;
 	initInv();
 }

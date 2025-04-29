@@ -15,6 +15,7 @@ constexpr float PI = 3.14159265359f, TRIGER_DIST_MAX = 80, TRIGER_DIST_MIN = 40;
 constexpr int ENEMY_COUNT = 14;
 
 class Map;
+class Gun;
 class Player;
 class UIManager;
 class ItemManager;
@@ -31,7 +32,7 @@ enum EnemyState
 
 enum NpcType
 {
-	Dilog, Trader, Traveler, Changer, Quest, Mechenick, Portal
+	Dilog, Trader, Traveler, Changer, Quest, Mechanic, Portal
 };
 
 struct MapSprite
@@ -148,7 +149,7 @@ public:
 	virtual void use() override = 0;
 	void update(int chooseKey) override;
 protected:
-	void check() override;
+	virtual void check() override;
 
 	ItemManager* itemManager;
 	int choose;
@@ -187,6 +188,28 @@ private:
 	int coef;
 };
 
+class PortalNpc : public FuncNpc
+{
+public:
+	PortalNpc(SpriteDef spDef, MapSprite spMap, NpcDef npcDef, UIManager* uiManager,
+		ItemManager* itemManager, Player* player, int _id);
+	void init() override;
+	void use() override;
+};
+
+class MechanicNpc : public FuncNpc
+{
+public:
+	MechanicNpc(SpriteDef spDef, MapSprite spMap, NpcDef npcDef, UIManager* uiManager,
+		ItemManager* itemManager, Player* player, int _id);
+	void init() override;
+	void use() override;
+private:
+	void check() override;
+
+	Gun* nowGun;
+};
+
 static std::vector<NpcDef> npcDefs = {
 	{Portal, 1},
 	{Trader, 4},
@@ -194,7 +217,7 @@ static std::vector<NpcDef> npcDefs = {
 	{Changer, 3},
 	{Traveler, 2},
 	{Quest, 6},
-	{Mechenick, 7}
+	{Mechanic, 7}
 };
 
 static std::vector<TraderDef> traderDefs = {

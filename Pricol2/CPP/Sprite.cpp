@@ -2,6 +2,7 @@
 #include "UIManeger.h"
 #include "ItemManager.h"
 #include "Map.h"
+#include "Weapon.h"
 #include "Player.h"
 
 Sprite::Sprite(SpriteDef _spDef, MapSprite _spMap, int _id) :
@@ -392,7 +393,11 @@ void TravelerNpc::use()
 
 ChangerNpc::ChangerNpc(SpriteDef spDef, MapSprite spMap, NpcDef npcDef, 
 	UIManager* uiManager, ItemManager* itemManager, Player* _player, int _id) : 
-	FuncNpc(spDef, spMap, npcDef, itemManager, uiManager, _player, _id), coef{ Random::intRandom(2, 5) } {}
+	FuncNpc(spDef, spMap, npcDef, itemManager, uiManager, _player, _id)
+{
+	auto& state = GameState::getInstance();
+	coef = state.data.changerCoef;
+}
 
 void ChangerNpc::init()
 {
@@ -416,4 +421,75 @@ void ChangerNpc::use()
 	player->money += 10 * coef;
 
 	init();
+}
+
+PortalNpc::PortalNpc(SpriteDef spDef, MapSprite spMap, NpcDef npcDef, 
+	UIManager* uiManager, ItemManager* itemManager, Player* player, int _id) :
+	FuncNpc(spDef, spMap, npcDef, itemManager, uiManager, player, _id) {}
+
+void PortalNpc::init()
+{
+	if (!isFunc)
+	{
+		Npc::init();
+	}
+	else
+	{
+		FuncNpc::stop();
+
+		auto& event = EventSystem::getInstance();
+		event.trigger<int>("SWAPLOC", BASE_N);
+	}
+}
+
+void PortalNpc::use() {}
+
+MechanicNpc::MechanicNpc(SpriteDef spDef, MapSprite spMap, NpcDef npcDef,
+	UIManager* uiManager, ItemManager* itemManager, Player* player, int _id) : 
+	FuncNpc(spDef, spMap, npcDef, itemManager, uiManager, player, _id), nowGun{ nullptr } {}
+
+void MechanicNpc::init()
+{
+	if (!isFunc)
+	{
+		Npc::init();
+	}
+	else
+	{
+		uiManager->deleteNow();
+
+		uiManager->initMechanic(player, nowGun);
+	}
+}
+
+void MechanicNpc::use()
+{
+	if (choose == -1) return;
+
+	if (!nowGun) return;
+
+
+
+}
+
+void MechanicNpc::check()
+{
+	if (nowKey == -100)
+	{
+		stop();
+	}
+	else if (nowKey == -200)
+	{
+		use();
+	}
+	else
+	{
+		if (nowKey == 1 || nowKey == 2)
+		{
+			nowGun = player->guns[nowKey];
+			return;
+		}
+
+		choose = nowKey;
+	}
 }

@@ -315,15 +315,96 @@ void UIManager::initTrade(std::map<int, Itemble*> variants, Player* player)
 	sf::RectangleShape rect1({ size + 10, 350 });
 	rect1.setFillColor(sf::Color(70, 70, 70));
 	Group g3(rect1, text1);
-	g3.setPosition({ (SCREEN_W + DIALOG_W) / 2 + g3.getSize().x, g3.getSize().y / 2 + 5});
+	g3.setPosition({ (SCREEN_W + DIALOG_W) / 2 + g3.getSize().x, g3.getSize().y / 2 + 5.0f});
 
 	buttons.push_back(Button(g3));
 	buttons.back().setFunc([=]() { keyButton = -200; });
 
 	g3.setString(L"В\nЫ\nХ\nО\nД");
-	g3.setPosition({ (SCREEN_W + DIALOG_W) / 2 + g3.getSize().x , SCREEN_H - g3.getSize().y/2 - 5});
+	g3.setPosition({ (SCREEN_W + DIALOG_W) / 2 + g3.getSize().x , SCREEN_H - g3.getSize().y/2 - 5.0f});
 	buttons.push_back(Button(g3));
 	buttons.back().setFunc([=]() { keyButton = -100; });
+}
+
+void UIManager::initMechanic(Player* player, Gun* choose)
+{
+	sf::Text text(L"Баланс: " + std::to_wstring(player->money) + L" | Запчасти: " + std::to_wstring(player->details), Resources::UIFont, 30.0f);
+	sf::RectangleShape shape({ DIALOG_W, text.getLocalBounds().height + 5.0f});
+	shape.setFillColor(sf::Color(70, 70, 70));
+	shape.setPosition({ SCREEN_W / 2, shape.getSize().y / 2 + 5.0f });
+	Button button(Group(shape, text));
+	buttons.push_back(button);
+
+	sf::RectangleShape dataShape({ DIALOG_W / 4 + 15, DIALOG_H / 2 });
+	dataShape.setFillColor(sf::Color(70, 70, 70));
+	Group dataGroup(dataShape, {});
+	dataGroup.setPosition({ shape.getPosition().x - shape.getSize().x / 2 + dataShape.getSize().x / 2, shape.getPosition().y / 2 + INTERVAL + dataGroup.getSize().y / 2});
+
+	sf::RectangleShape textureShape({ ICON_SIZE, ICON_SIZE });
+	textureShape.setScale({ 2, 2 });
+	Group textureGroup(textureShape, {});
+	
+	std::wostringstream oss;
+	if (player->guns[1])
+	{
+		buttons.push_back(dataGroup);
+
+		textureGroup.setPosition({ dataGroup.getPosition().x, dataGroup.getPosition().y - dataGroup.getSize().y / 2 + ICON_SIZE + 20.0f});
+		buttons.push_back(Button(textureGroup));
+		buttons.back().setTexture(&Resources::itembleIcon);
+		buttons.back().setTextureRect({ {ICON_SIZE * player->guns[1]->id, 0},{ICON_SIZE, ICON_SIZE}});
+
+		oss << L"Урон: " << std::fixed << std::setprecision(2) << player->guns[1]->damage << "\n";
+		oss << L"Обойма: " << std::fixed << std::setprecision(2) << player->guns[1]->maxCount << "\n";
+		oss << L"Разброс: " << std::fixed << std::setprecision(2) << player->guns[1]->maxImpRad << "\n";
+
+		text.setCharacterSize(20.0f);
+		text.setString(oss.str());
+		shape.setSize({ text.getLocalBounds().width + 10.0f, text.getLocalBounds().height + 10.0f });
+		shape.setPosition({ textureGroup.getPosition().x, textureGroup.getPosition().y + textureGroup.getSize().y + 60.0f});
+		buttons.push_back(Group(shape, text));
+
+		oss.clear();
+		oss.str(L"");
+		dataGroup.move({ 0, dataGroup.getSize().y + 10.0f });
+	}
+	if (player->guns[2])
+	{
+		buttons.push_back(dataGroup);
+
+		textureGroup.setPosition({ dataGroup.getPosition().x, dataGroup.getPosition().y - dataGroup.getSize().y / 2 + ICON_SIZE + 20.0f});
+		buttons.push_back(Button(textureGroup));
+		buttons.back().setTexture(&Resources::itembleIcon);
+		buttons.back().setTextureRect({ {ICON_SIZE * player->guns[2]->id, 0},{ICON_SIZE, ICON_SIZE} });
+
+		oss << L"Урон: " << std::fixed << std::setprecision(2) << player->guns[2]->damage << "\n";
+		oss << L"Обойма: " << std::fixed << std::setprecision(2) << player->guns[2]->maxCount << "\n";
+		oss << L"Разброс: " << std::fixed << std::setprecision(2) << player->guns[2]->maxImpRad << "\n";
+
+		text.setCharacterSize(20.0f);
+		text.setString(oss.str());
+		shape.setPosition({ textureGroup.getPosition().x, textureGroup.getPosition().y + textureGroup.getSize().y + 60.0f});
+		buttons.push_back(Group(shape, text));
+	}
+	text.setCharacterSize(30.0f);
+
+	text.setString(L"У\nЛ\nУ\nЧ\nШ\nИ\nТ\nЬ");
+	shape.setSize({ text.getLocalBounds().width + 10.0f, text.getLocalBounds().height + 10.0f });
+	shape.setPosition({ (SCREEN_W + DIALOG_W) / 2 + shape.getSize().x, SCREEN_H / 2 - shape.getSize().y / 2 - 5.0f });
+	button = Button(Group(shape, text));
+	button.setFunc([=]() { keyButton = -200; });
+	buttons.push_back(button);
+
+	text.setString(L"В\nЫ\nХ\nО\nД");
+	shape.setPosition({ (SCREEN_W + DIALOG_W) / 2 + shape.getSize().x, SCREEN_H / 2 + shape.getSize().y / 2 + 5.0f });
+	button = Button(Group(shape, text));
+	button.setFunc([=]() { keyButton = -100; });
+	buttons.push_back(button);
+
+	if (choose != nullptr)
+	{
+
+	}
 }
 
 void UIManager::initChanger(int coef, Player* player)
@@ -447,9 +528,9 @@ void UIManager::initInvent(std::map<Itemble*, int> items, Itemble* choose, Playe
 		std::wostringstream oss;
 		if (auto item = dynamic_cast<Item*>(choose); item)
 		{
-				makeGroup.setString(L"Использовать");
-				buttons.push_back(Button(makeGroup));
-				buttons.back().setFunc([&]() { keyButton = 100;});
+			makeGroup.setString(L"Использовать");
+			buttons.push_back(Button(makeGroup));
+			buttons.back().setFunc([&]() { keyButton = 100;});
 
 			oss << choose->disc;
 		}
@@ -463,7 +544,7 @@ void UIManager::initInvent(std::map<Itemble*, int> items, Itemble* choose, Playe
 			{
 				makeGroup.setString(L"Надеть на первый слот");
 			}
-			buttons.push_back(Button(makeGroup));
+			buttons.push_back(makeGroup);
 			buttons.back().setFunc([&]() { keyButton = 100;});
 			makeGroup.move({ 0, makeGroup.getSize().y + 5 });
 
@@ -475,12 +556,14 @@ void UIManager::initInvent(std::map<Itemble*, int> items, Itemble* choose, Playe
 			{
 				makeGroup.setString(L"Надеть на второй слот");
 			}
-			buttons.push_back(Button(makeGroup));
+			buttons.push_back(makeGroup);
 			buttons.back().setFunc([&]() { keyButton = 101;});
 
 			int i = 102;
 			for (auto it : gun->improvement)
 			{
+				if (!it.second) continue;
+
 				makeGroup.move({ 0, makeGroup.getSize().y + 5 });
 				makeGroup.setString(L"Снять " + it.second->name);
 				buttons.push_back(Button(makeGroup));
@@ -528,13 +611,14 @@ int UIManager::checkButton()
 {
 	sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
 	sf::Vector2i worldPos = (sf::Vector2i)window->mapPixelToCoords(mousePos);
+
 	for (int i = 0; i < buttons.size(); i++)
 	{
 		if (buttons[i].isClicked(worldPos))
 		{
-			if (choseBut != nullptr) choseBut->setFillColor(sf::Color(50, 50, 50));
+			if (choseBut) choseBut->setFillColor(sf::Color(50, 50, 50));
 			choseBut = &buttons[i];
-			choseBut->setFillColor(sf::Color(223, 154, 51));
+			choseBut->setFillColor(sf::Color::Red);
 			buttons[i].use();
 			return keyButton;
 		}
