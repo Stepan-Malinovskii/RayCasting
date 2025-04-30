@@ -328,7 +328,7 @@ void UIManager::initTrade(std::map<int, Itemble*> variants, Player* player)
 
 void UIManager::initMechanic(Player* player, Gun* choose)
 {
-	sf::Text text(L"Áàëàíñ: " + std::to_wstring(player->money) + L" | Çàï÷àñòè: " + std::to_wstring(player->details), Resources::UIFont, 30.0f);
+	sf::Text text(L"Áàëàíñ: " + std::to_wstring(player->money) + L" | Çàï÷àñòè: " + std::to_wstring(player->details) + L" | Îäíî óëó÷øåíèå ñòîèò 50 ðóá è 15 äåòàëåé", Resources::UIFont, 30.0f);
 	sf::RectangleShape shape({ DIALOG_W, text.getLocalBounds().height + 5.0f});
 	shape.setFillColor(sf::Color(70, 70, 70));
 	shape.setPosition({ SCREEN_W / 2, shape.getSize().y / 2 + 5.0f });
@@ -336,7 +336,7 @@ void UIManager::initMechanic(Player* player, Gun* choose)
 	buttons.push_back(button);
 
 	sf::RectangleShape dataShape({ DIALOG_W / 4 + 15, DIALOG_H / 2 });
-	dataShape.setFillColor(sf::Color(70, 70, 70));
+	dataShape.setFillColor(sf::Color(50, 50, 50));
 	Group dataGroup(dataShape, {});
 	dataGroup.setPosition({ shape.getPosition().x - shape.getSize().x / 2 + dataShape.getSize().x / 2, shape.getPosition().y / 2 + INTERVAL + dataGroup.getSize().y / 2});
 
@@ -345,46 +345,35 @@ void UIManager::initMechanic(Player* player, Gun* choose)
 	Group textureGroup(textureShape, {});
 	
 	std::wostringstream oss;
-	if (player->guns[1])
+	for (int i = 1; i <= 2; i++)
 	{
-		buttons.push_back(dataGroup);
+		if (player->guns[i])
+		{
+			if (player->guns[i] == choose) dataGroup.shape.setFillColor(sf::Color::Red);
+			buttons.push_back(dataGroup);
+			buttons.back().setFunc([=]() { keyButton = i; });
 
-		textureGroup.setPosition({ dataGroup.getPosition().x, dataGroup.getPosition().y - dataGroup.getSize().y / 2 + ICON_SIZE + 20.0f});
-		buttons.push_back(Button(textureGroup));
-		buttons.back().setTexture(&Resources::itembleIcon);
-		buttons.back().setTextureRect({ {ICON_SIZE * player->guns[1]->id, 0},{ICON_SIZE, ICON_SIZE}});
+			textureGroup.setPosition({ dataGroup.getPosition().x, dataGroup.getPosition().y - dataGroup.getSize().y / 2 + ICON_SIZE + 20.0f });
+			buttons.push_back(Button(textureGroup));
+			buttons.back().setTexture(&Resources::itembleIcon);
+			buttons.back().setTextureRect({ {ICON_SIZE * player->guns[i]->id, 0},{ICON_SIZE, ICON_SIZE} });
 
-		oss << L"Óðîí: " << std::fixed << std::setprecision(2) << player->guns[1]->damage << "\n";
-		oss << L"Îáîéìà: " << std::fixed << std::setprecision(2) << player->guns[1]->maxCount << "\n";
-		oss << L"Ðàçáðîñ: " << std::fixed << std::setprecision(2) << player->guns[1]->maxImpRad << "\n";
+			oss << L"Óðîí: " << std::fixed << std::setprecision(2) << player->guns[i]->damage << "\n";
+			oss << L"Îáîéìà: " << std::fixed << std::setprecision(2) << player->guns[i]->maxCount << "\n";
+			oss << L"Ðàçáðîñ: " << std::fixed << std::setprecision(2) << player->guns[i]->maxImpRad << "\n";
+			oss << L"Êîëè÷åñòâî óëó÷øåíèé: " << player->guns[i]->upgradeCount << L"/ 5" << "\n";
 
-		text.setCharacterSize(20.0f);
-		text.setString(oss.str());
-		shape.setSize({ text.getLocalBounds().width + 10.0f, text.getLocalBounds().height + 10.0f });
-		shape.setPosition({ textureGroup.getPosition().x, textureGroup.getPosition().y + textureGroup.getSize().y + 60.0f});
-		buttons.push_back(Group(shape, text));
+			text.setCharacterSize(20.0f);
+			text.setString(oss.str());
+			shape.setSize({ text.getLocalBounds().width + 10.0f, text.getLocalBounds().height + 10.0f });
+			shape.setPosition({ textureGroup.getPosition().x, textureGroup.getPosition().y + textureGroup.getSize().y + 60.0f });
+			buttons.push_back(Group(shape, text));
 
-		oss.clear();
-		oss.str(L"");
-		dataGroup.move({ 0, dataGroup.getSize().y + 10.0f });
-	}
-	if (player->guns[2])
-	{
-		buttons.push_back(dataGroup);
-
-		textureGroup.setPosition({ dataGroup.getPosition().x, dataGroup.getPosition().y - dataGroup.getSize().y / 2 + ICON_SIZE + 20.0f});
-		buttons.push_back(Button(textureGroup));
-		buttons.back().setTexture(&Resources::itembleIcon);
-		buttons.back().setTextureRect({ {ICON_SIZE * player->guns[2]->id, 0},{ICON_SIZE, ICON_SIZE} });
-
-		oss << L"Óðîí: " << std::fixed << std::setprecision(2) << player->guns[2]->damage << "\n";
-		oss << L"Îáîéìà: " << std::fixed << std::setprecision(2) << player->guns[2]->maxCount << "\n";
-		oss << L"Ðàçáðîñ: " << std::fixed << std::setprecision(2) << player->guns[2]->maxImpRad << "\n";
-
-		text.setCharacterSize(20.0f);
-		text.setString(oss.str());
-		shape.setPosition({ textureGroup.getPosition().x, textureGroup.getPosition().y + textureGroup.getSize().y + 60.0f});
-		buttons.push_back(Group(shape, text));
+			oss.clear();
+			oss.str(L"");
+			dataGroup.move({ 0, dataGroup.getSize().y + 10.0f });
+			dataGroup.shape.setFillColor(sf::Color(50, 50, 50));
+		}
 	}
 	text.setCharacterSize(30.0f);
 
@@ -401,9 +390,26 @@ void UIManager::initMechanic(Player* player, Gun* choose)
 	button.setFunc([=]() { keyButton = -100; });
 	buttons.push_back(button);
 
-	if (choose != nullptr)
+	if (choose)
 	{
+		sf::RectangleShape percShape({ DIALOG_W / 2 + 15.0f, DIALOG_H / 4 });
+		percShape.setPosition(dataGroup.getPosition().x + dataGroup.getSize().x / 2 + percShape.getSize().x / 2 + 10.0f, SCREEN_H / 3 - percShape.getSize().y / 3 + 10.0f);
+		percShape.setFillColor(sf::Color(50, 50, 50));
+		Group percGroup(percShape, text);
 
+		percGroup.setString(L"ÓÂÅËÈ×ÒÜ ÓÐÎÍ ÍÀ +3");
+		buttons.push_back(percGroup);
+		buttons.back().setFunc([=]() {keyButton = 101;});
+		percGroup.move({0.0f, percGroup.getSize().y + 10.0f});
+
+		percGroup.setString(L"ÓÂÅËÈ×ÒÜ ÐÀÇÌÅÐ ÎÁÎÉÌÛ ÍÀ +5");
+		buttons.push_back(percGroup);
+		buttons.back().setFunc([=]() {keyButton = 102;});
+		percGroup.move({ 0.0f, percGroup.getSize().y + 10.0f });
+
+		percGroup.setString(L"ÓÌÅÍÜØÈÒÜ ÐÀÇÁÐÎÑ ÍÀ +2");
+		buttons.push_back(percGroup);
+		buttons.back().setFunc([=]() {keyButton = 103;});
 	}
 }
 
@@ -488,7 +494,7 @@ void UIManager::initInvent(std::map<Itemble*, int> items, Itemble* choose, Playe
 		i++;
 	}
 
-	if (choose != nullptr)
+	if (choose)
 	{
 		sf::RectangleShape dataShape({ DIALOG_W / 4 + 15, DIALOG_H / 3 });
 		dataShape.setFillColor(sf::Color(70, 70, 70));

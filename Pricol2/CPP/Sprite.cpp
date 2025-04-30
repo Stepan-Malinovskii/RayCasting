@@ -465,11 +465,36 @@ void MechanicNpc::init()
 void MechanicNpc::use()
 {
 	if (choose == -1) return;
-
 	if (!nowGun) return;
+	if (player->money < 50 || player->details < 15) return;
 
+	player->money -= 50;
+	player->details -= 15;
+	
+	Improve* imp = nullptr;
 
+	if (choose == 101)
+	{
+		imp = nowGun->deleteImprove(Damage);
+		nowGun->damage += 3;
+	}
+	else if (choose == 102)
+	{
+		imp = nowGun->deleteImprove(Magazin);
+		nowGun->maxCount += 5;
+	}
+	else if (choose == 103)
+	{
+		imp = nowGun->deleteImprove(Spread);
+		nowGun->maxRad += 3;
+	}
 
+	nowGun->trySetImprove(imp);
+	nowGun->upgradeCount++;
+	
+	nowGun = nullptr;
+	choose = -1;
+	init();
 }
 
 void MechanicNpc::check()
@@ -482,14 +507,14 @@ void MechanicNpc::check()
 	{
 		use();
 	}
+	else if (nowKey == 1 || nowKey == 2)
+	{
+		nowGun = player->guns[nowKey];
+		init();
+		return;	
+	}
 	else
 	{
-		if (nowKey == 1 || nowKey == 2)
-		{
-			nowGun = player->guns[nowKey];
-			return;
-		}
-
 		choose = nowKey;
 	}
 }

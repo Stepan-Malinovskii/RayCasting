@@ -17,6 +17,8 @@
 #include "SoundManager.h"
 #include "EventSystem.h"
 
+constexpr float MAX_RAD = 30.0f, MIN_RAD = 1.0f;
+
 class Gun;
 class Player;
 
@@ -38,6 +40,10 @@ struct GunData
 {
 	int id;
 	int nowCount;
+	int nowMaxCount;
+	int nowMaxRad;
+	int nowDamage;
+	int upgradeCount;
 	std::vector<int> improveId;
 };
 
@@ -151,12 +157,12 @@ public:
 	int nowCount;
 	int maxCount;
 	int damage;
-	float nowRad;
-	float maxImpRad;
+	int upgradeCount;
+	float nowRad, maxImpRad;
+	int maxRad;
 	std::map<ImproveType, Improve*> improvement;
 private:
 	int gunId;
-	float maxRad;
 	float timeBetwenReset, nowTimeBetwenReset;
 };
 

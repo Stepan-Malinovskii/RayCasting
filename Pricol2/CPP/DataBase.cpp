@@ -218,6 +218,10 @@ std::vector<GunData> Data::getGunData()
 	{
 		in.read(reinterpret_cast<char*>(&defs[i].id), sizeof(defs[i].id));
 		in.read(reinterpret_cast<char*>(&defs[i].nowCount), sizeof(defs[i].nowCount));
+		in.read(reinterpret_cast<char*>(&defs[i].nowMaxCount), sizeof(defs[i].nowMaxCount));
+		in.read(reinterpret_cast<char*>(&defs[i].nowMaxRad), sizeof(defs[i].nowMaxRad));
+		in.read(reinterpret_cast<char*>(&defs[i].nowDamage), sizeof(defs[i].nowDamage));
+		in.read(reinterpret_cast<char*>(&defs[i].upgradeCount), sizeof(defs[i].upgradeCount));
 
 		int unSize;
 		in.read(reinterpret_cast<char*>(&unSize), sizeof(unSize));
@@ -245,8 +249,12 @@ void Data::saveGunData(std::vector<GunData> guns)
 
 	for (auto def : guns)
 	{
-		out.write(reinterpret_cast<const char*>(&def.id), sizeof(def.id));
-		out.write(reinterpret_cast<const char*>(&def.nowCount), sizeof(def.nowCount));
+		out.write(reinterpret_cast<char*>(&def.id), sizeof(def.id));
+		out.write(reinterpret_cast<char*>(&def.nowCount), sizeof(def.nowCount));
+		out.write(reinterpret_cast<char*>(&def.nowMaxCount), sizeof(def.nowMaxCount));
+		out.write(reinterpret_cast<char*>(&def.nowMaxRad), sizeof(def.nowMaxRad));
+		out.write(reinterpret_cast<char*>(&def.nowDamage), sizeof(def.nowDamage));
+		out.write(reinterpret_cast<char*>(&def.upgradeCount), sizeof(def.upgradeCount));
 
 		int unSize = def.improveId.size();
 		out.write(reinterpret_cast<const char*>(&unSize), sizeof(unSize));

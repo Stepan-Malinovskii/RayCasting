@@ -15,7 +15,13 @@ ItemManager::ItemManager()
 			guns[i]->deleteImprove(ImproveType::Damage);
 			guns[i]->deleteImprove(ImproveType::Spread);
 			guns[i]->deleteImprove(ImproveType::Magazin);
-			guns[i]->nowCount = guns[i]->maxCount;
+			guns[i]->nowCount = gunsDef[i].maxCount;
+			guns[i]->maxCount = gunsDef[i].maxCount;
+			guns[i]->damage = gunsDef[i].damage;
+			guns[i]->maxRad = MAX_RAD;
+			guns[i]->nowRad = MIN_RAD;
+			guns[i]->maxImpRad = MAX_RAD;
+			guns[i]->upgradeCount = 0;
 		}});
 }
 
@@ -56,9 +62,13 @@ void  ItemManager::createGuns()
 	{
 		GunDef def = gunsDef[i];
 		def.nowCount = gunsData[i].nowCount;
+		def.maxCount = gunsData[i].nowMaxCount;
+		def.damage = gunsData[i].nowDamage;
 
 		guns.push_back(std::make_unique<Gun>(Gun(def, i > 1, i)));
 		guns.back()->setAnimator(std::move(createAnimator(i)));
+		guns.back()->maxRad = gunsData[i].nowMaxRad;
+		guns.back()->upgradeCount = gunsData[i].upgradeCount;
 
 		itemble[def.id] = guns.back().get();
 

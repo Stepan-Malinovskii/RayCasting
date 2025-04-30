@@ -119,11 +119,12 @@ void Item::useItem(Player* sprite) { useFunc(sprite); }
 Gun::Gun(GunDef def, bool _isReset, int _gunId) : Weapon(def.shutTime, def.maxDist),
 Itemble(def.name, def.disc, def.cost, def.id),
 damage{ def.damage }, maxCount{ def.maxCount }, nowCount{ def.nowCount },
-nowTimeBetwenReset{ def.resetTime }, timeBetwenReset{ def.resetTime }, isReset{ _isReset }, gunId{ _gunId }
+nowTimeBetwenReset{ def.resetTime }, timeBetwenReset{ def.resetTime }, 
+isReset{ _isReset }, gunId{ _gunId }
 {
-	nowRad = 1;
-	maxImpRad = 30;
-	maxRad = 30;
+	maxRad = MAX_RAD;
+	nowRad = MIN_RAD;
+	maxImpRad = MAX_RAD;
 }
 
 void Gun::update(float dt)
@@ -140,11 +141,11 @@ void Gun::updateRad(bool isRun, float deltaTime)
 {
 	if (isRun)
 	{
-		nowRad = std::min(nowRad + maxRad * deltaTime * 2, maxImpRad);
+		nowRad = std::min(nowRad + MAX_RAD * deltaTime * 2, maxImpRad);
 	}
 	else
 	{
-		nowRad = std::max(nowRad - maxRad * deltaTime * 2, 1.0f);
+		nowRad = std::max(nowRad - MAX_RAD * deltaTime * 2, 1.0f);
 	}
 }
 
@@ -188,7 +189,7 @@ void Gun::ussing(Enemy* sp, float dist)
 	{
 		if (sp)
 		{
-			if (Random::bitRandom() > (nowRad - 0.05f) / maxRad - 0.35f || nowRad == 1)
+			if (Random::bitRandom() > (nowRad - 0.05f) / MAX_RAD - 0.35f || nowRad == MIN_RAD)
 			{
 				sp->takeDamage(damage * (dist < maxDist ? 1 : 0));
 			}
@@ -202,10 +203,14 @@ void Gun::ussing(Enemy* sp, float dist)
 
 Improve* Gun::trySetImprove(Improve* improve)
 {
+	if (!improve) return nullptr;
+
 	auto temp = improvement[improve->type];
-	if (temp != nullptr) { temp->deleteImprove(this); }
+	if (temp) { temp->deleteImprove(this); }
+
 	improvement[improve->type] = improve;
 	improve->getImprove(this);
+
 	return temp;
 }
 
@@ -222,14 +227,30 @@ Improve* Gun::deleteImprove(ImproveType type)
 
 GunData Gun::getGunData()
 {
-	std::vector<int> ids;
+	GunData data;
 	for (auto im : improvement)
 	{
-		if (im.second != nullptr)
+		if (im.second)
 		{
-			ids.push_back(im.second->id);
+			data.improveId.push_back(im.second->id);
 		}
 	}
+	data.id = id;
+	data.upgradeCount = upgradeCount;
+	data.nowCount = nowCount;
 
-	return { id, nowCount, ids };
+	Improve* imp;
+	imp = deleteImprove(Magazin);
+	data.nowMaxCount = maxCount;
+	trySetImprove(imp);
+
+	imp = deleteImprove(Damage);
+	data.nowDamage = damage;
+	trySetImprove(imp);
+
+	imp = deleteImprove(Spread);
+	data.nowMaxRad = maxRad;
+	trySetImprove(imp);
+
+	return data;
 }
