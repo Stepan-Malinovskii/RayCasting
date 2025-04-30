@@ -260,7 +260,7 @@ EnemyState SpriteManager::determineNewState(Enemy* enemy, float distance)
 	{
 		return Run;
 	}
-	else if (distance > TRIGER_DIST_MAX)
+	else
 	{
 		return Stay;
 	}

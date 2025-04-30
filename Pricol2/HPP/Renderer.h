@@ -15,8 +15,7 @@
 #include "Resources.h"
 
 constexpr int MAX_DETH = 64;
-constexpr float PLAYER_FOV = 60.0f, CAMERA_Z = SCREEN_H / 2.0f,
-ASPECT = SCREEN_W / SCREEN_H * 0.5f, BRIGHTNESTDIST = MAX_DETH / 7.0f;
+constexpr float PLAYER_FOV = 60.0f, CAMERA_Z = SCREEN_H / 2.0f, ASPECT = (float)SCREEN_W / SCREEN_H * 0.5f, BRIGHTNESTDIST = MAX_DETH / 7.0f;
 
 class ThreadPool
 {

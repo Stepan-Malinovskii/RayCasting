@@ -7,9 +7,9 @@ Player::Player(Enemy* _sprite, PlayerDef def, Map* _nowMap) :
 	patrons{ def.countpantrons }, money{ def.money }, details{ def.details },
 	nowMap{ _nowMap }, enemy{ _sprite }, nowGun{ 0 }, nowHeal{ nullptr }, kick{ nullptr },
 	invent{ nullptr }, pitch{ 0 }, shakeTime{ 0 }, posZ{ 0 }, isJump{ false }, jumpFlag{ false },
-	boostSpeed{ 8.0f }, nowSpeed{ enemy->enemyDef.speed } 
+	boostSpeed{ 8.0f }, nowSpeed{ enemy->enemyDef.speed }, mouseSpeed{1.0f}
 {
-	enemy->textSize = 104.0f;
+	enemy->textSize = 104;
 
 	auto& event = EventSystem::getInstance();
 	event.subscribe<int>("SAVE", [=](const int NON) 
@@ -45,7 +45,7 @@ void Player::setInventory(Inventory* _invent)
 
 void Player::updateMouseData(sf::Vector2f mousePos, float deltaTime)
 {
-	enemy->spMap.angle += MOUSE_TURN_SPEED * ROTATION_SPEED * mousePos.x * deltaTime;
+	enemy->spMap.angle += mouseSpeed * ROTATION_SPEED * mousePos.x * deltaTime;
 
 	pitch = std::clamp(pitch - mousePos.y * deltaTime * VERTICAL_MOUSE_SPEED, -200.0f, 200.0f);
 

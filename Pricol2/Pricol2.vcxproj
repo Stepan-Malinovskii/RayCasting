@@ -151,7 +151,7 @@
     <ClCompile Include="CPP\MapManager.cpp" />
     <ClCompile Include="CPP\Menu.cpp" />
     <ClCompile Include="CPP\Player.cpp" />
-    <ClCompile Include="CPP\Pricol2.cpp" />
+    <ClCompile Include="CPP\main.cpp" />
     <ClCompile Include="CPP\Randomizer.cpp" />
     <ClCompile Include="CPP\Raycast.cpp" />
     <ClCompile Include="CPP\Renderer.cpp" />

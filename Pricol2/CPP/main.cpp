@@ -23,7 +23,7 @@ int main()
 	event.subscribe<int>("RESET_GAME", [&](const int NON) {
 		sfe::Movie movie;
 		if (!movie.openFromFile("Sound/startIntroVideo.mp4")) return;
-		movie.fit(0, 0, window.getSize().x, window.getSize().y);
+		movie.fit(0.0f, 0.0f, (float)window.getSize().x, (float)window.getSize().y);
 		movie.play();
 		auto& state = GameState::getInstance();
 		state.data.isFirstGame = false;
@@ -33,6 +33,27 @@ int main()
 		/*while (movie.getStatus() == sfe::Status::Playing) // Вернуть в итоговой версии
 		{
 			window.clear();	
+			movie.update();
+			window.draw(movie);
+			window.display();
+		}*/
+
+		window.clear();
+		});
+
+	event.subscribe<int>("WIN_GAME", [&](const int NON) {
+		sfe::Movie movie;
+		if (!movie.openFromFile("Sound/endIntroVideo.mp4")) return;
+		movie.fit(0.0f, 0.0f, (float)window.getSize().x, (float)window.getSize().y);
+		movie.play();
+		auto& state = GameState::getInstance();
+		state.data.isFirstGame = true;
+		SoundManager::stopAllSound();
+		SoundManager::playerMusic(EndIntro);
+
+		/*while (movie.getStatus() == sfe::Status::Playing) // Вернуть в итоговой версии
+		{
+			window.clear();
 			movie.update();
 			window.draw(movie);
 			window.display();
@@ -129,5 +150,6 @@ int main()
 	}
 
 	game->save();
+
 	return 0;
 }

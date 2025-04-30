@@ -5,7 +5,7 @@ RayHit raycast(Map* map, sf::Vector2f pos, sf::Vector2f dir,
 {
 	float origin[2] = { pos.x, pos.y };
 	float dir_inv[2] = { 1.0f / dir.x, 1.0f / dir.y };
-	sf::Vector2f deltaDist{ abs(dir_inv[0]), abs(dir_inv[1])};
+	sf::Vector2f deltaDist{ abs(dir_inv[0]), abs(dir_inv[1]) };
 	sf::Vector2i mapPos{ pos };
 	sf::Vector2i step;
 	sf::Vector2f sideDist;
@@ -73,22 +73,22 @@ RayHit raycast(Map* map, sf::Vector2f pos, sf::Vector2f dir,
 				float t1 = (min[d] - origin[d]) * dir_inv[d];
 				float t2 = (max[d] - origin[d]) * dir_inv[d];
 
-				tmin = fmax(tmin, fmin(tmax, fmin(t1,t2)));
+				tmin = fmax(tmin, fmin(tmax, fmin(t1, t2)));
 				tmax = fmin(tmax, fmax(tmin, fmax(t1, t2)));
 			}
 
-			if (tmin < tmax) 
+			if (tmin < tmax)
 			{
 				int poss = pitch * sqrt(SQUARE(pos.x - sprite->spMap.position.x) +
 					SQUARE(pos.y - sprite->spMap.position.y)) / 3;
 				if (poss - 20 < sprite->textSize && poss + 20 > -sprite->textSize)
 				{
-					hitSprite = sprite; 
+					hitSprite = sprite;
 				}
 			}
 		}
 	}
-	
-	return RayHit{ hit, mapPos, isVertHit, 
+
+	return RayHit{ hit, mapPos, isVertHit,
 	isVertHit ? sideDist.y - deltaDist.y : sideDist.x - deltaDist.x, hitSprite };
 }

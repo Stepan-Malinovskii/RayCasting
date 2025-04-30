@@ -21,7 +21,7 @@ void Weapon::drawWeapon(sf::RenderTarget* window, sf::Vector2f delta)
 	if (tex)
 	{
 		sf::Sprite weapon{ *tex };
-		weapon.setOrigin(tex->getSize().x / 2.0f, tex->getSize().y);
+		weapon.setOrigin(tex->getSize().x / 2.0f, (float)tex->getSize().y);
 		weapon.scale(2.5f, 2.5f);
 		weapon.setPosition(SCREEN_W / 2.0f - 20 + delta.x, SCREEN_H + delta.y + 10);
 		window->draw(weapon);
@@ -48,9 +48,9 @@ Improve::Improve(ImproveDef def) :
 {
 	if (type == Damage)
 	{
-		setGetFunc([=](Gun* gun) {gun->damage = round(gun->damage * def.effect);});
+		setGetFunc([=](Gun* gun) {gun->damage = (int)round(gun->damage * def.effect);});
 
-		setDelFunc([=](Gun* gun) {gun->damage = round(gun->damage / def.effect);});
+		setDelFunc([=](Gun* gun) {gun->damage = (int)round(gun->damage / def.effect);});
 	}
 	else if (type == Spread)
 	{
@@ -62,10 +62,10 @@ Improve::Improve(ImproveDef def) :
 	}
 	else if (type == Magazin)
 	{
-		setGetFunc([=](Gun* gun) {gun->maxCount = round(gun->maxCount * def.effect);
+		setGetFunc([=](Gun* gun) {gun->maxCount = (int)round(gun->maxCount * def.effect);
 		gun->nowCount = std::min(gun->maxCount, gun->nowCount);});
 
-		setDelFunc([=](Gun* gun) {gun->maxCount = round(gun->maxCount / def.effect);
+		setDelFunc([=](Gun* gun) {gun->maxCount = (int)round(gun->maxCount / def.effect);
 		gun->nowCount = std::min(gun->maxCount, gun->nowCount);});
 	}
 }
@@ -102,9 +102,9 @@ type{ def.type }, maxUsing{ def.maxUSing }
 	}
 	else if (def.type == Armor)
 	{
-		setFunc([=](Player* pl) {pl->defence = def.effect;
-		pl->maxStrenght = def.maxUSing;
-		pl->nowStrenght = def.maxUSing;});
+		setFunc([=](Player* pl) {pl->defence = (float)def.effect;
+		pl->maxStrenght = (float)def.maxUSing;
+		pl->nowStrenght = (float)def.maxUSing;});
 	}
 	else if (def.type == Patrons)
 	{
@@ -120,7 +120,7 @@ Gun::Gun(GunDef def, bool _isReset, int _gunId) : Weapon(def.shutTime, def.maxDi
 Itemble(def.name, def.disc, def.cost, def.id),
 damage{ def.damage }, maxCount{ def.maxCount }, nowCount{ def.nowCount },
 nowTimeBetwenReset{ def.resetTime }, timeBetwenReset{ def.resetTime }, 
-isReset{ _isReset }, gunId{ _gunId }
+isReset{ _isReset }, gunId{ _gunId }, upgradeCount{0}
 {
 	maxRad = MAX_RAD;
 	nowRad = MIN_RAD;
@@ -191,7 +191,7 @@ void Gun::ussing(Enemy* sp, float dist)
 		{
 			if (Random::bitRandom() > (nowRad - 0.05f) / MAX_RAD - 0.35f || nowRad == MIN_RAD)
 			{
-				sp->takeDamage(damage * (dist < maxDist ? 1 : 0));
+				sp->takeDamage((float)damage * (dist < maxDist ? 1 : 0));
 			}
 		}
 

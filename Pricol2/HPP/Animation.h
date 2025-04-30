@@ -54,7 +54,7 @@ public:
 	bool isLopping = false;
 
 	Animator(T _base = T(), std::vector<Animation<T>> _animations = {}) :
-		base{ _base }, animations{ _animations }, current{ -1 } {}
+		base{ _base }, animations{ _animations }, current{ -1 }, time{ 0.0f } {}
 
 	void setAnimation(int anim, bool loop = false)
 	{

@@ -9,7 +9,7 @@
 class Menu
 {
 public:
-	Menu(sf::RenderWindow* _window, UIManager* _uiManager);
+	Menu(sf::RenderWindow* _window, UIManager* _uiManager, Player* player);
 	void initStartMenu();
 	void initGameMenu();
 	void initSetting();
@@ -21,6 +21,7 @@ public:
 private:
 	bool isKeyPressed;
 	sf::RenderWindow* window;
+	Player* player;
 	UIManager* uiManager;
 	RenderState startMenuState;
 	RenderState gameMenuState;

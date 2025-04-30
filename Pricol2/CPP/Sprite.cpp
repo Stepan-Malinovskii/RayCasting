@@ -6,7 +6,7 @@
 #include "Player.h"
 
 Sprite::Sprite(SpriteDef _spDef, MapSprite _spMap, int _id) :
-	spDef{ _spDef }, spMap{ _spMap }, id{ _id }
+	spDef{ _spDef }, spMap{ _spMap }, id{ _id }, textSize{0}, texture{nullptr}
 {
 	if (spDef.texture != -1)
 	{
@@ -157,7 +157,7 @@ bool Enemy::checkCollision(Map* map, sf::Vector2f newPos, bool xAxis)
 	sf::Vector2f thisEnd = newPos + thisSize;
 
 	if (xAxis) {
-		if (map->GetOnGrid(newPos.x, newPos.y, WALL_LAYER)) { return true; }
+		if (map->GetOnGrid((int)newPos.x, (int)newPos.y, WALL_LAYER)) { return true; }
 
 		auto curSp = map->getBlockMap((sf::Vector2i)newPos);
 		for (auto sp : curSp) {
@@ -182,7 +182,7 @@ bool Enemy::checkCollision(Map* map, sf::Vector2f newPos, bool xAxis)
 		}
 	}
 	else {
-		if (map->GetOnGrid(newPos.x, newPos.y, WALL_LAYER)) { return true; }
+		if (map->GetOnGrid((int)newPos.x, (int)newPos.y, WALL_LAYER)) { return true; }
 
 		const auto& set = map->getBlockMap({ (int)newPos.x, (int)newPos.y });
 		for (const auto& thing : set) {
@@ -466,7 +466,7 @@ void MechanicNpc::use()
 {
 	if (choose == -1) return;
 	if (!nowGun) return;
-	if (player->money < 50 || player->details < 15) return;
+	if (player->money < 50 || player->details < 15 || nowGun->upgradeCount > 5) return;
 
 	player->money -= 50;
 	player->details -= 15;

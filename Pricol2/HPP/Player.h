@@ -14,7 +14,7 @@
 #include "Weapon.h"
 #include "Raycast.h"
 
-constexpr float ROTATION_SPEED = 80.0f, MOUSE_TURN_SPEED = 0.08f, VERTICAL_MOUSE_SPEED = 25.0f;
+constexpr float ROTATION_SPEED = 80.0f, VERTICAL_MOUSE_SPEED = 25.0f;
 
 class Inventory;
 
@@ -63,6 +63,7 @@ public:
 	Gun* kick;
 	float pitch, posZ, maxEnergy, nowEnergy;
 	float defence, nowStrenght, maxStrenght;
+	float mouseSpeed;
 	int patrons;
 	int money;
 	int details;

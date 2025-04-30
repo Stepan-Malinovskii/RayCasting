@@ -48,7 +48,7 @@
     <ClCompile Include="CPP\Player.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="CPP\Pricol2.cpp">
+    <ClCompile Include="CPP\main.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="CPP\Randomizer.cpp">

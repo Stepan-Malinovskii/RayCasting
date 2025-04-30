@@ -13,14 +13,14 @@ std::vector<std::pair<int, std::vector<int>>> Data::loadKeyData()
 
 	while (std::getline(fileIn, line))
 	{
-		int st = line.find(L'[');
-		int end = line.find(L']');
+		size_t st = line.find(L'[');
+		size_t end = line.find(L']');
 		int fkey = std::stoi(line.substr(st + 1, end - st - 1));
 		line = line.substr(end + 3, line.size() - end - 4);
 		std::vector<int> keys;
 		while (line.size() != 0)
 		{
-			int j = line.find(L',');
+			size_t j = line.find(L',');
 			keys.push_back(std::stoi(line.substr(0, j)));
 			line = line.substr(j + 1);
 		}
@@ -43,8 +43,8 @@ std::vector<std::tuple<int, std::wstring, int>> Data::loadTextData()
 	std::wstring line, text;
 	while (std::getline(fileIn, line))
 	{
-		int st = line.find(L'[');
-		int end = line.find(L']');
+		size_t st = line.find(L'[');
+		size_t end = line.find(L']');
 		int fkey = std::stoi(line.substr(st + 1, end - st - 1));
 		st = line.rfind(L'[');
 
@@ -64,11 +64,11 @@ std::vector<std::pair<int, int>> Data::getInvent()
 	std::ifstream in{ "Data/inventory.inv", std::ios::in | std::ios::binary };
 	if (!in.is_open()) return {};
 	
-	int size;
+	size_t size;
 	in.read(reinterpret_cast<char*>(&size), sizeof(size));
 	std::vector<std::pair<int, int>> inv(size);
 
-	for (int i = 0; i < size; i++)
+	for (size_t i = 0; i < size; i++)
 	{
 		int first, second;
 		in.read(reinterpret_cast<char*>(&first), sizeof(first));
@@ -85,7 +85,7 @@ void Data::saveInvent(std::vector<std::pair<int, int>> inv)
 	std::ofstream out{ "Data/inventory.inv", std::ios::out | std::ios::binary };
 	if (!out.is_open()) return;
 
-	int size = inv.size();
+	size_t size = inv.size();
 	out.write(reinterpret_cast<const char*>(&size), sizeof(size));
 
 	for (auto it : inv)
@@ -101,25 +101,29 @@ std::vector<int> Data::getKeys(int key)
 {
 	auto key2key = loadKeyData();
 
-	for (int i = 0; i < key2key.size(); i++)
+	for (size_t i = 0; i < key2key.size(); i++)
 	{
 		if (key == key2key[i].first) {
 			return key2key[i].second;
 		}
 	}
+
+	return {};
 }
 
 std::pair<std::wstring, int> Data::getText(int key)
 {
 	auto key2text = loadTextData();
 
-	for (int i = 0; i < key2text.size(); i++)
+	for (size_t i = 0; i < key2text.size(); i++)
 	{
 		if (key == std::get<0>(key2text[i]))
 		{
 			return { std::get<1>(key2text[i]) ,std::get<2>(key2text[i]) };
 		}
 	}
+
+	return {};
 }
 
 GameStateData Data::getGameState()
@@ -161,11 +165,11 @@ PlayerDef Data::getPlayerData()
 	in.read(reinterpret_cast<char*>(&plDef.money), sizeof(plDef.money));
 	in.read(reinterpret_cast<char*>(&plDef.details), sizeof(plDef.details));
 
-	int size = 0;
+	size_t size;
 	in.read(reinterpret_cast<char*>(&size), sizeof(size));
 	
 	plDef.gunsData.reserve(size);
-	for (int i = 0; i < size; i++)
+	for (size_t i = 0; i < size; i++)
 	{
 		int id;
 		in.read(reinterpret_cast<char*>(&id), sizeof(id));
@@ -195,7 +199,7 @@ void Data::savePlayerData(Player* player)
 	out.write(reinterpret_cast<const char*>(&plDef.money), sizeof(plDef.money));
 	out.write(reinterpret_cast<const char*>(&plDef.details), sizeof(plDef.details));
 
-	int size = plDef.gunsData.size();
+	size_t size = plDef.gunsData.size();
 	out.write(reinterpret_cast<const char*>(&size), sizeof(size));
 	for (auto it : plDef.gunsData)
 	{
@@ -210,11 +214,11 @@ std::vector<GunData> Data::getGunData()
 	std::ifstream in{ "Data/gunData.gun", std::ios::in | std::ios::binary };
 	if (!in.is_open()) return{};
 
-	int size;
+	size_t size;
 	in.read(reinterpret_cast<char*>(&size), sizeof(size));
 	std::vector<GunData> defs(size);
 
-	for (int i = 0; i < size; i++)
+	for (size_t i = 0; i < size; i++)
 	{
 		in.read(reinterpret_cast<char*>(&defs[i].id), sizeof(defs[i].id));
 		in.read(reinterpret_cast<char*>(&defs[i].nowCount), sizeof(defs[i].nowCount));
@@ -223,17 +227,18 @@ std::vector<GunData> Data::getGunData()
 		in.read(reinterpret_cast<char*>(&defs[i].nowDamage), sizeof(defs[i].nowDamage));
 		in.read(reinterpret_cast<char*>(&defs[i].upgradeCount), sizeof(defs[i].upgradeCount));
 
-		int unSize;
+		size_t unSize;
 		in.read(reinterpret_cast<char*>(&unSize), sizeof(unSize));
 
 		defs[i].improveId.reserve(unSize);
-		for (int j = 0; j < unSize; j++)
+		for (size_t j = 0; j < unSize; j++)
 		{
 			int id;
 			in.read(reinterpret_cast<char*>(&id), sizeof(id));
 			defs[i].improveId.push_back(id);
 		}
 	}
+
 	in.close();
 
 	return defs;
@@ -244,7 +249,7 @@ void Data::saveGunData(std::vector<GunData> guns)
 	std::ofstream out{ "Data/gunData.gun", std::ios::out | std::ios::binary };
 	if (!out.is_open()) return;
 
-	int size = guns.size();
+	size_t size = guns.size();
 	out.write(reinterpret_cast<const char*>(&size), sizeof(size));
 
 	for (auto def : guns)
@@ -256,7 +261,7 @@ void Data::saveGunData(std::vector<GunData> guns)
 		out.write(reinterpret_cast<char*>(&def.nowDamage), sizeof(def.nowDamage));
 		out.write(reinterpret_cast<char*>(&def.upgradeCount), sizeof(def.upgradeCount));
 
-		int unSize = def.improveId.size();
+		size_t unSize = def.improveId.size();
 		out.write(reinterpret_cast<const char*>(&unSize), sizeof(unSize));
 
 		for (auto im : def.improveId)
@@ -264,5 +269,6 @@ void Data::saveGunData(std::vector<GunData> guns)
 			out.write(reinterpret_cast<const char*>(&im), sizeof(im));
 		}
 	}
+
 	out.close();
 }

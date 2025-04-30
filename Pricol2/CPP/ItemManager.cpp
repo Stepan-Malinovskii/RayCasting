@@ -9,20 +9,27 @@ ItemManager::ItemManager()
 
 	auto& event = EventSystem::getInstance();
 	event.subscribe<int>("SAVE", [=](const int& NON) {saveGun();});
-	event.subscribe<int>("RESET_GAME", [=](const int& NON) {
-		for (int i = 0; i < guns.size(); i++)
-		{
-			guns[i]->deleteImprove(ImproveType::Damage);
-			guns[i]->deleteImprove(ImproveType::Spread);
-			guns[i]->deleteImprove(ImproveType::Magazin);
-			guns[i]->nowCount = gunsDef[i].maxCount;
-			guns[i]->maxCount = gunsDef[i].maxCount;
-			guns[i]->damage = gunsDef[i].damage;
-			guns[i]->maxRad = MAX_RAD;
-			guns[i]->nowRad = MIN_RAD;
-			guns[i]->maxImpRad = MAX_RAD;
-			guns[i]->upgradeCount = 0;
-		}});
+
+	event.subscribe<int>("RESET_GAME", [=](const int& NON) { resetGuns(); });
+
+	event.subscribe<int>("WIN_GAME", [=](const int& NON) { resetGuns(); });
+}
+
+void ItemManager::resetGuns()
+{
+	for (int i = 0; i < guns.size(); i++)
+	{
+		guns[i]->deleteImprove(ImproveType::Damage);
+		guns[i]->deleteImprove(ImproveType::Spread);
+		guns[i]->deleteImprove(ImproveType::Magazin);
+		guns[i]->nowCount = gunsDef[i].maxCount;
+		guns[i]->maxCount = gunsDef[i].maxCount;
+		guns[i]->damage = gunsDef[i].damage;
+		guns[i]->maxRad = MAX_RAD;
+		guns[i]->nowRad = MIN_RAD;
+		guns[i]->maxImpRad = MAX_RAD;
+		guns[i]->upgradeCount = 0;
+	}
 }
 
 void ItemManager::createImprovements()
@@ -89,7 +96,7 @@ Animator<sf::Texture*> ItemManager::createAnimator(int gunIndex)
 Animation<sf::Texture*> ItemManager::createAnimation(std::vector<sf::Texture>* frames, float duration)
 {
 	Animation<sf::Texture*> anim;
-	int count = frames->size();
+	int count = (int)frames->size();
 
 	for (int j = 0; j < count; ++j)
 	{

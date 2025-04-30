@@ -17,7 +17,7 @@
 #include "SoundManager.h"
 #include "EventSystem.h"
 
-constexpr float MAX_RAD = 30.0f, MIN_RAD = 1.0f;
+constexpr int MAX_RAD = 30, MIN_RAD = 1;
 
 class Gun;
 class Player;

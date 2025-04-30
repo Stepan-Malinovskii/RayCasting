@@ -16,6 +16,7 @@ constexpr int COUNT_ROW_TEXT = 7;
 class Editor
 {
 public:
+	Editor() = default;
 	void init(sf::RenderWindow* window, sf::RenderWindow* editorWindow, MapManager* mapMn);
 	void takeWindowInput(sf::Event event);
 	void takeEditInput(sf::Event event);

@@ -12,7 +12,8 @@
 #include "Weapon.h"
 #include <map>
 
-constexpr float DIALOG_W = SCREEN_W - 200, DIALOG_H = SCREEN_H - 100, TEXTSIZE = 50, INTERVAL = 40;
+constexpr float DIALOG_W = SCREEN_W - 200, DIALOG_H = SCREEN_H - 100, INTERVAL = 40;
+constexpr int TEXTSIZE = 50;
 
 class UIManager
 {

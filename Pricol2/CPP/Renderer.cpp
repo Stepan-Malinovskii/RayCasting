@@ -6,7 +6,7 @@ ThreadPool::ThreadPool(int threadCount)
 	for (size_t i = 0; i < threadCount; ++i)
 	{
 		workers.emplace_back([this]() {
-			while (true) 
+			while (true)
 			{
 				std::function<void()> task;
 				{
@@ -34,7 +34,7 @@ ThreadPool::~ThreadPool()
 		stop = true;
 	}
 	condition.notify_all();
-	for (auto& worker : workers) 
+	for (auto& worker : workers)
 	{
 		if (worker.joinable()) worker.join();
 	}
@@ -57,12 +57,12 @@ void ThreadPool::waitAll()
 
 int ThreadPool::getThreadCount() { return workers.size(); }
 
-Renderer::Renderer(sf::RenderWindow* _window) : 
-	window{_window}, threads{ (int)std::thread::hardware_concurrency() - 2 }
+Renderer::Renderer(sf::RenderWindow* _window) :
+	window{ _window }, threads{ (int)std::thread::hardware_concurrency() - 2 }
 {
 	Init();
-	screenPixels = new uint8_t[(int)SCREEN_H * (int)SCREEN_W * 4]();
-	distanceBuffer = new float[(int)SCREEN_W + 1] {};
+	screenPixels = new uint8_t[SCREEN_H * SCREEN_W * 4]();
+	distanceBuffer = new float[SCREEN_W + 1] {};
 }
 
 Renderer::~Renderer()
@@ -82,7 +82,7 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<
 	//StaticCalculations
 	float pRadians = player->enemy->spMap.angle * PI / 180.0f;
 	sf::Vector2f pDirection{ cosf(pRadians), sinf(pRadians) };
-	sf::Vector2f cameraPlane = sf::Vector2f(- pDirection.y, pDirection.x) * ASPECT;
+	sf::Vector2f cameraPlane = sf::Vector2f(-pDirection.y, pDirection.x) * ASPECT;
 	sf::Vector2f rayPos = player->enemy->spMap.position;
 
 	//FloorPart
@@ -91,7 +91,7 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<
 	int threadCount = threads.getThreadCount() - 1;
 	for (int cnt = 0; cnt < threadCount; cnt++)
 	{
-		threads.addTask([&, cnt] ()
+		threads.addTask([&, cnt]()
 			{
 				int start = (int)((SCREEN_H / threadCount * cnt));
 				int end = (int)((SCREEN_H / threadCount * (cnt + 1)));
@@ -104,7 +104,7 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<
 		{
 			return COMPARER(a->spMap.position, b->spMap.position, player->enemy->spMap.position);
 		};
-	
+
 
 	threads.addTask([&]() {
 		std::sort(sprites->begin(), sprites->end(), comperer);});
@@ -134,13 +134,13 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<
 		rayDir = pDirection + cameraPlane * cameraX;
 
 		RayHit hit = raycast(map, rayPos, rayDir);
-		
+
 		if (hit.cell)
 		{
 			float wallHeight = SCREEN_H / hit.perpWallDist;
 			float wallStart = (SCREEN_H - wallHeight) / 2.0f + player->pitch + player->posZ / hit.perpWallDist;
 			float wallEnd = (SCREEN_H + wallHeight) / 2.0f + player->pitch + player->posZ / hit.perpWallDist;
-			
+
 
 			float wallX = hit.isHitVert ? rayPos.x + hit.perpWallDist * rayDir.x :
 				rayPos.y + hit.perpWallDist * rayDir.y;
@@ -152,12 +152,12 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<
 			if (brightnes < 0.11f) brightnes = 0.11f;
 			if (hit.isHitVert) brightnes -= 0.09f;
 			sf::Color colorShade(255 * brightnes, 255 * brightnes, 255 * brightnes);
-			
+
 			walls.append(sf::Vertex(sf::Vector2f((float)i, wallStart), colorShade,
-				sf::Vector2f(textureX + (hit.cell - 1) % (int)TEXTURE_COUNT * TEXTURE_SIZE, 
+				sf::Vector2f(textureX + (hit.cell - 1) % (int)TEXTURE_COUNT * TEXTURE_SIZE,
 					(hit.cell - 1) / (int)TEXTURE_COUNT * TEXTURE_SIZE)));
 			walls.append(sf::Vertex(sf::Vector2f((float)i, wallEnd + 1), colorShade,
-				sf::Vector2f(textureX + (hit.cell - 1) % (int)TEXTURE_COUNT * TEXTURE_SIZE, 
+				sf::Vector2f(textureX + (hit.cell - 1) % (int)TEXTURE_COUNT * TEXTURE_SIZE,
 					TEXTURE_SIZE + (hit.cell - 1) / (int)TEXTURE_COUNT * TEXTURE_SIZE)));
 
 			distanceBuffer[i] = hit.perpWallDist;
@@ -173,7 +173,7 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<
 
 	sf::RenderStates states{ &Resources::textures };
 	window->draw(walls, states);
-	
+
 	DrawSprite(pDirection, cameraPlane, player, sprites);
 
 	spriteColumns.clear();
@@ -193,8 +193,8 @@ void Renderer::DrawSprite(sf::Vector2f& pDirection, sf::Vector2f& cameraPlane, P
 		auto spData = sp->getTextIndex();
 		if (brightnes < 0.1f) brightnes = 0.1f;
 		sf::Color colorShade(255 * brightnes, 255 * brightnes, 255 * brightnes);
-		if (spData.second) 
-		{ 
+		if (spData.second)
+		{
 			if (colorShade.r * 1.5f > 255) colorShade.r = 255;
 			colorShade.g /= 2;
 			colorShade.b /= 2;
@@ -262,12 +262,12 @@ void Renderer::DrawFloor(sf::Vector2f& rayDirLeft, sf::Vector2f& rayDirRight, sf
 	{
 		bool is_floor = y > SCREEN_H / 2 + player->pitch;
 		int p = is_floor ? (y - SCREEN_H / 2 - player->pitch) : (SCREEN_H / 2 - y + player->pitch);
-		float rowDist = is_floor ? ( CAMERA_Z + player->posZ ) / p : ( CAMERA_Z - player->posZ )/ p ;
-		sf::Vector2f floorStep = rowDist * (rayDirRight - rayDirLeft) / SCREEN_W;
+		float rowDist = is_floor ? (CAMERA_Z + player->posZ) / p : (CAMERA_Z - player->posZ) / p;
+		sf::Vector2f floorStep = rowDist * (rayDirRight - rayDirLeft) / (float)SCREEN_W;
 		sf::Vector2f floor = rayPos + rowDist * rayDirLeft;
 		float brightnes = 1 - rowDist / BRIGHTNESTDIST;
 		if (brightnes < 0.08f) brightnes = 0.08f;
-		
+
 		for (int x = 0; x < SCREEN_W; x++)
 		{
 			sf::Vector2i cell{ floor };
@@ -282,13 +282,13 @@ void Renderer::DrawFloor(sf::Vector2f& rayDirLeft, sf::Vector2f& rayDirRight, sf
 			if (is_floor)
 			{
 				color = floorText == 0 ? sf::Color(0, 0, 0, 0) :
-				Resources::textureImage.getPixel((floorText - 1) % TEXTURE_COUNT * TEXTURE_SIZE + textCoords.x, 
-					(floorText - 1) / TEXTURE_COUNT * TEXTURE_SIZE + textCoords.y);
+					Resources::textureImage.getPixel((floorText - 1) % TEXTURE_COUNT * TEXTURE_SIZE + textCoords.x,
+						(floorText - 1) / TEXTURE_COUNT * TEXTURE_SIZE + textCoords.y);
 			}
 			else
 			{
 				color = cellingText == 0 ? sf::Color(0, 0, 0, 0) :
-					Resources::textureImage.getPixel((cellingText - 1) % (int)TEXTURE_COUNT * TEXTURE_SIZE + textCoords.x, 
+					Resources::textureImage.getPixel((cellingText - 1) % (int)TEXTURE_COUNT * TEXTURE_SIZE + textCoords.x,
 						(cellingText - 1) / (int)TEXTURE_COUNT * TEXTURE_SIZE + textCoords.y);
 			}
 			screenPixels[(x + y * (int)SCREEN_W) * 4 + 0] = color.r * brightnes;

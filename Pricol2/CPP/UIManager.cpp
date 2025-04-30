@@ -1,9 +1,11 @@
 #include "UIManeger.h"
 #include <sstream>
+#include <string>
 #include <iomanip>
 #include <SFML/Graphics.hpp>
 
-UIManager::UIManager(sf::RenderWindow* _window) : window{ _window } {}
+UIManager::UIManager(sf::RenderWindow* _window) : 
+	window{ _window }, choseBut{ nullptr }, keyButton{ -1 } {}
 
 std::wstring UIManager::splitText(std::wstring text, int maxLen, int textSize)
 {
@@ -39,7 +41,7 @@ std::wstring UIManager::splitText(std::wstring text, int maxLen, int textSize)
 
 std::wstring UIManager::toMax(std::wstring str, float maxW, float textSize)
 {
-	sf::Text text(L"", Resources::UIFont, textSize);
+	sf::Text text(L"", Resources::UIFont, (int)textSize);
 	std::wstring result = str;
 	while (true)
 	{
@@ -59,25 +61,24 @@ void UIManager::initDialog(std::map<int, std::wstring, std::greater<int>> varian
 	std::wstring npcName)
 {
 	background = sf::Sprite(Resources::dialogBackground);
-	background.setScale({ SCREEN_W / Resources::dialogBackground.getSize().x,
-		SCREEN_H / Resources::dialogBackground.getSize().y });
+	background.setScale({ (float)SCREEN_W / Resources::dialogBackground.getSize().x,
+		(float)SCREEN_H / Resources::dialogBackground.getSize().y });
 
 	sf::RectangleShape nameBase{ {DIALOG_W, TEXTSIZE + 10} };
 	nameBase.setFillColor(sf::Color(100, 100, 100));
 	sf::Text nameText(npcName, Resources::UIFont, TEXTSIZE);
 	Group g(nameBase, nameText);
-	g.setPosition({ SCREEN_W / 2, INTERVAL});
+	g.setPosition({ (float)SCREEN_W / 2, INTERVAL});
 	buttons.push_back(g);
 
 	sf::RectangleShape dataBase{ {DIALOG_W, DIALOG_H / 2.5f} };
 	dataBase.setFillColor(sf::Color(100, 100, 100));
-	sf::Text dataText(splitText(variants[-1], DIALOG_W, 40), Resources::UIFont, TEXTSIZE - 10);
+	sf::Text dataText(splitText(variants[-1], (int)DIALOG_W, 40), Resources::UIFont, TEXTSIZE - 10);
 	Group g1(dataBase, dataText);
-	g1.setPosition({ SCREEN_W / 2, g.getPosition().y + g1.getSize().y / 2 + INTERVAL});
+	g1.setPosition({ (float)SCREEN_W / 2, g.getPosition().y + g1.getSize().y / 2 + INTERVAL});
 	buttons.push_back(g1);
 
-	sf::Vector2f pos(SCREEN_W / 2, g1.getPosition().y + g1.getSize().y / 2 + INTERVAL);
-
+	sf::Vector2f pos((float)SCREEN_W / 2, g1.getPosition().y + g1.getSize().y / 2 + INTERVAL);
 	
 	for (auto var : variants)
 	{
@@ -98,25 +99,25 @@ void UIManager::initDialog(std::map<int, std::wstring, std::greater<int>> varian
 void UIManager::initStartMenu()
 {
 	background = sf::Sprite(Resources::menuBackground);
-	background.setScale({ SCREEN_W / Resources::menuBackground.getSize().x,
-		SCREEN_H / Resources::menuBackground.getSize().y });
+	background.setScale({ (float)SCREEN_W / Resources::menuBackground.getSize().x,
+		(float)SCREEN_H / Resources::menuBackground.getSize().y });
 	
-	sf::Text text(L"œ–ŒƒŒÀ∆»“‹ »√–”", Resources::UIFont, 50.0f);
+	sf::Text text(L"œ–ŒƒŒÀ∆»“‹ »√–”", Resources::UIFont, 50);
 	sf::RectangleShape shape( {text.getLocalBounds().width + 20.0f, 60.0f});
 	shape.setFillColor(sf::Color(100, 100, 100));
 	Button button(Group(shape, text));
-	button.setPosition({ SCREEN_W / 2.0f, 2.0f * SCREEN_H / 3.0f - 35.0f });
+	button.setPosition({ (float)SCREEN_W / 2.0f, 2.0f * (float)SCREEN_H / 3.0f - 35.0f });
 	button.setFunc([=]() { keyButton = 0;});
 	auto& state = GameState::getInstance();
 	if (!state.data.isFirstGame) buttons.push_back(button);
 
 	button.setString(L"ÕŒ¬¿ﬂ »√–¿");
-	button.setPosition({ SCREEN_W / 2.0f, 2.0f * SCREEN_H / 3.0f + 35.0f });
+	button.setPosition({ (float)SCREEN_W / 2.0f, 2.0f * (float)SCREEN_H / 3.0f + 35.0f });
 	button.setFunc([=]() { keyButton = 1;});
 	buttons.push_back(button);
 
 	button.setString(L"¬€’Œƒ");
-	button.setPosition({ SCREEN_W / 2.0f, 2.0f * SCREEN_H / 3.0f + 105.0f });
+	button.setPosition({ (float)SCREEN_W / 2.0f, 2.0f * (float)SCREEN_H / 3.0f + 105.0f });
 	button.setFunc([=]() { keyButton = 2;});
 	buttons.push_back(button);
 }
@@ -124,24 +125,24 @@ void UIManager::initStartMenu()
 void UIManager::initGameMenu()
 {
 	background = sf::Sprite(Resources::inventoryBackground);
-	background.setScale({ SCREEN_W / Resources::inventoryBackground.getSize().x,
-		SCREEN_H / Resources::inventoryBackground.getSize().y });
+	background.setScale({ (float)SCREEN_W / Resources::inventoryBackground.getSize().x,
+		(float)SCREEN_H / Resources::inventoryBackground.getSize().y });
 
-	sf::Text text(L"œ–ŒƒŒÀ∆»“‹", Resources::UIFont, 50.0f);
+	sf::Text text(L"œ–ŒƒŒÀ∆»“‹", Resources::UIFont, 50);
 	sf::RectangleShape shape({ text.getLocalBounds().width + 20.0f, 60.0f });
 	shape.setFillColor(sf::Color(100, 100, 100));
 	Button button(Group(shape, text));
-	button.setPosition({ SCREEN_W / 2.0f, 2.0f * SCREEN_H / 3.0f - 35.0f });
+	button.setPosition({ (float)SCREEN_W / 2.0f, 2.0f * (float)SCREEN_H / 3.0f - 35.0f });
 	button.setFunc([=]() { keyButton = 0; });
 	buttons.push_back(button);
 
 	button.setString(L"Õ¿—“–Œ… »");
-	button.setPosition({ SCREEN_W / 2.0f, 2.0f * SCREEN_H / 3.0f + 35.0f });
+	button.setPosition({ (float)SCREEN_W / 2.0f, 2.0f * (float)SCREEN_H / 3.0f + 35.0f });
 	button.setFunc([=]() { keyButton = 1;});
 	buttons.push_back(button);
 
 	button.setString(L"¬€’Œƒ");
-	button.setPosition({ SCREEN_W / 2.0f, 2.0f * SCREEN_H / 3.0f + 105.0f });
+	button.setPosition({ (float)SCREEN_W / 2.0f, 2.0f * (float)SCREEN_H / 3.0f + 105.0f });
 	button.setFunc([=]() { keyButton = 2;});
 	buttons.push_back(button);
 }
@@ -149,14 +150,14 @@ void UIManager::initGameMenu()
 void UIManager::initSetting()
 {
 	background = sf::Sprite(Resources::inventoryBackground);
-	background.setScale({ SCREEN_W / Resources::inventoryBackground.getSize().x,
-		SCREEN_H / Resources::inventoryBackground.getSize().y });
+	background.setScale({ (float)SCREEN_W / Resources::inventoryBackground.getSize().x,
+		(float)SCREEN_H / Resources::inventoryBackground.getSize().y });
 
-	sf::Text text(L"¬€’Œƒ", Resources::UIFont, 50.0f);
-	sf::RectangleShape shape({ text.getLocalBounds().width + 20.0f, 60.0f });
+	sf::Text text(L"¬€’Œƒ", Resources::UIFont, 50);
+	sf::RectangleShape shape({ text.getLocalBounds().width + 20.0f, 60.0f});
 	shape.setFillColor(sf::Color(100, 100, 100));
 	Button button(Group(shape, text));
-	button.setPosition({ SCREEN_W / 2.0f, 80.0f });
+	button.setPosition({ (float)SCREEN_W / 2.0f, 80.0f });
 	button.setFunc([=]() { keyButton = 0; });
 	buttons.push_back(button);
 
@@ -171,7 +172,7 @@ void UIManager::initSetting()
 	shape = sf::RectangleShape({ text.getLocalBounds().width + 20.0f, 60.0f });
 	shape.setFillColor(sf::Color(100, 100, 100));
 	button = Button(Group(shape, text));
-	button.setPosition({ SCREEN_W / 2.0f, 150.0f});
+	button.setPosition({ (float)SCREEN_W / 2.0f, 150.0f});
 	buttons.push_back(button);
 	funcButton.setPosition({ button.getPosition().x + button.getSize().x / 2 + 30.0f, button.getPosition().y });
 	funcButton.setFunc([&]() {state.data.effectVolume++;keyButton = 1;});
@@ -182,7 +183,7 @@ void UIManager::initSetting()
 	buttons.push_back(funcButton);
 
 	button.setString(L"√–ŒÃ Œ—“‹ Ã”«€ »: " + std::to_wstring(state.data.soundVolume));
-	button.setPosition({ SCREEN_W / 2.0f, 220.0f});
+	button.setPosition({ (float)SCREEN_W / 2.0f, 220.0f});
 	buttons.push_back(button);
 	funcButton.setString(L"+");
 	funcButton.setPosition({ button.getPosition().x + button.getSize().x / 2 + 30.0f, button.getPosition().y });
@@ -192,15 +193,28 @@ void UIManager::initSetting()
 	funcButton.setFunc([&]() {state.data.soundVolume--; keyButton = 1;});
 	funcButton.setString(L"-");
 	buttons.push_back(funcButton);
+
+	std::wstring std = std::to_wstring(state.data.mouseSpeed + 1.0f);
+	button.setString(L"C Œ–Œ—“‹ Ã€ÿ»: " + std.substr(0, std.find(L".") + 3));
+	button.setPosition({ (float)SCREEN_W / 2.0f, 290.0f });
+	buttons.push_back(button);
+	funcButton.setString(L"+");
+	funcButton.setPosition({ button.getPosition().x + button.getSize().x / 2 + 30.0f, button.getPosition().y });
+	funcButton.setFunc([&]() {state.data.mouseSpeed += 0.01f; keyButton = 2;});
+	buttons.push_back(funcButton);
+	funcButton.setPosition({ button.getPosition().x - button.getSize().x / 2 - 30.0f, button.getPosition().y });
+	funcButton.setFunc([&]() {state.data.mouseSpeed -= 0.01f; keyButton = 2;});
+	funcButton.setString(L"-");
+	buttons.push_back(funcButton);
 	
 	funcButton.setFunc(nullptr);
 	shape = sf::RectangleShape({shape.getSize().x / 2, 30.0f});
 	shape.setFillColor(sf::Color(100, 100, 100));
-	text = sf::Text(L"", Resources::UIFont, 20.0f);
+	text = sf::Text(L"", Resources::UIFont, 20);
 	button = Button(Group(shape, text));
 	funcShape.setSize({ 30.0f, 30.0f });
 	funcButton = Button(Group(funcShape, text));
-	sf::Vector2f pos{ SCREEN_W / 2.0f - shape.getSize().x / 2 - 15.0f, 280.0f };
+	sf::Vector2f pos{ (float)SCREEN_W / 2.0f - shape.getSize().x / 2 - 15.0f, 350.0f };
 
 	std::vector<std::pair<std::wstring, std::wstring>> keys = {
 		{L"A", L"Move left"},
@@ -217,7 +231,7 @@ void UIManager::initSetting()
 		{L"ESC", L"To open menu"},
 		};
 
-	for (int i = 0; i < keys.size(); i++)
+	for (size_t i = 0; i < keys.size(); i++)
 	{
 		button.setString(keys[i].second);
 		funcButton.setString(keys[i].first);
@@ -241,18 +255,18 @@ void UIManager::initSetting()
 void UIManager::initTrade(std::map<int, Itemble*> variants, Player* player)
 {
 	background = sf::Sprite(Resources::tradeBackground);
-	background.setScale({ SCREEN_W / Resources::tradeBackground.getSize().x,
-		SCREEN_H / Resources::tradeBackground.getSize().y });
+	background.setScale({ (float)SCREEN_W / Resources::tradeBackground.getSize().x,
+		(float)SCREEN_H / Resources::tradeBackground.getSize().y });
 
 	float interval = 5.0f;
-	float size = 44;
+	float size = 44.0f;
 
-	float maxName = 0, maxDisc = 0, maxCost = 0;
-	sf::Text text(L"", Resources::UIFont, size - 25);
+	float maxName = 0.0f, maxDisc = 0.0f, maxCost = 0.0f;
+	sf::Text text(L"", Resources::UIFont, (int)size - 25);
 	
 	for (auto pair : variants)
 	{
-		if (pair.second == nullptr) continue;
+		if (!pair.second) continue;
 		
 		text.setString(pair.second->name);
 		maxName = std::fmaxf(text.getLocalBounds().width, maxName);
@@ -264,8 +278,8 @@ void UIManager::initTrade(std::map<int, Itemble*> variants, Player* player)
 		maxCost = std::fmaxf(text.getLocalBounds().width, maxCost);
 	}
 	
-	sf::Vector2f pos(SCREEN_W / 2, size + interval * 2);
-	sf::Vector2f textPos((SCREEN_W - DIALOG_W) / 2 - ICON_SIZE / 2, size + interval * 2);
+	sf::Vector2f pos((float)SCREEN_W / 2, size + interval * 2.0f);
+	sf::Vector2f textPos(((float)SCREEN_W - DIALOG_W) / 2 - ICON_SIZE / 2, size + interval * 2.0f);
 
 	sf::RectangleShape rect({ DIALOG_W, size });
 	sf::RectangleShape texture({ ICON_SIZE, ICON_SIZE });
@@ -280,7 +294,7 @@ void UIManager::initTrade(std::map<int, Itemble*> variants, Player* player)
 
 	for (auto var : variants)
 	{
-		if (var.second == nullptr) continue;
+		if (!var.second) continue;
 
 		std::wstring line = toMax(var.second->name, maxName, size - 25) + L" | " + 
 			toMax(std::to_wstring(var.second->cost) + L" Û·", maxCost, size - 25) + L" | " +
@@ -303,35 +317,35 @@ void UIManager::initTrade(std::map<int, Itemble*> variants, Player* player)
 	}
 
 	sf::RectangleShape rect2(rect);
-	rect2.setSize({ DIALOG_W, size - 20 });
+	rect2.setSize({ DIALOG_W, size - 20.0f });
 	Group g9(rect2, text);
 	g9.setString(L"¡‡Î‡ÌÒ: " + std::to_wstring(player->money) + L" | «‡Ô˜‡ÒÚË: " + std::to_wstring(player->details));
-	g9.setPosition({SCREEN_W / 2, g9.getSize().y / 2 + interval});
+	g9.setPosition({ (float)SCREEN_W / 2, g9.getSize().y / 2 + interval});
 	buttons.push_back(g9);
 
 	sf::Text text1(text);
 	text1.setString(L" \n”\nœ\n»\n“\n‹");
 	text1.setCharacterSize(50);
-	sf::RectangleShape rect1({ size + 10, 350 });
+	sf::RectangleShape rect1({ size + 10.0f, 350.0f });
 	rect1.setFillColor(sf::Color(70, 70, 70));
 	Group g3(rect1, text1);
-	g3.setPosition({ (SCREEN_W + DIALOG_W) / 2 + g3.getSize().x, g3.getSize().y / 2 + 5.0f});
+	g3.setPosition({ ((float)SCREEN_W + DIALOG_W) / 2 + g3.getSize().x, g3.getSize().y / 2 + 5.0f});
 
 	buttons.push_back(Button(g3));
 	buttons.back().setFunc([=]() { keyButton = -200; });
 
 	g3.setString(L"¬\n€\n’\nŒ\nƒ");
-	g3.setPosition({ (SCREEN_W + DIALOG_W) / 2 + g3.getSize().x , SCREEN_H - g3.getSize().y/2 - 5.0f});
+	g3.setPosition({ ((float)SCREEN_W + DIALOG_W) / 2 + g3.getSize().x , (float)SCREEN_H - g3.getSize().y/2 - 5.0f});
 	buttons.push_back(Button(g3));
 	buttons.back().setFunc([=]() { keyButton = -100; });
 }
 
 void UIManager::initMechanic(Player* player, Gun* choose)
 {
-	sf::Text text(L"¡‡Î‡ÌÒ: " + std::to_wstring(player->money) + L" | «‡Ô˜‡ÒÚË: " + std::to_wstring(player->details) + L" | Œ‰ÌÓ ÛÎÛ˜¯ÂÌËÂ ÒÚÓËÚ 50 Û· Ë 15 ‰ÂÚ‡ÎÂÈ", Resources::UIFont, 30.0f);
+	sf::Text text(L"¡‡Î‡ÌÒ: " + std::to_wstring(player->money) + L" | «‡Ô˜‡ÒÚË: " + std::to_wstring(player->details) + L" | Œ‰ÌÓ ÛÎÛ˜¯ÂÌËÂ ÒÚÓËÚ 50 Û· Ë 15 ‰ÂÚ‡ÎÂÈ", Resources::UIFont, 30);
 	sf::RectangleShape shape({ DIALOG_W, text.getLocalBounds().height + 5.0f});
 	shape.setFillColor(sf::Color(70, 70, 70));
-	shape.setPosition({ SCREEN_W / 2, shape.getSize().y / 2 + 5.0f });
+	shape.setPosition({ (float)SCREEN_W / 2, shape.getSize().y / 2 + 5.0f });
 	Button button(Group(shape, text));
 	buttons.push_back(button);
 
@@ -345,13 +359,13 @@ void UIManager::initMechanic(Player* player, Gun* choose)
 	Group textureGroup(textureShape, {});
 	
 	std::wostringstream oss;
-	for (int i = 1; i <= 2; i++)
+	for (size_t i = 1; i <= 2; i++)
 	{
 		if (player->guns[i])
 		{
 			if (player->guns[i] == choose) dataGroup.shape.setFillColor(sf::Color::Red);
 			buttons.push_back(dataGroup);
-			buttons.back().setFunc([=]() { keyButton = i; });
+			buttons.back().setFunc([=]() { keyButton = (int)i; });
 
 			textureGroup.setPosition({ dataGroup.getPosition().x, dataGroup.getPosition().y - dataGroup.getSize().y / 2 + ICON_SIZE + 20.0f });
 			buttons.push_back(Button(textureGroup));
@@ -363,7 +377,7 @@ void UIManager::initMechanic(Player* player, Gun* choose)
 			oss << L"–‡Á·ÓÒ: " << std::fixed << std::setprecision(2) << player->guns[i]->maxImpRad << "\n";
 			oss << L" ÓÎË˜ÂÒÚ‚Ó ÛÎÛ˜¯ÂÌËÈ: " << player->guns[i]->upgradeCount << L"/ 5" << "\n";
 
-			text.setCharacterSize(20.0f);
+			text.setCharacterSize(20);
 			text.setString(oss.str());
 			shape.setSize({ text.getLocalBounds().width + 10.0f, text.getLocalBounds().height + 10.0f });
 			shape.setPosition({ textureGroup.getPosition().x, textureGroup.getPosition().y + textureGroup.getSize().y + 60.0f });
@@ -375,17 +389,17 @@ void UIManager::initMechanic(Player* player, Gun* choose)
 			dataGroup.shape.setFillColor(sf::Color(50, 50, 50));
 		}
 	}
-	text.setCharacterSize(30.0f);
+	text.setCharacterSize(30);
 
 	text.setString(L"”\nÀ\n”\n◊\nÿ\n»\n“\n‹");
 	shape.setSize({ text.getLocalBounds().width + 10.0f, text.getLocalBounds().height + 10.0f });
-	shape.setPosition({ (SCREEN_W + DIALOG_W) / 2 + shape.getSize().x, SCREEN_H / 2 - shape.getSize().y / 2 - 5.0f });
+	shape.setPosition({ ((float)SCREEN_W + DIALOG_W) / 2 + shape.getSize().x, (float)SCREEN_H / 2 - shape.getSize().y / 2 - 5.0f });
 	button = Button(Group(shape, text));
 	button.setFunc([=]() { keyButton = -200; });
 	buttons.push_back(button);
 
 	text.setString(L"¬\n€\n’\nŒ\nƒ");
-	shape.setPosition({ (SCREEN_W + DIALOG_W) / 2 + shape.getSize().x, SCREEN_H / 2 + shape.getSize().y / 2 + 5.0f });
+	shape.setPosition({ ((float)SCREEN_W + DIALOG_W) / 2 + shape.getSize().x, (float)SCREEN_H / 2 + shape.getSize().y / 2 + 5.0f });
 	button = Button(Group(shape, text));
 	button.setFunc([=]() { keyButton = -100; });
 	buttons.push_back(button);
@@ -393,7 +407,7 @@ void UIManager::initMechanic(Player* player, Gun* choose)
 	if (choose)
 	{
 		sf::RectangleShape percShape({ DIALOG_W / 2 + 15.0f, DIALOG_H / 4 });
-		percShape.setPosition(dataGroup.getPosition().x + dataGroup.getSize().x / 2 + percShape.getSize().x / 2 + 10.0f, SCREEN_H / 3 - percShape.getSize().y / 3 + 10.0f);
+		percShape.setPosition(dataGroup.getPosition().x + dataGroup.getSize().x / 2 + percShape.getSize().x / 2 + 10.0f, (float)SCREEN_H / 3 - percShape.getSize().y / 3 + 10.0f);
 		percShape.setFillColor(sf::Color(50, 50, 50));
 		Group percGroup(percShape, text);
 
@@ -416,19 +430,19 @@ void UIManager::initMechanic(Player* player, Gun* choose)
 void UIManager::initChanger(int coef, Player* player)
 {
 	background = sf::Sprite(Resources::tradeBackground);
-	background.setScale({ SCREEN_W / Resources::tradeBackground.getSize().x,
-		SCREEN_H / Resources::tradeBackground.getSize().y });
+	background.setScale({ (float)SCREEN_W / Resources::tradeBackground.getSize().x,
+		(float)SCREEN_H / Resources::tradeBackground.getSize().y });
 
-	sf::Text text(L"¡‡Î‡ÌÒ: " + std::to_wstring(player->money) + L" | «‡Ô˜‡ÒÚË: " + std::to_wstring(player->details), Resources::UIFont, 50.0f);
+	sf::Text text(L"¡‡Î‡ÌÒ: " + std::to_wstring(player->money) + L" | «‡Ô˜‡ÒÚË: " + std::to_wstring(player->details), Resources::UIFont, 50);
 	sf::RectangleShape shape({ text.getLocalBounds().width + 10.0f, text.getLocalBounds().height + 10.0f });
 	shape.setFillColor(sf::Color(70, 70, 70));
-	shape.setPosition({ SCREEN_W / 2, shape.getSize().y + 10.0f });
+	shape.setPosition({ (float)SCREEN_W / 2, shape.getSize().y + 10.0f });
 	Button button(Group(shape, text));
 	buttons.push_back(button);
 
 	text.setString(L"“ÂÍÛ˘ËÈ ÍÛÒ: 1 ‰ÂÚ‡Î¸ Í " + std::to_wstring(coef) + L" ÏÓÌÂÚ‡Ï");
 	shape.setSize({ text.getLocalBounds().width + 10.0f, text.getLocalBounds().height + 10.0f });
-	shape.move({ 0, shape.getSize().y + 5.0f });
+	shape.move({ 0, shape.getSize().y + 10.0f });
 	button = Button(Group(shape, text));
 	buttons.push_back(button);
 
@@ -440,13 +454,13 @@ void UIManager::initChanger(int coef, Player* player)
 
 	text.setString(L"Œ\n¡\nÃ\n≈\nÕ\nﬂ\n“\n‹");
 	shape.setSize({ text.getLocalBounds().width + 10.0f, text.getLocalBounds().height + 10.0f });
-	shape.setPosition({ shape.getSize().x + 5.0f, SCREEN_H / 2});
+	shape.setPosition({ shape.getSize().x + 5.0f, (float)SCREEN_H / 2});
 	button = Button(Group(shape, text));
 	button.setFunc([=]() { keyButton = -200; });
 	buttons.push_back(button);
 
 	text.setString(L"¬\n€\n’\nŒ\nƒ");
-	shape.setPosition({ SCREEN_W - shape.getSize().x - 5.0f, SCREEN_H / 2 });
+	shape.setPosition({ (float)SCREEN_W - shape.getSize().x - 5.0f, (float)SCREEN_H / 2 });
 	button = Button(Group(shape, text));
 	button.setFunc([=]() { keyButton = -100; });
 	buttons.push_back(button);
@@ -455,8 +469,8 @@ void UIManager::initChanger(int coef, Player* player)
 void UIManager::initInvent(std::map<Itemble*, int> items, Itemble* choose, Player* player)
 {
 	background = sf::Sprite(Resources::inventoryBackground);
-	background.setScale({ SCREEN_W / Resources::inventoryBackground.getSize().x,
-		SCREEN_H / Resources::inventoryBackground.getSize().y });
+	background.setScale({ (float)SCREEN_W / Resources::inventoryBackground.getSize().x,
+		(float)SCREEN_H / Resources::inventoryBackground.getSize().y });
 
 	sf::RectangleShape baseShape({ DIALOG_W / 2 + 15, DIALOG_H + 10});
 	baseShape.setFillColor(sf::Color(70, 70, 70));
@@ -602,7 +616,7 @@ void UIManager::initInvent(std::map<Itemble*, int> items, Itemble* choose, Playe
 
 			oss << choose->disc;
 		}
-		dataGroup1.setString(splitText(oss.str(), dataGroup1.getSize().x, dataGroup1.text.getCharacterSize()));
+		dataGroup1.setString(splitText(oss.str(), (int)dataGroup1.getSize().x, dataGroup1.text.getCharacterSize()));
 		buttons.push_back(dataGroup1);
 	}
 }
@@ -618,7 +632,7 @@ int UIManager::checkButton()
 	sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
 	sf::Vector2i worldPos = (sf::Vector2i)window->mapPixelToCoords(mousePos);
 
-	for (int i = 0; i < buttons.size(); i++)
+	for (size_t i = 0; i < buttons.size(); i++)
 	{
 		if (buttons[i].isClicked(worldPos))
 		{
@@ -647,7 +661,7 @@ void UIManager::drawPlayerUI(Player* player)
 
 	if (!player->kick->isCanUsed())
 	{
-		player->kick->drawWeapon(window, { 0,0 });
+		player->kick->drawWeapon(window, { 0.0f, 0.0f });
 	}
 	else
 	{
@@ -659,25 +673,25 @@ void UIManager::drawPlayerUI(Player* player)
 			weaponInfo = sf::Text(std::to_string(player->patrons), Resources::UIFont, 30);
 			auto b = weaponInfo.getLocalBounds();
 			weaponInfo.setOrigin({ b.width / 2, b.height / 2 });
-			weaponInfo.setPosition({ SCREEN_W / 2, SCREEN_H / 2 - weaponInfo.getCharacterSize() / 4 });
-			weaponInfo.setPosition({ SCREEN_W - b.width / 2 - 20, SCREEN_H - 30 });
+			weaponInfo.setPosition({ (float)SCREEN_W / 2, (float)SCREEN_H / 2 - weaponInfo.getCharacterSize() / 4 });
+			weaponInfo.setPosition({ (float)SCREEN_W - b.width / 2 - 20, (float)SCREEN_H - 30 });
 			weaponInfo.setFillColor({ 0, 0, 0 });
 			window->draw(weaponInfo);
 
 			weaponInfo.setString(std::to_string(gun->nowCount) + " / " + std::to_string(gun->maxCount));
 			b = weaponInfo.getLocalBounds();
 			weaponInfo.setOrigin({ b.width / 2, b.height / 2 });
-			weaponInfo.setPosition({ SCREEN_W / 2, SCREEN_H / 2 - weaponInfo.getCharacterSize() / 4 });
-			weaponInfo.setPosition({ SCREEN_W - b.width / 2 - 20, SCREEN_H - 60 });
+			weaponInfo.setPosition({ (float)SCREEN_W / 2, (float)SCREEN_H / 2 - weaponInfo.getCharacterSize() / 4 });
+			weaponInfo.setPosition({ (float)SCREEN_W - b.width / 2 - 20, (float)SCREEN_H - 60 });
 			window->draw(weaponInfo);
 		}
 	}
 	float baseX = 300;
 	sf::RectangleShape baseShape({ baseX, 40 });
-	baseShape.setFillColor({ 128, 128, 128 });
+	baseShape.setFillColor(sf::Color(128, 128, 128));
 	sf::Text text("", Resources::UIFont, 30);
 	Group group1(baseShape, text);
-	group1.setPosition({ 170, SCREEN_H - 120 });
+	group1.setPosition({ 170, (float)SCREEN_H - 120 });
 	window->draw(group1.shape);
 
 	Group group2(group1);
@@ -694,7 +708,7 @@ void UIManager::drawPlayerUI(Player* player)
 	oss << std::fixed << std::setprecision(2) << player->enemy->enemyDef.maxHealpoint;
 	std::wstring str = oss.str();
 
-	group1.shape.setFillColor({ 255, 23, 23 });
+	group1.shape.setFillColor(sf::Color(255, 23, 23));
 	float newXH = baseX * (player->enemy->spMap.nowHealPoint <= 0 ? 0 :
 		player->enemy->spMap.nowHealPoint) / player->enemy->enemyDef.maxHealpoint;
 	group1.shape.setSize({ newXH, 40 });
@@ -709,7 +723,7 @@ void UIManager::drawPlayerUI(Player* player)
 	oss << std::fixed << std::setprecision(2) << player->maxStrenght;
 	str = oss.str();
 
-	group2.shape.setFillColor({ 70, 130, 80 });
+	group2.shape.setFillColor(sf::Color(70, 130, 80));
 	float newXD = baseX * player->nowStrenght / player->maxStrenght;
 	group2.shape.setSize({ newXD, 40 });
 	group2.setString(str);
@@ -723,7 +737,7 @@ void UIManager::drawPlayerUI(Player* player)
 	oss << std::fixed << std::setprecision(2) << player->maxEnergy;
 	str = oss.str();
 
-	group3.shape.setFillColor({ 44, 148, 15 });
+	group3.shape.setFillColor(sf::Color(44, 148, 15));
 	float newXB = baseX * player->nowEnergy / player->maxEnergy;
 	group3.shape.setSize({ newXB, 40 });
 	group3.setString(str);
@@ -739,11 +753,11 @@ void UIManager::drawPlayerUI(Player* player)
 		rect.setOrigin({ b.width / 2, b.height / 2 });
 		if (weaponInfo.getString() != "")
 		{
-			rect.setPosition({ SCREEN_W - ICON_SIZE - weaponInfo.getLocalBounds().width,  SCREEN_H - ICON_SIZE / 2 });
+			rect.setPosition({ (float)SCREEN_W - ICON_SIZE - weaponInfo.getLocalBounds().width,  (float)SCREEN_H - ICON_SIZE / 2 });
 		}
 		else
 		{
-			rect.setPosition({ SCREEN_W - b.width / 2 - 20, SCREEN_H - ICON_SIZE / 2 });
+			rect.setPosition({ (float)SCREEN_W - b.width / 2 - 20, (float)SCREEN_H - ICON_SIZE / 2 });
 		}
 		window->draw(rect);
 	}
@@ -753,6 +767,6 @@ void UIManager::drawPlayerUI(Player* player)
 	aim.setFillColor(sf::Color(0, 0, 0, 0));
 	aim.setOutlineColor(sf::Color::Black);
 	aim.setOutlineThickness(1.5f);
-	aim.setPosition({ SCREEN_W / 2, SCREEN_H / 2 });
+	aim.setPosition({ (float)SCREEN_W / 2, (float)SCREEN_H / 2 });
 	window->draw(aim);
 }

@@ -25,7 +25,7 @@ void Editor::createTextureButton()
 	b.setTexture(&Resources::textures);
 
 	int x = 0, y = 0;
-	for (; x < Resources::textures.getSize().x / TEXTURE_SIZE * 5; x++, y++)
+	for (; x < (int)Resources::textures.getSize().x / TEXTURE_SIZE * 5; x++, y++)
 	{
 		b.setPosition({ (x % COUNT_ROW_TEXT) * (float)ICON_SIZE + ICON_SIZE / 2, 
 						(y / COUNT_ROW_TEXT) * (float)ICON_SIZE });
@@ -41,7 +41,7 @@ void Editor::createTextureButton()
 
 void Editor::createSpriteButton()
 {
-	int y = buttons.size() / COUNT_ROW_TEXT * COUNT_ROW_TEXT + COUNT_ROW_TEXT;
+	int  y = (int)buttons.size() / COUNT_ROW_TEXT * COUNT_ROW_TEXT + COUNT_ROW_TEXT;
 
 	sf::RectangleShape shape(sf::Vector2f{ ICON_SIZE, ICON_SIZE });
 	Button b({ shape, {} });
@@ -149,7 +149,7 @@ void Editor::windowStateNoRightClick()
 
 void Editor::scrollAndCntr(float delta)
 {
-	if (!(nowLayer == SPRITE_LAYER)) return;
+	if (nowLayer != SPRITE_LAYER) return;
 
 	sf::Vector2f worldPos = window->mapPixelToCoords(windowMousePos);
 	sf::Vector2i mapPos = getMapPos(worldPos);

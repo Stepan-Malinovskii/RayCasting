@@ -22,6 +22,7 @@ private:
 	std::vector<std::unique_ptr<Gun>> guns;
 	std::vector<std::unique_ptr<Item>> travelItem;
 
+	void resetGuns();
 	void saveGun();
 	void createImprovements();
 	void createGuns();

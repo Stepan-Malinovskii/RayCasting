@@ -10,7 +10,7 @@ sf::Music SoundManager::music{};
 
 void SoundManager::playSound(sf::SoundBuffer& buffer, bool isLoop)
 {
-	for (int i = 0; i < sounds.size(); i++)
+	for (size_t i = 0; i < sounds.size(); i++)
 	{
 		if (sounds[i]->getBuffer() == &buffer)
 		{
@@ -24,7 +24,7 @@ void SoundManager::playSound(sf::SoundBuffer& buffer, bool isLoop)
 
 	sounds.push_back(std::make_unique<sf::Sound>(buffer));
 	sounds.back()->setLoop(isLoop);
-	sounds.back()->setVolume(state.data.effectVolume);
+	sounds.back()->setVolume((float)state.data.effectVolume);
 	sounds.back()->play();
 }
 
@@ -57,13 +57,13 @@ void SoundManager::playerMusic(MusicType type)
 
 	if (!music.openFromFile(filePath + ".ogg")) return;
 	music.setLoop(true);
-	music.setVolume(state.data.soundVolume);
+	music.setVolume((float)state.data.soundVolume);
 	music.play();
 }
 
 void SoundManager::stopAllSound()
 {
-	for (int i = 0; i < sounds.size(); i++)
+	for (size_t i = 0; i < sounds.size(); i++)
 	{
 		sounds[i]->stop();
 	}
@@ -74,7 +74,7 @@ void SoundManager::stopAllSound()
 
 void SoundManager::update()
 {
-	int i = 0;
+	size_t i = 0;
 
 	while (i < sounds.size())
 	{
@@ -93,12 +93,10 @@ void SoundManager::updateVolume()
 {
 	auto& state = GameState::getInstance();
 
-	music.setVolume(state.data.soundVolume);
+	music.setVolume((float)state.data.soundVolume);
 
-	for (int i = 0; i < sounds.size(); i++)
+	for (size_t i = 0; i < sounds.size(); i++)
 	{
-		sounds[i]->setVolume(state.data.effectVolume);
+		sounds[i]->setVolume((float)state.data.effectVolume);
 	}
 }
-
-

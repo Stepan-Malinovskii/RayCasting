@@ -1,7 +1,7 @@
 #include "Menu.h"
 
-Menu::Menu(sf::RenderWindow* _window, UIManager* _uiManager) : 
-	uiManager{_uiManager}, window{_window}, isKeyPressed{false},
+Menu::Menu(sf::RenderWindow* _window, UIManager* _uiManager, Player* _player) : 
+	uiManager{_uiManager}, window{_window}, isKeyPressed{false}, player{_player},
 	startMenuState{[=](float deltaTime) {updateStartMenu();}, [=]() {draw();}},
 	gameMenuState{[=](float deltaTime) {updateGameMenu();},[=]() {draw();} },
 	settingState{ [=](float deltaTime) {updateSetting();}, [=]() {draw();} } {}
@@ -37,6 +37,7 @@ void Menu::stop()
 	window->setMouseCursorVisible(false);
 	uiManager->deleteNow();
 	event.trigger<RenderState*>("SWAP_STATE", nullptr);
+	SoundManager::playerMusic(BaseSound);
 }
 
 void Menu::draw() { uiManager->drawNow(); }
@@ -129,6 +130,13 @@ void Menu::updateSetting()
 	else if (key == 1)
 	{
 		SoundManager::updateVolume();
+		uiManager->deleteNow();
+		uiManager->initSetting();
+	}
+	else if (key == 2)
+	{
+		auto& state = GameState::getInstance();
+		player->mouseSpeed = state.data.mouseSpeed;
 		uiManager->deleteNow();
 		uiManager->initSetting();
 	}

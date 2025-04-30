@@ -19,6 +19,7 @@ struct GameStateData
 	int levelNumber;
 	bool isLevelBase;
 	int changerCoef;
+	float mouseSpeed;
 };
 
 class Data

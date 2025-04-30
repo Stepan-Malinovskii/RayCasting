@@ -21,7 +21,10 @@ Inventory::Inventory(sf::RenderWindow* _window, Player* _player, UIManager* _uiM
 			auto& data = Data::getInstance();
 			data.saveInvent(convert2save());
 		});
+
 	event.subscribe<int>("RESET_GAME", [=](const int NON) { items.clear(); });
+
+	event.subscribe<int>("WIN_GAME", [&](const int NON) { items.clear(); });
 }
 
 Item* Inventory::takeMaxHeal()
@@ -164,6 +167,7 @@ void Inventory::useSelectedGun(Gun* gun)
 				items[dynamic_cast<Itemble*>(gun->deleteImprove(it.first))] += 1;
 				break;
 			}
+
 			i++;
 		}
 	}

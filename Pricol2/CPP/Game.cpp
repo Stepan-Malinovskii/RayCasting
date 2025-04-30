@@ -6,11 +6,11 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 	screenMidlePos = { (int)(SCREEN_W / 2), (int)(SCREEN_H / 2) };
 	itemManager = new ItemManager();
 	renderer = new Renderer(window);
-	uiManager = new UIManager(window);
-	menu = new Menu(window, uiManager);
+	uiManager = new UIManager(window);;
 	dialogSys = new Dialog(window, uiManager, itemManager);
 	spManager = new SpriteManager(mapManager->getNowMap(), uiManager, itemManager);
 	player = spManager->getPlayer();
+	menu = new Menu(window, uiManager, player);
 	invent = new Inventory(window, player, uiManager);
 	initPlayer();
 
@@ -28,37 +28,32 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 	playState = RenderState(update, draw);
 
 	auto& event = EventSystem::getInstance();
-	event.subscribe<int>("SWAPLOC", [=](const int levelN)
-		{
+	event.subscribe<int>("SWAPLOC", [=](const int levelN) {
 			auto& state = GameState::getInstance();
 			state.data.changerCoef = Random::intRandom(2, 5);
 			sf::Vector2f pos = mapManager->nextLocation(levelN);
 			spManager->resetMap(mapManager->getNowMap(), pos);
-		}
-	);
+		});
 
 	event.subscribe<int>("RESET_GAME", [=](const int NON) { currentState = &playState;
 	player->guns[1] = nullptr; player->guns[2] = nullptr; invent->takeItem(itemManager->getGunByIndex(2), 1);
 	player->setGun(itemManager->getGunByIndex(2), 1);});
 
+	event.subscribe<int>("WIN_GAME", [=](const int NON) { menu->initStartMenu();
+		player->guns[1] = nullptr; player->guns[2] = nullptr; invent->takeItem(itemManager->getGunByIndex(2), 1);
+	player->setGun(itemManager->getGunByIndex(2), 1);
+		});
+
 	event.subscribe<RenderState*>("SWAP_STATE", [=](RenderState* state) {
-		if (state)
-		{
-			currentState = state;
-		}
+		if (state) { currentState = state; }
 		else
 		{
 			currentState = &playState;
 			auto& state = GameState::getInstance();
-			SoundManager::stopAllSound();
-			if (state.data.isLevelBase) { SoundManager::playerMusic(BaseSound); }
-			else { SoundManager::playerMusic(LevelSound); }
-		}});
+		}
+		});
 
 	menu->initStartMenu();
-
-	//player->enemy->spMap.nowHealPoint = 100.0f; // ÂÛÐÅÇÀÒÜ ÏÎÒÎÌ
-	//player->money = 1000; // ÂÛÐÅÇÀÒÜ ÏÎÒÎÌ
 }
 
 Game::~Game()
@@ -77,6 +72,10 @@ void Game::initPlayer()
 	player->kick = itemManager->getGunByIndex(0);
 	player->setGun(itemManager->getGunByIndex(1), 0);
 	player->nowHeal = invent->takeMaxHeal();
+
+	auto& state = GameState::getInstance();
+	player->mouseSpeed = state.data.mouseSpeed;
+
 	auto& data = Data::getInstance();
 	PlayerDef plDef = data.getPlayerData();
 
