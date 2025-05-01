@@ -31,7 +31,7 @@ QuestManager::~QuestManager()
     dataBase.saveQuest(questData);
 }
 
-void QuestManager::addQuest(QuestData data) 
+void QuestManager::addQuest(QuestData data)
 { 
     for (size_t i = 0; i < quests.size(); i++)
     {
@@ -47,9 +47,21 @@ void QuestManager::updateQuests(QuestType type, int value)
 {
     for (auto quest : quests) 
     {
-        if (quest->data.type == type)
+        if (quest && quest->data.type == type)
         {
             quest->updateProgress(value);
+        }
+    }
+}
+
+void QuestManager::deleteAllQuest()
+{
+    for (size_t i = 0; i < quests.size(); i++)
+    {
+        if (quests[i])
+        {
+            delete quests[i];
+            quests[i] = nullptr;
         }
     }
 }

@@ -448,7 +448,7 @@ void PortalNpc::use() {}
 
 MechanicNpc::MechanicNpc(SpriteDef spDef, MapSprite spMap, NpcDef npcDef,
 	UIManager* uiManager, ItemManager* itemManager, Player* player, int _id) : 
-	FuncNpc(spDef, spMap, npcDef, itemManager, uiManager, player, _id), nowGun{ nullptr } {}
+	FuncNpc(spDef, spMap, npcDef, itemManager, uiManager, player, _id), typeUpgade{ -1 } {}
 
 void MechanicNpc::init()
 {
@@ -460,32 +460,39 @@ void MechanicNpc::init()
 	{
 		uiManager->deleteNow();
 
-		uiManager->initMechanic(player, nowGun);
+		uiManager->initMechanic(player, (choose == -1 ? nullptr : player->guns[choose]));
 	}
+}
+
+void MechanicNpc::stop()
+{
+	FuncNpc::stop();
+	typeUpgade = -1;
 }
 
 void MechanicNpc::use()
 {
-	if (choose == -1) return;
-	if (!nowGun) return;
+	if (choose == -1 || typeUpgade == -1) return;
+
+	Gun* nowGun = player->guns[choose];
+
 	if (player->money < 50 || player->details < 15 || nowGun->upgradeCount > 5) return;
 
 	player->money -= 50;
 	player->details -= 15;
 	
 	Improve* imp = nullptr;
-
-	if (choose == 101)
+	if (typeUpgade == 101)
 	{
 		imp = nowGun->deleteImprove(Damage);
 		nowGun->damage += 3;
 	}
-	else if (choose == 102)
+	else if (typeUpgade == 102)
 	{
 		imp = nowGun->deleteImprove(Magazin);
 		nowGun->maxCount += 5;
 	}
-	else if (choose == 103)
+	else if (typeUpgade == 103)
 	{
 		imp = nowGun->deleteImprove(Spread);
 		nowGun->maxRad += 3;
@@ -494,7 +501,7 @@ void MechanicNpc::use()
 	nowGun->trySetImprove(imp);
 	nowGun->upgradeCount++;
 	
-	nowGun = nullptr;
+	typeUpgade = -1;
 	choose = -1;
 	init();
 }
@@ -511,13 +518,13 @@ void MechanicNpc::check()
 	}
 	else if (nowKey == 1 || nowKey == 2)
 	{
-		nowGun = player->guns[nowKey];
+		choose = nowKey;
 		init();
 		return;
 	}
 	else
 	{
-		choose = nowKey;
+		typeUpgade = nowKey;
 	}
 }
 
@@ -563,7 +570,7 @@ void QuestNpc::check()
 	}
 	else if (nowKey == -300)
 	{
-		int type = Random::intRandom(0, 3);
+		int type = Random::intRandom(0, 2);
 		QuestData data;
 		data.progress = 0;
 		data.type = QuestType(type);

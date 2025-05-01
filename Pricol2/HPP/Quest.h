@@ -46,6 +46,8 @@ public:
         return instance;
     }
 
+    void deleteAllQuest();
+
     void addQuest(QuestData data);
 
     void updateQuests(QuestType type, int value);

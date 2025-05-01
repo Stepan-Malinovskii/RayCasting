@@ -9,34 +9,34 @@ Menu::Menu(sf::RenderWindow* _window, UIManager* _uiManager, Player* _player) :
 void Menu::initStartMenu()
 {
 	auto& event = EventSystem::getInstance();
+	event.trigger<RenderState*>("SWAP_STATE", &startMenuState);
 	window->setMouseCursorVisible(true);
 	uiManager->initStartMenu();
-	event.trigger<RenderState*>("SWAP_STATE", &startMenuState);
 	SoundManager::playerMusic(MenuSound);
 }
 
 void Menu::initGameMenu()
 {
 	auto& event = EventSystem::getInstance();
+	event.trigger<RenderState*>("SWAP_STATE", &gameMenuState);
 	window->setMouseCursorVisible(true);
 	uiManager->initGameMenu();
-	event.trigger<RenderState*>("SWAP_STATE", &gameMenuState);
 }
 
 void Menu::initSetting()
 {
 	auto& event = EventSystem::getInstance();
+	event.trigger<RenderState*>("SWAP_STATE", &settingState);
 	window->setMouseCursorVisible(true);
 	uiManager->initSetting();
-	event.trigger<RenderState*>("SWAP_STATE", &settingState);
 }
 
 void Menu::stop()
 {
 	auto& event = EventSystem::getInstance();
+	event.trigger<RenderState*>("SWAP_STATE", nullptr);
 	window->setMouseCursorVisible(false);
 	uiManager->deleteNow();
-	event.trigger<RenderState*>("SWAP_STATE", nullptr);
 	SoundManager::playerMusic(BaseSound);
 }
 

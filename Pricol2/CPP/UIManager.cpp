@@ -516,12 +516,12 @@ void UIManager::initMechanic(Player* player, Gun* choose)
 		percShape.setFillColor(sf::Color(50, 50, 50));
 		Group percGroup(percShape, text);
 
-		percGroup.setString(L"сбекхврэ спнм мю +3");
+		percGroup.setString(L"сбекхвхрэ спнм мю +3");
 		buttons.push_back(percGroup);
 		buttons.back().setFunc([=]() {keyButton = 101;});
 		percGroup.move({0.0f, percGroup.getSize().y + 10.0f});
 
-		percGroup.setString(L"сбекхврэ пюглеп нанилш мю +5");
+		percGroup.setString(L"сбекхвхрэ пюглеп нанилш мю +5");
 		buttons.push_back(percGroup);
 		buttons.back().setFunc([=]() {keyButton = 102;});
 		percGroup.move({ 0.0f, percGroup.getSize().y + 10.0f });

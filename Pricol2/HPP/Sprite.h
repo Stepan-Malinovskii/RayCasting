@@ -146,7 +146,7 @@ public:
 		UIManager* uiManager, Player* player, int id);
 
 	virtual void init() override = 0;
-	void stop() override;
+	virtual void stop() override;
 	virtual void use() override = 0;
 	void update(int chooseKey) override;
 protected:
@@ -205,10 +205,11 @@ public:
 		ItemManager* itemManager, Player* player, int _id);
 	void init() override;
 	void use() override;
+	virtual void stop() override;
 private:
 	void check() override;
 
-	Gun* nowGun;
+	int typeUpgade;
 };
 
 class QuestNpc : public FuncNpc
@@ -239,18 +240,18 @@ static std::vector<TraderDef> traderDefs = {
 
 static std::vector<EnemyDef> enemyDefs = {
 	{true,  0.0f,  0.0f,  0,  0.0f, 5.0f, 0.0f },
-	{true,  5.0f,  5.0f,  10, 1.5f, 3.0f, 70.0f  },
-	{true,  5.0f,  8.0f,  15, 1.0f, 4.0f, 90.0f  },
-	{true,  5.0f,  10.0f, 20, 1.5f, 5.0f, 100.0f },
-	{true,  20.0f, 8.0f,  25, 1.0f, 4.0f, 120.0f },
-	{true,  20.0f, 10.0f, 30, 1.0f, 5.0f, 200.0f },
-	{true,  5.0f,  12.0f, 35, 1.5f, 6.0f, 150.0f },
-	{true,  20.0f, 20.0f, 40, 1.5f, 3.0f, 300.0f },
-	{true,  5.0f,  15.0f, 45, 1.5f, 6.0f, 200.0f },
-	{true,  5.0f,  20.0f, 50, 1.5f, 6.0f, 200.0f },
-	{true,  20.0f, 22.0f, 55, 1.0f, 5.0f, 180.0f },
-	{false, 20.0f, 35.0f, 60, 1.5f, 4.0f, 300.0f },
-	{true,  5.0f,  26.0f, 65, 1.5f, 4.0f, 320.0f },
+	{true,  5.0f,  5.0f,  3, 1.5f, 3.0f, 70.0f  },
+	{true,  5.0f,  8.0f,  5, 1.0f, 4.0f, 90.0f  },
+	{true,  5.0f,  10.0f, 7, 1.5f, 5.0f, 100.0f },
+	{true,  20.0f, 8.0f,  9, 1.0f, 4.0f, 120.0f },
+	{true,  20.0f, 10.0f, 10, 1.0f, 5.0f, 200.0f },
+	{true,  5.0f,  12.0f, 13, 1.5f, 6.0f, 150.0f },
+	{true,  20.0f, 20.0f, 14, 1.5f, 3.0f, 300.0f },
+	{true,  5.0f,  15.0f, 15, 1.5f, 6.0f, 200.0f },
+	{true,  5.0f,  20.0f, 18, 1.5f, 6.0f, 200.0f },
+	{true,  20.0f, 22.0f, 19, 1.0f, 5.0f, 180.0f },
+	{false, 20.0f, 35.0f, 20, 1.5f, 4.0f, 300.0f },
+	{true,  5.0f,  26.0f, 25, 1.5f, 4.0f, 320.0f },
 	{true,  5.0f,  30.0f, 10, 1.5f, 5.0f, 2000.0f}
 };
 

@@ -37,19 +37,24 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 
 	event.subscribe<int>("RESET_GAME", [=](const int NON) { currentState = &playState;
 	player->guns[1] = nullptr; player->guns[2] = nullptr; invent->takeItem(itemManager->getGunByIndex(2), 1);
-	player->setGun(itemManager->getGunByIndex(2), 1);});
+	player->setGun(itemManager->getGunByIndex(2), 1);
+	auto& questM = QuestManager::getInstance();
+	questM.deleteAllQuest();
+		});
 
 	event.subscribe<int>("WIN_GAME", [=](const int NON) { menu->initStartMenu();
 		player->guns[1] = nullptr; player->guns[2] = nullptr; invent->takeItem(itemManager->getGunByIndex(2), 1);
 	player->setGun(itemManager->getGunByIndex(2), 1);
+	auto& questM = QuestManager::getInstance();
+	questM.deleteAllQuest();
 		});
 
 	event.subscribe<RenderState*>("SWAP_STATE", [=](RenderState* state) {
+		uiManager->deleteNow();
 		if (state) { currentState = state; }
 		else
 		{
 			currentState = &playState;
-			auto& state = GameState::getInstance();
 		}
 		});
 
