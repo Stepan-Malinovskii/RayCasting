@@ -55,15 +55,15 @@ public:
 	sf::Vector2f getSize() { return shape.getSize(); }
 	sf::Vector2f getPosition() { return shape.getPosition(); }
 
-	sf::RectangleShape shape;
-	sf::Text text;
-private:
 	void centrlized()
 	{
 		shape.setOrigin({ shape.getLocalBounds().width / 2, shape.getLocalBounds().height / 2 });
 		text.setOrigin({ text.getLocalBounds().width / 2, text.getLocalBounds().height / 2 });
 		text.setPosition({ shape.getPosition().x, shape.getPosition().y - text.getCharacterSize() / 4 });
 	}
+
+	sf::RectangleShape shape;
+	sf::Text text;
 };
 
 class Button : public sf::Drawable
@@ -73,8 +73,10 @@ public:
 	Button(Group _group);
 	Button() = default;
 
+	void move(sf::Vector2f delta);
 	void setFillColor(sf::Color color);
 	void setPosition(sf::Vector2f);
+	void setSize(sf::Vector2f size);
 	sf::Vector2f getPosition();
 	sf::Vector2f getSize();
 	void setString(std::wstring data);
@@ -84,9 +86,10 @@ public:
 	void setFunc(std::function<void()>&& _fn);
 	bool isClicked(sf::Vector2i& mousePos);
 	void use();
+
+	Group group;
 private:
 	std::function<void()> fn;
-	Group group;
 
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 };

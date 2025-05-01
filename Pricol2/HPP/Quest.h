@@ -50,7 +50,7 @@ public:
 
     void updateQuests(QuestType type, int value);
 
-    void deleteQuest(Quest* quest);
+    int deleteQuest(Quest* quest);
 
     std::vector<Quest*> quests;
 private:

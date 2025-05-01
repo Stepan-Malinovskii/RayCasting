@@ -419,6 +419,8 @@ void ChangerNpc::use()
 
 	player->details -= 10;
 	player->money += 10 * coef;
+	auto& questM = QuestManager::getInstance();
+	questM.updateQuests(CollectionMoney, 10 * coef);
 
 	init();
 }
@@ -521,7 +523,7 @@ void MechanicNpc::check()
 
 QuestNpc::QuestNpc(SpriteDef spDef, MapSprite spMap, NpcDef npcDef,
 	UIManager* uiManager, ItemManager* itemManager, Player* player, int _id) :
-	FuncNpc(spDef, spMap, npcDef, itemManager, uiManager, player, _id), quest{ nullptr }  {}
+	FuncNpc(spDef, spMap, npcDef, itemManager, uiManager, player, _id)  {}
 
 void QuestNpc::init()
 {
@@ -533,28 +535,20 @@ void QuestNpc::init()
 	{
 		uiManager->deleteNow();
 
-		uiManager->initQuest(quest);
+		auto& questM = QuestManager::getInstance();
+		uiManager->initQuest((choose == -1 ? nullptr : questM.quests[choose - 1]), player);
 	}
 }
 
 void QuestNpc::use()
 {
-	if (nowKey == -1) return;
-	if (!quest) return;
+	if (choose == -1) return;
 
-	if (nowKey == 101)
-	{
-		if (quest->isCompleted())
-		{
-			player->money += quest->data.rewardCoins;
+	auto& questM = QuestManager::getInstance();
+	player->money += questM.deleteQuest(questM.quests[choose - 1]);
 
-			auto& questM = QuestManager::getInstance();
-			questM.deleteQuest(quest);
-
-			quest = nullptr;
-			init();
-		}
-	}
+	choose = -1;
+	init();
 }
 
 void QuestNpc::check()
@@ -577,17 +571,17 @@ void QuestNpc::check()
 		if (type == 0)
 		{
 			data.target = Random::intRandom(5, 15);
-			data.rewardCoins = data.target * 10;
+			data.rewardCoins = Random::intRandom(data.target * 10, data.target * 15);
 		}
 		else if (type == 1)
 		{
 			data.target = Random::intRandom(100, 300);
-			data.rewardCoins = (int)(data.target * 1.3f);
+			data.rewardCoins = Random::intRandom((int)(data.target * 1.1f), (int)(data.target * 1.3f));
 		}
 		else if (type == 2)
 		{
 			data.target = Random::intRandom(10, 25);
-			data.rewardCoins = data.target * 10;
+			data.rewardCoins = data.rewardCoins = Random::intRandom(data.target * 10, data.target * 15);
 		}
 		
 		auto& questM = QuestManager::getInstance();
@@ -597,9 +591,7 @@ void QuestNpc::check()
 	}
 	else if (nowKey == 1 || nowKey == 2 || nowKey == 3)
 	{
-		auto& questM = QuestManager::getInstance();
-		quest = questM.quests[QuestType(nowKey)];
-
+		choose = nowKey;
 		init();
 	}
 }

@@ -289,7 +289,13 @@ bool SpriteManager::isEnemyHit(Enemy* enemy)
 void SpriteManager::killEnemy(Enemy* enem)
 {
 	enem->changeState(Dead);
-	player->details += Random::intRandom((int)(enem->enemyDef.midleDrop * 0.8f), (int)(enem->enemyDef.midleDrop * 1.2f));
+
+	int details = Random::intRandom((int)(enem->enemyDef.midleDrop * 0.8f), (int)(enem->enemyDef.midleDrop * 1.2f));
+	player->details += details;
+	auto& questM = QuestManager::getInstance();
+	questM.updateQuests(CollectionDetails, details);
+	questM.updateQuests(KillMonster, 1);
+
 	nowMap->deleteInBlockMap(enem);
 
 	for (int i = 0; i < enemys.size(); i++)

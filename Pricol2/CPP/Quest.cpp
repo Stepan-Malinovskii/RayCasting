@@ -9,6 +9,7 @@ bool Quest::isCompleted() { return data.progress >= data.target; }
 
 QuestManager::QuestManager()
 {
+    quests = std::vector<Quest*>(3);
     auto& dataBase = Data::getInstance();
     auto questData = dataBase.getQuest();
 
@@ -23,14 +24,24 @@ QuestManager::~QuestManager()
     std::vector<QuestData> questData;
     for (auto q : quests)
     {
-        questData.push_back(q->data); 
+        if (q) { questData.push_back(q->data); }
     }
 
     auto& dataBase = Data::getInstance();
     dataBase.saveQuest(questData);
 }
 
-void QuestManager::addQuest(QuestData data) { quests.push_back(new Quest(data)); }
+void QuestManager::addQuest(QuestData data) 
+{ 
+    for (size_t i = 0; i < quests.size(); i++)
+    {
+        if (!quests[i])
+        {
+            quests[i] = new Quest(data);
+            break;
+        }
+    }
+}
 
 void QuestManager::updateQuests(QuestType type, int value)
 {
@@ -43,15 +54,20 @@ void QuestManager::updateQuests(QuestType type, int value)
     }
 }
 
-void QuestManager::deleteQuest(Quest* quest) 
+int QuestManager::deleteQuest(Quest* quest) 
 {
+    int reward = 0;
     for (size_t i = 0; i < quests.size(); i++)
     {
         if (quests[i] == quest)
         {
-            quests.erase(quests.begin() + i);
+            reward = quest->data.rewardCoins;
+            delete quest;
+            quests[i] = nullptr;
             break;
         }
     }
+
+    return reward;
 }
 

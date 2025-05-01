@@ -252,13 +252,109 @@ void UIManager::initSetting()
 	}
 }
 
-void UIManager::initQuest(Quest* quest)
+void UIManager::initQuest(Quest* quest, Player* player)
 {
 	background = sf::Sprite(Resources::tradeBackground);
 	background.setScale({ (float)SCREEN_W / Resources::tradeBackground.getSize().x,
 		(float)SCREEN_H / Resources::tradeBackground.getSize().y });
 
+	sf::Text text(L"Баланс: " + std::to_wstring(player->money) + L" | Запчасти: " + std::to_wstring(player->details), Resources::UIFont, 50);
+	sf::RectangleShape shape({ text.getLocalBounds().width + 10.0f, text.getLocalBounds().height + 10.0f});
+	shape.setFillColor(sf::Color(70, 70, 70));
+	shape.setPosition({ (float)SCREEN_W / 2, shape.getSize().y / 2 + 10.0f });
+	Button button(Group(shape, text));
+	buttons.push_back(button);
 
+	text.setString(L"Взять новый квест");
+	shape.setSize({text.getLocalBounds().width + 10.0f, text.getLocalBounds().height + 10.0f});
+	Button newQuest(Group(shape, text));
+	newQuest.setFunc([=]() {keyButton = -300; });
+
+	text.setCharacterSize(30);
+	shape.setSize({DIALOG_W / 3, DIALOG_H / 3 - 20.0f});
+	shape.setPosition({shape.getSize().x, shape.getSize().y / 2 + 90.0f});
+	Button totalQuest(Group(shape, text));
+
+	auto& questM = QuestManager::getInstance();
+	auto total = questM.quests;
+	std::wstringstream oss;
+	for (size_t i = 0; i < total.size(); i++)
+	{
+		if (total[i]) // квест есть
+		{
+			if (total[i]->data.type == KillMonster)
+			{
+				oss << L"Охотник на монстров";
+				oss << L"\n";
+				oss << L"Убей " << total[i]->data.target << L" монстров";
+			}
+			else if (total[i]->data.type == CollectionMoney)
+			{
+				oss << L"Капиталист";
+				oss << L"\n";
+				oss << L"Заработай " << total[i]->data.target << L" монет";
+			}
+			else if (total[i]->data.type == CollectionDetails)
+			{
+				oss << L"Сбор запчастей";
+				oss << L"\n";
+				oss << L"Собери " << total[i]->data.target << L" запчастей";
+			}
+
+			oss << L"\n";
+			oss << L"Статус: " << (total[i]->isCompleted() ? L"Завершен" : L"В процессе");
+			oss << L"\n";
+			oss << L"Награда: " << total[i]->data.rewardCoins << L" монет";
+			oss << L"\n";
+			oss << L"Прогресс: " << total[i]->data.progress << L" / " << total[i]->data.target;
+
+			totalQuest.setString(oss.str());
+			totalQuest.setFunc([=]() {keyButton = (int)(i + 1);});
+
+			if (total[i] == quest)
+			{
+				totalQuest.setFillColor(sf::Color::Red);
+			}
+
+			buttons.push_back(totalQuest);
+			totalQuest.setFillColor(sf::Color(70, 70, 70));
+			oss.clear();
+			oss.str(L"");
+		}
+		else // квеста нет
+		{
+			newQuest.setPosition(totalQuest.getPosition());
+			buttons.push_back(newQuest);
+		}
+
+		totalQuest.move({0, totalQuest.getSize().y + 5.0f});
+	}
+
+	if (quest)
+	{
+		Button dataButton(Group(shape, text));
+		if (quest->isCompleted())
+		{
+			dataButton.setString(L"Получить награду");
+			dataButton.setFunc([=]() {keyButton = -200;});
+		}
+		else
+		{
+			dataButton.setString(L"Задание не выполнено");
+		}
+
+		dataButton.setSize({dataButton.group.text.getLocalBounds().width + 10.0f, dataButton.group.text.getLocalBounds().height + 10.0f});
+		dataButton.setPosition({ totalQuest.getPosition().x + totalQuest.getSize().x / 2 + dataButton.getSize().x / 2 + 10.0f , SCREEN_H / 2});
+		buttons.push_back(dataButton);
+	}
+
+	text.setCharacterSize(50);
+	text.setString(L"В\nЫ\nХ\nО\nД");
+	shape.setSize({ text.getLocalBounds().width + 10.0f, text.getLocalBounds().height + 10.0f });
+	shape.setPosition({ (float)SCREEN_W - shape.getSize().x - 5.0f, (float)SCREEN_H / 2 });
+	button = Button(Group(shape, text));
+	button.setFunc([=]() { keyButton = -100; });
+	buttons.push_back(button);
 }
 
 void UIManager::initTrade(std::map<int, Itemble*> variants, Player* player)

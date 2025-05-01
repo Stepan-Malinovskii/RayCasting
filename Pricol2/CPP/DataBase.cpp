@@ -111,6 +111,7 @@ std::vector<QuestData> Data::getQuest()
 	{
 		QuestData quest;
 		in.read(reinterpret_cast<char*>(&quest), sizeof(quest));
+		quests[i] = quest;
 	}
 
 	in.close();

@@ -14,12 +14,24 @@ sf::Vector2f Button::getSize() { return group.getSize(); }
 
 void Button::setString(std::wstring data) { group.setString(data); }
 
+void Button::move(sf::Vector2f delta)
+{
+	group.shape.move(delta);
+	group.text.move(delta);
+}
+
 void Button::setFillColor(sf::Color color)
 {
 	group.shape.setFillColor(color);
 }
 
 void Button::setPosition(sf::Vector2f pos) { group.setPosition(pos); }
+
+void Button::setSize(sf::Vector2f size)
+{
+	group.setSize(size);
+	group.centrlized();
+}
 
 bool Button::isClicked(sf::Vector2i& mousePos)
 {

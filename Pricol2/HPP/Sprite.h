@@ -220,8 +220,6 @@ public:
 	void use() override;
 private:
 	void check() override;
-
-	Quest* quest;
 };
 
 static std::vector<NpcDef> npcDefs = {
