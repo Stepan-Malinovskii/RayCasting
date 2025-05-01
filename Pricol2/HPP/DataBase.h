@@ -8,6 +8,7 @@
 #include <string>
 #include <tuple>
 #include "Player.h"
+#include "Quest.h"
 #include <codecvt>
 #include <locale>
 
@@ -46,6 +47,9 @@ public:
 	std::vector<std::pair<int, int>> getInvent();
 	void saveInvent(std::vector<std::pair<int, int>> inv);
 
+	std::vector<QuestData> getQuest();
+	void saveQuest(std::vector<QuestData> quests);
+
 	std::vector<int> getKeys(int key);
 	std::pair<std::wstring, int> getText(int key);
 private:
@@ -70,16 +74,8 @@ public:
 
 	GameStateData data;
 private:
-	GameState()
-	{
-		auto& dataBase = Data::getInstance();
-		data = dataBase.getGameState();
-	}
-	~GameState()
-	{
-		auto& dataBase = Data::getInstance();
-		dataBase.saveGameState(data);
-	}
+	GameState();
+	~GameState();
 };
 
 #endif // !DATA

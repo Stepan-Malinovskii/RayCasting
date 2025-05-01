@@ -90,7 +90,7 @@ void SpriteManager::createEnemy(MapSprite mapSprite, SpriteDef def)
 void SpriteManager::createNpc(MapSprite mapSprite, SpriteDef def)
 {
 	auto npcDef = npcDefs[mapSprite.spriteDefId - ENEMY_COUNT];
-	if (npcDef.type == Trader)
+	if (npcDef.type == TraderNpcType)
 	{
 		TraderDef tradeDef;
 		for (auto t : traderDefs)
@@ -109,17 +109,21 @@ void SpriteManager::createNpc(MapSprite mapSprite, SpriteDef def)
 	{
 		allSprites->push_back(std::make_shared<TravelerNpc>(TravelerNpc(def, mapSprite, npcDef, uiManager, itemManager, player.get(), id)));
 	}
-	else if (npcDef.type == Changer)
+	else if (npcDef.type == ChangerNpcType)
 	{
 		allSprites->push_back(std::make_shared<ChangerNpc>(ChangerNpc(def, mapSprite, npcDef, uiManager, itemManager, player.get(), id)));
 	}
-	else if (npcDef.type == Portal)
+	else if (npcDef.type == PortalNpcType)
 	{
 		allSprites->push_back(std::make_shared<PortalNpc>(PortalNpc(def, mapSprite, npcDef, uiManager, itemManager, player.get(), id)));
 	}
-	else if (npcDef.type == Mechanic)
+	else if (npcDef.type == MechanicNpcType)
 	{
 		allSprites->push_back(std::make_shared<MechanicNpc>(MechanicNpc(def, mapSprite, npcDef, uiManager, itemManager, player.get(), id)));
+	}
+	else if (npcDef.type == QuestNpcType)
+	{
+		allSprites->push_back(std::make_shared<QuestNpc>(QuestNpc(def, mapSprite, npcDef, uiManager, itemManager, player.get(), id)));
 	}
 	else
 	{

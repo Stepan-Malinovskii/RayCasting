@@ -75,6 +75,7 @@ std::vector<std::pair<int, int>> Data::getInvent()
 		in.read(reinterpret_cast<char*>(&second), sizeof(second));
 		inv[i] = {first, second};
 	}
+
 	in.close();
 
 	return inv;
@@ -92,6 +93,42 @@ void Data::saveInvent(std::vector<std::pair<int, int>> inv)
 	{
 		out.write(reinterpret_cast<const char*>(&it.first), sizeof(it.first));
 		out.write(reinterpret_cast<const char*>(&it.second), sizeof(it.second));
+	}
+
+	out.close();
+}
+
+std::vector<QuestData> Data::getQuest()
+{
+	std::ifstream in{ "Data/Quest.qst", std::ios::in | std::ios::binary };
+	if (!in.is_open()) return {};
+
+	size_t size;
+	in.read(reinterpret_cast<char*>(&size), sizeof(size));
+	std::vector<QuestData> quests(size);
+
+	for (size_t i = 0; i < size; i++)
+	{
+		QuestData quest;
+		in.read(reinterpret_cast<char*>(&quest), sizeof(quest));
+	}
+
+	in.close();
+
+	return quests;
+}
+
+void Data::saveQuest(std::vector<QuestData> quests)
+{
+	std::ofstream out{ "Data/Quest.qst", std::ios::out | std::ios::binary };
+	if (!out.is_open()) return;
+
+	size_t size = quests.size();
+	out.write(reinterpret_cast<const char*>(&size), sizeof(size));
+
+	for (auto q : quests)
+	{
+		out.write(reinterpret_cast<const char*>(&q), sizeof(q));
 	}
 
 	out.close();
@@ -271,4 +308,16 @@ void Data::saveGunData(std::vector<GunData> guns)
 	}
 
 	out.close();
+}
+
+GameState::GameState()
+{
+	auto& dataBase = Data::getInstance();
+	data = dataBase.getGameState();
+}
+
+GameState::~GameState()
+{
+	auto& dataBase = Data::getInstance();
+	dataBase.saveGameState(data);
 }

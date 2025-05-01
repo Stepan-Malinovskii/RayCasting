@@ -7,6 +7,7 @@
 #include <functional>
 #include <algorithm>
 #include "Animation.h"
+#include "Quest.h"
 #include <memory>
 #include <set>
 #include <iostream>
@@ -32,7 +33,7 @@ enum EnemyState
 
 enum NpcType
 {
-	Dilog, Trader, Traveler, Changer, Quest, Mechanic, Portal
+	Dilog, TraderNpcType, Traveler, ChangerNpcType, QuestNpcType, MechanicNpcType, PortalNpcType
 };
 
 struct MapSprite
@@ -210,14 +211,27 @@ private:
 	Gun* nowGun;
 };
 
+class QuestNpc : public FuncNpc
+{
+public:
+	QuestNpc(SpriteDef spDef, MapSprite spMap, NpcDef npcDef, UIManager* uiManager,
+		ItemManager* itemManager, Player* player, int _id);
+	void init() override;
+	void use() override;
+private:
+	void check() override;
+
+	Quest* quest;
+};
+
 static std::vector<NpcDef> npcDefs = {
-	{Portal, 1},
-	{Trader, 4},
-	{Trader, 5},
-	{Changer, 3},
+	{PortalNpcType, 1},
+	{TraderNpcType, 4},
+	{TraderNpcType, 5},
+	{ChangerNpcType, 3},
 	{Traveler, 2},
-	{Quest, 6},
-	{Mechanic, 7}
+	{QuestNpcType, 6},
+	{MechanicNpcType, 7}
 };
 
 static std::vector<TraderDef> traderDefs = {

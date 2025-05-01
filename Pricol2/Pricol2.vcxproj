@@ -152,6 +152,7 @@
     <ClCompile Include="CPP\Menu.cpp" />
     <ClCompile Include="CPP\Player.cpp" />
     <ClCompile Include="CPP\main.cpp" />
+    <ClCompile Include="CPP\Quest.cpp" />
     <ClCompile Include="CPP\Randomizer.cpp" />
     <ClCompile Include="CPP\Raycast.cpp" />
     <ClCompile Include="CPP\Renderer.cpp" />
@@ -177,6 +178,7 @@
     <ClInclude Include="HPP\MapManager.h" />
     <ClInclude Include="HPP\Menu.h" />
     <ClInclude Include="HPP\Player.h" />
+    <ClInclude Include="HPP\Quest.h" />
     <ClInclude Include="HPP\Randomizer.h" />
     <ClInclude Include="HPP\Raycast.h" />
     <ClInclude Include="HPP\Renderer.h" />

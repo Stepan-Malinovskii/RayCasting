@@ -81,6 +81,9 @@
     <ClCompile Include="CPP\Weapon.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="CPP\Quest.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HPP\Animation.h">
@@ -153,6 +156,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="HPP\Weapon.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="HPP\Quest.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

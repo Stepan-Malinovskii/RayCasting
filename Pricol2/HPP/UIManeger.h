@@ -25,6 +25,7 @@ public:
 	void initStartMenu();
 	void initGameMenu();
 	void initSetting();
+	void initQuest(Quest* quest);
 	void initTrade(std::map<int, Itemble*> variants, Player* player);
 	void initMechanic(Player* player, Gun* choose);
 	void initChanger(int coef, Player* player);

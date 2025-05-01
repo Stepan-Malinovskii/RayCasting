@@ -314,7 +314,7 @@ void FuncNpc::check()
 
 TradeNpc::TradeNpc(SpriteDef spDef, MapSprite spMap, TraderDef _tradeDef,
 	ItemManager* _itemManager, UIManager* uiManager, Player* _player, int _id) : 
-	FuncNpc(spDef, spMap, NpcDef{Trader, _tradeDef.startKey}, _itemManager, uiManager, _player, _id), tradeDef{_tradeDef} {}
+	FuncNpc(spDef, spMap, NpcDef{TraderNpcType, _tradeDef.startKey}, _itemManager, uiManager, _player, _id), tradeDef{_tradeDef} {}
 
 void TradeNpc::init()
 {
@@ -511,10 +511,95 @@ void MechanicNpc::check()
 	{
 		nowGun = player->guns[nowKey];
 		init();
-		return;	
+		return;
 	}
 	else
 	{
 		choose = nowKey;
+	}
+}
+
+QuestNpc::QuestNpc(SpriteDef spDef, MapSprite spMap, NpcDef npcDef,
+	UIManager* uiManager, ItemManager* itemManager, Player* player, int _id) :
+	FuncNpc(spDef, spMap, npcDef, itemManager, uiManager, player, _id), quest{ nullptr }  {}
+
+void QuestNpc::init()
+{
+	if (!isFunc)
+	{
+		Npc::init();
+	}
+	else
+	{
+		uiManager->deleteNow();
+
+		uiManager->initQuest(quest);
+	}
+}
+
+void QuestNpc::use()
+{
+	if (nowKey == -1) return;
+	if (!quest) return;
+
+	if (nowKey == 101)
+	{
+		if (quest->isCompleted())
+		{
+			player->money += quest->data.rewardCoins;
+
+			auto& questM = QuestManager::getInstance();
+			questM.deleteQuest(quest);
+
+			quest = nullptr;
+			init();
+		}
+	}
+}
+
+void QuestNpc::check()
+{
+	if (nowKey == -100)
+	{
+		stop();
+	}
+	else if (nowKey == -200)
+	{
+		use();
+	}
+	else if (nowKey == -300)
+	{
+		int type = Random::intRandom(0, 3);
+		QuestData data;
+		data.progress = 0;
+		data.type = QuestType(type);
+
+		if (type == 0)
+		{
+			data.target = Random::intRandom(5, 15);
+			data.rewardCoins = data.target * 10;
+		}
+		else if (type == 1)
+		{
+			data.target = Random::intRandom(100, 300);
+			data.rewardCoins = (int)(data.target * 1.3f);
+		}
+		else if (type == 2)
+		{
+			data.target = Random::intRandom(10, 25);
+			data.rewardCoins = data.target * 10;
+		}
+		
+		auto& questM = QuestManager::getInstance();
+		questM.addQuest(data);
+
+		init();
+	}
+	else if (nowKey == 1 || nowKey == 2 || nowKey == 3)
+	{
+		auto& questM = QuestManager::getInstance();
+		quest = questM.quests[QuestType(nowKey)];
+
+		init();
 	}
 }

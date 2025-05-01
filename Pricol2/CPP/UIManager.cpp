@@ -252,6 +252,15 @@ void UIManager::initSetting()
 	}
 }
 
+void UIManager::initQuest(Quest* quest)
+{
+	background = sf::Sprite(Resources::tradeBackground);
+	background.setScale({ (float)SCREEN_W / Resources::tradeBackground.getSize().x,
+		(float)SCREEN_H / Resources::tradeBackground.getSize().y });
+
+
+}
+
 void UIManager::initTrade(std::map<int, Itemble*> variants, Player* player)
 {
 	background = sf::Sprite(Resources::tradeBackground);
