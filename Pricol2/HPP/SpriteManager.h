@@ -25,6 +25,7 @@ private:
 	void killEnemy(Enemy* enem);
 	EnemyState determineNewState(Enemy* enemy, float distance);
 	void createSpriteFromMapSprite(MapSprite mapSprite);
+	void createConverter(MapSprite mapSprite, SpriteDef def);
 	void createEnemy(MapSprite mapSprite, SpriteDef def);
 	void createPlayer(MapSprite mapSprite, SpriteDef def, PlayerDef plDef);
 	void createNpc(MapSprite mapSprite, SpriteDef );

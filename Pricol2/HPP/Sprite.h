@@ -13,7 +13,7 @@
 #include <iostream>
 
 constexpr float PI = 3.14159265359f, TRIGER_DIST_MAX = 80, TRIGER_DIST_MIN = 40;
-constexpr int ENEMY_COUNT = 14;
+constexpr int ENEMY_MAX_INDEX = 12;
 
 class Map;
 class Gun;
@@ -23,7 +23,7 @@ class ItemManager;
 
 enum class SpriteType
 {
-	Enemy, PlayerT, NPC
+	Enemy, PlayerT, NPC, Convertor, Boss
 };
 
 enum EnemyState
@@ -64,6 +64,11 @@ struct EnemyDef
 	float maxHealpoint;
 };
 
+struct ConverterDef
+{
+	std::vector<int> callingIndex;
+};
+
 struct NpcDef
 {
 	NpcType type;
@@ -97,18 +102,20 @@ class Enemy : public Sprite
 public:
 	Enemy(SpriteDef spDef, MapSprite spMap, EnemyDef enemyDef, int id);
 	virtual ~Enemy() = default;
-	std::pair<int, bool> getTextIndex() override;
+	virtual std::pair<int, bool> getTextIndex() override;
+	virtual void death();
+	virtual void attack(Player* player);
 	void update(float deltaTime);
 	void move(Map* map, sf::Vector2f move);
 	void takeDamage(float damage);
 	bool canChangeState();
-	void changeState(EnemyState newState);
+	virtual void changeState(EnemyState newState);
 
 	EnemyDef enemyDef;
 	bool isCanAttack = false;
 	bool isAtack = false;
 	Animator<int> animr;
-private:
+protected:
 	float timeAtecked, nowTimeAtack;
 	bool isDamaged;
 	EnemyState state;
@@ -116,6 +123,17 @@ private:
 	void updateTimeSinceLastAttack(float deltaTime);
 	void updateTimeSinceDamaged(float deltaTime);
 	bool checkCollision(Map* map, sf::Vector2f newPos, bool xAxis);
+};
+
+class Converter : public Enemy
+{
+public:
+	Converter(SpriteDef spDef, MapSprite spMap, EnemyDef enemyDef, ConverterDef cDef, int id);
+	void death() override;
+	void attack(Player* plaer) override;
+	void changeState(EnemyState newState) override;
+
+	ConverterDef cDef;
 };
 
 class Npc : public Sprite
@@ -252,31 +270,44 @@ static std::vector<EnemyDef> enemyDefs = {
 	{true,  20.0f, 22.0f, 19, 1.0f, 5.0f, 180.0f },
 	{false, 20.0f, 35.0f, 20, 1.5f, 4.0f, 300.0f },
 	{true,  5.0f,  26.0f, 25, 1.5f, 4.0f, 320.0f },
-	{true,  5.0f,  30.0f, 10, 1.5f, 5.0f, 2000.0f}
+	{true,  5.0f,  30.0f, 10, 1.5f, 5.0f, 2000.0f},
+	{false, 0.0f,  0.0f,  20, 5.0f, 0.0f, 1000.0f},
+	{false, 0.0f,  0.0f,  40, 5.0f, 0.0f, 1000.0f},
+	{false, 0.0f,  0.0f,  60, 5.0f, 0.0f, 1000.0f}
+};
+
+static std::vector<ConverterDef> converterDefs = {
+	{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}},
+	{{1, 2, 3, 4, 5}},
+	{{5, 6, 7, 8, 9}},
+	{{8, 9, 10, 11, 12}}
 };
 
 static std::vector<SpriteDef> spriteDefs = {
-	{ L"player",        SpriteType::PlayerT, 0.3f, -1,  false},
-	{ L"Бабл",          SpriteType::Enemy,   1.0f,  0,  true},
-	{ L"Синчик",        SpriteType::Enemy,   1.0f,  1,  true},
-	{ L"Розовый пинки", SpriteType::Enemy,   1.0f,  2,  true},
-	{ L"Кибер демон",   SpriteType::Enemy,   1.0f,  3,  true},
-	{ L"Спайдер",       SpriteType::Enemy,   1.0f,  4,  true},
-	{ L"Красный череп", SpriteType::Enemy,   1.0f,  5,  true},
-	{ L"Бомбастик",     SpriteType::Enemy,   1.0f,  6,  true},
-	{ L"Зеленый пинки", SpriteType::Enemy,   1.0f,  7,  true},
-	{ L"Розовый череп", SpriteType::Enemy,   1.0f,  8,  true},
-	{ L"Ревенант",      SpriteType::Enemy,   1.0f,  9,  true},
-	{ L"Мега бабл",     SpriteType::Enemy,   1.0f,  10, true},
-	{ L"Мать",          SpriteType::Enemy,   1.0f,  11, true},
-	{ L"Boss",          SpriteType::Enemy,   1.0f,  12, true},
-	{ L"Портал",        SpriteType::NPC,     1.0f,  13, true},
-	{ L"Петрович",      SpriteType::NPC,     1.0f,  14, true},
-	{ L"Молотов",       SpriteType::NPC,     1.0f,  15, true},
-	{ L"Роман",         SpriteType::NPC,     1.0f,  16, true},
-	{ L"Ванька",        SpriteType::NPC,     1.0f,  17, true},
-	{ L"Тихон",         SpriteType::NPC,     1.0f,  18, true},
-	{ L"Виктор",        SpriteType::NPC,     1.0f,  19, true} 
+	{ L"player",           SpriteType::PlayerT,   0.3f, -1,  false},
+	{ L"Бабл",             SpriteType::Enemy,     1.0f,  0,  true},
+	{ L"Синчик",           SpriteType::Enemy,     1.0f,  1,  true},
+	{ L"Розовый пинки",    SpriteType::Enemy,     1.0f,  2,  true},
+	{ L"Кибер демон",      SpriteType::Enemy,     1.0f,  3,  true},
+	{ L"Спайдер",          SpriteType::Enemy,     1.0f,  4,  true},
+	{ L"Красный череп",    SpriteType::Enemy,     1.0f,  5,  true},
+	{ L"Бомбастик",        SpriteType::Enemy,     1.0f,  6,  true},
+	{ L"Зеленый пинки",    SpriteType::Enemy,     1.0f,  7,  true},
+	{ L"Розовый череп",    SpriteType::Enemy,     1.0f,  8,  true},
+	{ L"Ревенант",         SpriteType::Enemy,     1.0f,  9,  true},
+	{ L"Мега бабл",        SpriteType::Enemy,     1.0f,  10, true},
+	{ L"Мать",             SpriteType::Enemy,     1.0f,  11, true},
+	{ L"Boss",             SpriteType::Boss,      1.0f,  12, true},
+	{ L"Преобразователь1", SpriteType::Convertor, 1.0f,  13, true},
+	{ L"Преобразователь1", SpriteType::Convertor, 1.0f,  14, true},
+	{ L"Преобразователь1", SpriteType::Convertor, 1.0f,  15, true},
+	{ L"Портал",           SpriteType::NPC,       1.0f,  16, true},
+	{ L"Петрович",         SpriteType::NPC,       1.0f,  17, true},
+	{ L"Молотов",          SpriteType::NPC,       1.0f,  18, true},
+	{ L"Роман",            SpriteType::NPC,       1.0f,  19, true},
+	{ L"Ванька",           SpriteType::NPC,       1.0f,  20, true},
+	{ L"Тихон",            SpriteType::NPC,       1.0f,  21, true},
+	{ L"Виктор",           SpriteType::NPC,       1.0f,  22, true} 
 };
 
 #endif // !SPRITE

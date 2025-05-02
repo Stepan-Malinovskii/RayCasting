@@ -62,8 +62,34 @@ void SpriteManager::createSpriteFromMapSprite(MapSprite mapSprite)
 {
 	auto def = spriteDefs[mapSprite.spriteDefId];
 
-	mapSprite.spriteDefId < ENEMY_COUNT ? createEnemy(mapSprite, def) : createNpc(mapSprite, def);
+	if (def.type == SpriteType::Enemy)
+	{
+		createEnemy(mapSprite, def);
+	}
+	else if (def.type == SpriteType::NPC)
+	{
+		createNpc(mapSprite, def);
+	}
+	else if (def.type == SpriteType::Convertor)
+	{
+		createConverter(mapSprite, def);
+	}
 	
+	id++;
+}
+
+void SpriteManager::createConverter(MapSprite mapSprite, SpriteDef def)
+{
+	auto cDef = converterDefs[def.texture - ENEMY_MAX_INDEX];
+	/*auto converter = std::make_shared<Converter>(Converter(def, mapSprite, enemyDefs[mapSprite.spriteDefId], cDef, id));
+
+	if (converter->spMap.nowHealPoint <= 0.0f) { return; }
+	
+	converter->changeState(Stay);
+	enemys.push_back(converter.get());
+	nowMap->setupBlockmap(converter.get());
+	allSprites->push_back(std::move(converter));*/
+
 	id++;
 }
 
@@ -89,7 +115,8 @@ void SpriteManager::createEnemy(MapSprite mapSprite, SpriteDef def)
 
 void SpriteManager::createNpc(MapSprite mapSprite, SpriteDef def)
 {
-	auto npcDef = npcDefs[mapSprite.spriteDefId - ENEMY_COUNT];
+	auto npcDef = npcDefs[def.texture - ENEMY_MAX_INDEX - 4];
+
 	if (npcDef.type == TraderNpcType)
 	{
 		TraderDef tradeDef;
@@ -215,7 +242,7 @@ void SpriteManager::aiControler(float deltaTime)
 		if (enemy->isAtack && enemy->animr.get() == 0)
 		{
 			enemy->isAtack = false;
-			if (isEnemyHit(enemy) && Random::bitRandom() < 0.6f) player->takeDamage(enemy->enemyDef.damage);
+			if (isEnemyHit(enemy) && Random::bitRandom() < 0.6f) enemy->attack(player.get());
 		}
 
 		float distance = GETDIST(enemy->spMap.position, player->enemy->spMap.position);

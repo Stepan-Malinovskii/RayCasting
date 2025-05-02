@@ -6,11 +6,12 @@ MapManager::MapManager(sf::RenderWindow* _window) :
 	auto& event = EventSystem::getInstance();
 	event.subscribe<int>("SAVE", [=](const int NON) { save(); });
 
-	event.subscribe<int>("RESET_GAME", [=](const int NON) {
+	event.subscribe<int>("RESET_GAME", [&](const int NON) {
 		load(mapFileNames[BASE_N]);
 		auto& state = GameState::getInstance(); 
 		state.data.isLevelBase = true; 
-		state.data.levelNumber = 0; 
+		state.data.levelNumber = 0;
+		event.trigger<int>("SWAPLOC", 0);
 		});
 
 	event.subscribe<int>("WIN_GAME", [&](const int NON) {
@@ -366,7 +367,7 @@ void MapManager::writeEnemy(std::vector<sf::IntRect> rooms)
 	auto& state = GameState::getInstance();
 	int midleRoomCount = std::min(ENEMY_LEVEL_COUNT, (state.data.levelNumber + 1) * 7) / (int)rooms.size();
 	int minEnemy = std::max((int)((state.data.levelNumber + 1) * 0.5f), 1);
-	int maxEnemy = std::min((int)((state.data.levelNumber + 1) * 1.3f), ENEMY_COUNT - 2);
+	int maxEnemy = std::min((int)((state.data.levelNumber + 1) * 1.2f), ENEMY_MAX_INDEX);
 
 	for (auto r : rooms)
 	{

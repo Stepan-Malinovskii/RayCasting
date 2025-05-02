@@ -54,6 +54,17 @@ Enemy::Enemy(SpriteDef spDef, MapSprite spMap, EnemyDef _enemyDef, int id) :
 
 std::pair<int, bool> Enemy::getTextIndex() { return { animr.get(), isDamaged }; }
 
+void Enemy::death() 
+{
+	animr.setAnimation(3);
+	isDamaged = false;
+}
+
+void Enemy::attack(Player* player)
+{
+	player->takeDamage(enemyDef.damage);
+}
+
 void Enemy::move(Map* map, sf::Vector2f move)
 {
 	if (move == sf::Vector2f()) return;
@@ -132,8 +143,7 @@ void Enemy::changeState(EnemyState newState)
 	}
 	else if (newState == Dead)
 	{
-		animr.setAnimation(3);
-		isDamaged = false;
+		death();
 	}
 
 	state = newState;
@@ -439,12 +449,15 @@ void PortalNpc::init()
 	{
 		FuncNpc::stop();
 
-		auto& event = EventSystem::getInstance();
-		event.trigger<int>("SWAPLOC", BASE_N);
+		use();
 	}
 }
 
-void PortalNpc::use() {}
+void PortalNpc::use()
+{
+	auto& event = EventSystem::getInstance();
+	event.trigger<int>("SWAPLOC", BASE_N);
+}
 
 MechanicNpc::MechanicNpc(SpriteDef spDef, MapSprite spMap, NpcDef npcDef,
 	UIManager* uiManager, ItemManager* itemManager, Player* player, int _id) : 
@@ -600,5 +613,42 @@ void QuestNpc::check()
 	{
 		choose = nowKey;
 		init();
+	}
+}
+
+Converter::Converter(SpriteDef spDef, MapSprite spMap, EnemyDef enemyDef, ConverterDef cDef, int id) :
+	Enemy(spDef, spMap, enemyDef, id), cDef{cDef}
+{
+	textSize = texture->getSize().y;
+	Animation<int> stay({ {0.0f, 0} });
+	Animation<int> attack({ {0.0f, 0}, {enemyDef.timeBettwenAtack, 0 }, {enemyDef.timeBettwenAtack, 0 } });
+	animr = Animator<int>(0, { stay, {}, attack });
+}
+
+void Converter::death()
+{
+	auto& event = EventSystem::getInstance();
+	event.trigger<sf::Vector2f>("SPAWN_PORTAL", spMap.position);
+}
+
+void Converter::attack(Player* plaer)
+{
+	auto& event = EventSystem::getInstance();
+	event.trigger<int>("SPAWN_ENEMY", cDef.callingIndex[Random::intRandom(0, cDef.callingIndex.size() - 1)]);
+}
+
+void Converter::changeState(EnemyState newState)
+{
+	if (state == Stay || state == Run) return;
+
+	if (state == Attack)
+	{
+		isCanAttack = false;
+		animr.setAnimation(2);
+		nowTimeAtack = 0.0f;
+	}
+	else if (newState == Dead)
+	{
+		death();
 	}
 }
