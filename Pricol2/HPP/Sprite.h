@@ -12,8 +12,8 @@
 #include <set>
 #include <iostream>
 
-constexpr float PI = 3.14159265359f, TRIGER_DIST_MAX = 120.0f, TRIGER_DIST_MIN = 80.0f;
-constexpr int ENEMY_MAX_INDEX = 12;
+constexpr float PI = 3.14159265359f, TRIGER_DIST = 100.0f;
+constexpr int ENEMY_MAX_INDEX = 12, PORTAL_INDEX = 17;
 
 class Map;
 class Gun;
@@ -261,23 +261,23 @@ static std::vector<TraderDef> traderDefs = {
 };
 
 static std::vector<EnemyDef> enemyDefs = {
-	{true,  0.0f,  0.0f,  0,  0.0f, 5.0f, 0.0f },
+	{true,  0.0f,   0.0f,  0,  0.0f, 5.0f, 0.0f },
 	{true,  10.0f,  5.0f,  3, 1.5f, 3.0f, 70.0f  },
 	{true,  10.0f,  8.0f,  5, 1.0f, 4.0f, 90.0f  },
 	{true,  10.0f,  10.0f, 7, 1.5f, 5.0f, 100.0f },
-	{true,  20.0f, 8.0f,  9, 1.0f, 4.0f, 120.0f },
-	{true,  20.0f, 10.0f, 10, 1.0f, 5.0f, 200.0f },
+	{true,  20.0f,  8.0f,  9, 1.0f, 4.0f, 120.0f },
+	{true,  20.0f,  10.0f, 10, 1.0f, 5.0f, 200.0f },
 	{true,  10.0f,  12.0f, 13, 1.5f, 6.0f, 150.0f },
-	{true,  20.0f, 20.0f, 14, 1.5f, 3.0f, 300.0f },
+	{true,  20.0f,  20.0f, 14, 1.5f, 3.0f, 300.0f },
 	{true,  10.0f,  15.0f, 15, 1.5f, 6.0f, 200.0f },
 	{true,  10.0f,  20.0f, 18, 1.5f, 6.0f, 200.0f },
-	{true,  20.0f, 22.0f, 19, 1.0f, 5.0f, 180.0f },
-	{false, 20.0f, 35.0f, 20, 1.5f, 4.0f, 300.0f },
+	{true,  20.0f,  22.0f, 19, 1.0f, 5.0f, 180.0f },
+	{false, 20.0f,  35.0f, 20, 1.5f, 4.0f, 300.0f },
 	{true,  10.0f,  26.0f, 25, 1.5f, 4.0f, 320.0f },
 	{true,  10.0f,  30.0f, 10, 1.5f, 5.0f, 2000.0f},
-	{false, 10.0f,  0.0f,  20, 3.0f, 0.0f, 1000.0f},
-	{false, 10.0f,  0.0f,  40, 3.0f, 0.0f, 1000.0f},
-	{false, 10.0f,  0.0f,  60, 3.0f, 0.0f, 1000.0f}
+	{false, 10.0f,  0.0f,  20, 3.0f, 0.0f, 100.0f},
+	{false, 10.0f,  0.0f,  40, 3.0f, 0.0f, 100.0f},
+	{false, 10.0f,  0.0f,  60, 3.0f, 0.0f, 100.0f}
 };
 
 static std::vector<ConverterDef> converterDefs = {

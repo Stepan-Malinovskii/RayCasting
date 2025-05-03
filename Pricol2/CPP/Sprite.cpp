@@ -124,6 +124,8 @@ bool Enemy::canChangeState()
 
 void Enemy::changeState(EnemyState newState)
 {
+	if (state == Dead) return;
+
 	if (newState == Stay)
 	{
 		animr.setAnimation(0);
@@ -621,14 +623,17 @@ Converter::Converter(SpriteDef spDef, MapSprite spMap, EnemyDef enemyDef, Conver
 	Enemy(spDef, spMap, enemyDef, id), cDef{cDef}
 {
 	nowSpawnCount = (int)(cDef.maxSpawnCount * spMap.nowHealPoint / enemyDef.maxHealpoint);
-	textSize = texture->getSize().y;
+	textSize = texture->getSize().y / 2;
 	Animation<int> stay({ {0.0f, 0} });
 	Animation<int> attack({ {0.0f, 0}, {enemyDef.timeBettwenAtack, 0 }, {enemyDef.timeBettwenAtack, 0 } });
-	animr = Animator<int>(0, { stay, {}, attack });
+	Animation<int> death({ {0.0f, 1} });
+	animr = Animator<int>(0, { stay, {}, attack, death });
 }
 
 void Converter::death()
 {
+	isDamaged = false;
+	animr.setAnimation(3);
 	auto& event = EventSystem::getInstance();
 	event.trigger<sf::Vector2f>("SPAWN_PORTAL", spMap.position);
 }
@@ -642,6 +647,8 @@ void Converter::attack(Player* plaer)
 
 void Converter::changeState(EnemyState newState)
 {
+	if (state == Dead) return;
+
 	if (newState == Attack)
 	{
 		isAtack = true;

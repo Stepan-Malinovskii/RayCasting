@@ -1,4 +1,5 @@
 #include "SpriteManager.h"
+#include "SFML/Graphics/ConvexShape.hpp"
 
 #define SQUARE(a) ((a) * (a))
 #define GETDIST(a,b) (SQUARE(a.x - b.x) + SQUARE(a.y - b.y))
@@ -11,6 +12,8 @@ SpriteManager::SpriteManager(Map* _nowMap, UIManager* _uiManager, ItemManager* _
 
 	auto& event = EventSystem::getInstance();
 	event.subscribe<std::pair<int, sf::Vector2i>>("SPAWN_ENEMY", [=](const std::pair<int, sf::Vector2i> pair) { spawnEnemy(pair); });
+
+	event.subscribe<sf::Vector2f>("SPAWN_PORTAL", [=](const sf::Vector2f pos) {spawnPortal(pos);});
 }
 
 void SpriteManager::init()
@@ -291,7 +294,7 @@ EnemyState SpriteManager::determineNewState(Enemy* enemy, float distance)
 	{
 		return Attack;
 	}
-	else if (distance < TRIGER_DIST_MIN)
+	else if (distance < TRIGER_DIST)
 	{
 		return Run;
 	}
@@ -309,13 +312,24 @@ bool SpriteManager::isEnemyHit(Enemy* enemy)
 	sf::Vector2f dir{ cos(angle), sin(angle) };
 
 	RayHit hit = raycast(nowMap, enemy->spMap.position, dir, true, enemy, enemy->enemyDef.atackDist);
-	if (hit.sprite)
+	if (hit.cell == 0)
 	{
-		if (hit.sprite == dynamic_cast<Sprite*>(player->enemy))
+		if (hit.sprite->spDef.type == SpriteType::PlayerT)
 		{
-			return true && Random::bitRandom() < 0.6f;
+			int h = enemy->enemyDef.atackDist;
+			sf::Vector2f v = { dir.x * (h + 0.5f), dir.y * (h + 0.5f) };
+			sf::Vector2f u = { -dir.y * (h + 1.0f), dir.x * (h + 1.0f)};
+
+			sf::ConvexShape shape(4);
+			shape.setPoint(0, enemy->spMap.position + u / 2.0f);
+			shape.setPoint(1, enemy->spMap.position + v + u / 2.0f);
+			shape.setPoint(2, enemy->spMap.position + v + u / 2.0f);
+			shape.setPoint(3, enemy->spMap.position - u / 2.0f);
+
+			return shape.getLocalBounds().contains(player->enemy->spMap.position);
 		}
 	}
+
 	return false;
 }
 
@@ -340,6 +354,13 @@ void SpriteManager::spawnEnemy(std::pair<int, sf::Vector2i> pair)
 	MapSprite spMap = {spDef.texture + 1, (sf::Vector2f)posVec[index], -90.0f, enemyDef.maxHealpoint};
 
 	createEnemy(spMap, spDef);
+}
+
+void SpriteManager::spawnPortal(sf::Vector2f pos)
+{
+	auto def = spriteDefs[PORTAL_INDEX];
+
+	createNpc({ def.texture + 1, pos, -90.0f, 10 }, def);
 }
 
 void SpriteManager::killEnemy(Enemy* enem)

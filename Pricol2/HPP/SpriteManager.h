@@ -25,6 +25,7 @@ public:
 private:
 	void init();
 	void createSpriteFromMapSprite(MapSprite mapSprite);
+	void spawnPortal(sf::Vector2f pos);
 	void createConverter(MapSprite mapSprite, SpriteDef def);
 	void createEnemy(MapSprite mapSprite, SpriteDef def);
 	void createNpc(MapSprite mapSprite, SpriteDef);
