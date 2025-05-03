@@ -253,7 +253,7 @@ void SpriteManager::aiControler(float deltaTime)
 				enemys[i]->spDef.type == SpriteType::Boss) { break; }
 		}
 
-		float distance = GETDIST(enemys[i]->spMap.position, player->enemy->spMap.position);
+		float distance = sqrt(GETDIST(enemys[i]->spMap.position, player->enemy->spMap.position));
 		auto newState = determineNewState(enemys[i], distance);
 
 		sf::Vector2f toPlayerDir = player->enemy->spMap.position - enemys[i]->spMap.position;
@@ -311,26 +311,20 @@ bool SpriteManager::isEnemyHit(Enemy* enemy)
 	float angle = enemy->spMap.angle * PI / 180.0f;
 	sf::Vector2f dir{ cos(angle), sin(angle) };
 
-	RayHit hit = raycast(nowMap, enemy->spMap.position, dir, true, enemy, enemy->enemyDef.atackDist);
-	if (hit.cell == 0)
-	{
-		if (hit.sprite->spDef.type == SpriteType::PlayerT)
-		{
-			int h = enemy->enemyDef.atackDist;
-			sf::Vector2f v = { dir.x * (h + 0.5f), dir.y * (h + 0.5f) };
-			sf::Vector2f u = { -dir.y * (h + 1.0f), dir.x * (h + 1.0f)};
+	RayHit hit = raycast(nowMap, enemy->spMap.position, dir, false, enemy, sqrt(GETDIST(player->enemy->spMap.position, enemy->spMap.position)));
+	if (hit.cell != 0) return false;
+	
+	int h = enemy->enemyDef.atackDist;
+	sf::Vector2f v = { dir.x * (h + 1.0f), dir.y * (h + 1.0f)};
+	sf::Vector2f u = { -dir.y * h / 3.0f, dir.x * h / 3.0f};
 
-			sf::ConvexShape shape(4);
-			shape.setPoint(0, enemy->spMap.position + u / 2.0f);
-			shape.setPoint(1, enemy->spMap.position + v + u / 2.0f);
-			shape.setPoint(2, enemy->spMap.position + v + u / 2.0f);
-			shape.setPoint(3, enemy->spMap.position - u / 2.0f);
+	sf::ConvexShape shape(4);
+	shape.setPoint(0, enemy->spMap.position + u / 2.0f);
+	shape.setPoint(1, enemy->spMap.position + v - u / 2.0f);
+	shape.setPoint(2, enemy->spMap.position + v + u / 2.0f);
+	shape.setPoint(3, enemy->spMap.position - u / 2.0f);
 
-			return shape.getLocalBounds().contains(player->enemy->spMap.position);
-		}
-	}
-
-	return false;
+	return shape.getLocalBounds().contains(player->enemy->spMap.position);	
 }
 
 void SpriteManager::spawnEnemy(std::pair<int, sf::Vector2i> pair)

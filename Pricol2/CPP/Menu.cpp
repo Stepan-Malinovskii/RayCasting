@@ -37,7 +37,8 @@ void Menu::stop()
 	event.trigger<RenderState*>("SWAP_STATE", nullptr);
 	window->setMouseCursorVisible(false);
 	uiManager->deleteNow();
-	SoundManager::playerMusic(BaseSound);
+	auto& state = GameState::getInstance();
+	SoundManager::playerMusic(state.data.isLevelBase ? BaseSound : LevelSound);
 }
 
 void Menu::draw() { uiManager->drawNow(); }

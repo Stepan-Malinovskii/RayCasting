@@ -387,7 +387,7 @@ void MapManager::writeEnemy(std::vector<sf::IntRect> rooms)
 		}
 	}
 
-	nowMap->setMapSprite({ 14, endPos, 0.0f, 100.0f });
+	nowMap->setMapSprite({ PORTAL_INDEX, endPos, 0.0f, 100.0f });
 }
 
 Map* MapManager::getNowMap() { return nowMap; }

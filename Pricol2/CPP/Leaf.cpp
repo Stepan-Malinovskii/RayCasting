@@ -121,14 +121,14 @@ bool Leaf::chooseRoom(Leaf* a, Leaf* b)
 			{
 				if (l->leafData.left + l->leafData.width - r->leafData.left > 2)
 				{
-					point.x = Random::intRandom(r->leafData.left + 1, l->leafData.left + l->leafData.width - 2);
+					point.x = Random::intRandom(r->leafData.left + 2, l->leafData.left + l->leafData.width - 3);
 				}
 			}
 			else
 			{
 				if (r->leafData.left + r->leafData.width - r->leafData.left > 2)
 				{
-					point.x = Random::intRandom(r->leafData.left + 1, r->leafData.left + r->leafData.width - 2);
+					point.x = Random::intRandom(r->leafData.left + 2, r->leafData.left + r->leafData.width - 3);
 				}
 			}
 		}
@@ -138,14 +138,14 @@ bool Leaf::chooseRoom(Leaf* a, Leaf* b)
 			{
 				if (l->leafData.left + l->leafData.width - l->leafData.left > 2)
 				{
-					point.x = Random::intRandom(l->leafData.left + 1, l->leafData.left + l->leafData.width - 2);
+					point.x = Random::intRandom(l->leafData.left + 2, l->leafData.left + l->leafData.width - 3);
 				}
 			}
 			else
 			{
 				if (r->leafData.left + r->leafData.width - l->leafData.left > 2)
 				{
-					point.x = Random::intRandom(l->leafData.left + 1, r->leafData.left + r->leafData.width - 2);
+					point.x = Random::intRandom(l->leafData.left + 2, r->leafData.left + r->leafData.width - 3);
 				}
 			}
 		}
@@ -160,14 +160,14 @@ bool Leaf::chooseRoom(Leaf* a, Leaf* b)
 			{
 				if (l->leafData.top + l->leafData.height - r->leafData.top > 2)
 				{
-					point.y = Random::intRandom(r->leafData.top + 1, l->leafData.top + l->leafData.height - 2);
+					point.y = Random::intRandom(r->leafData.top + 2, l->leafData.top + l->leafData.height - 3);
 				}
 			}
 			else
 			{
 				if (r->leafData.top + r->leafData.height - r->leafData.top > 2)
 				{
-					point.y = Random::intRandom(r->leafData.top + 1, r->leafData.top + r->leafData.height - 2);
+					point.y = Random::intRandom(r->leafData.top + 2, r->leafData.top + r->leafData.height - 3);
 				}
 			}
 		}
@@ -177,14 +177,14 @@ bool Leaf::chooseRoom(Leaf* a, Leaf* b)
 			{
 				if (l->leafData.top + l->leafData.height - l->leafData.top > 2)
 				{
-					point.y = Random::intRandom(l->leafData.top + 1, l->leafData.top + l->leafData.height - 2);
+					point.y = Random::intRandom(l->leafData.top + 2, l->leafData.top + l->leafData.height - 3);
 				}
 			}
 			else
 			{
 				if (r->leafData.top + r->leafData.height - l->leafData.top > 2)
 				{
-					point.y = Random::intRandom(l->leafData.top + 1, r->leafData.top + r->leafData.height - 2);
+					point.y = Random::intRandom(l->leafData.top + 2, r->leafData.top + r->leafData.height - 3);
 				}
 			}
 		}
@@ -194,7 +194,9 @@ bool Leaf::chooseRoom(Leaf* a, Leaf* b)
 	{
 		return false;
 	}
+
 	createHall(point);
+
 	return true;
 }
 

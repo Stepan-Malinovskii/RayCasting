@@ -30,13 +30,13 @@ int main()
 		SoundManager::stopAllSound();
 		SoundManager::playerMusic(StartIntro);
 
-		/*while (movie.getStatus() == sfe::Status::Playing) // Вернуть в итоговой версии
+		while (movie.getStatus() == sfe::Status::Playing) // Вернуть в итоговой версии
 		{
 			window.clear();	
 			movie.update();
 			window.draw(movie);
 			window.display();
-		}*/
+		}
 
 		window.clear();
 		});
