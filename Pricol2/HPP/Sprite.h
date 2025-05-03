@@ -12,7 +12,7 @@
 #include <set>
 #include <iostream>
 
-constexpr float PI = 3.14159265359f, TRIGER_DIST_MAX = 80, TRIGER_DIST_MIN = 40;
+constexpr float PI = 3.14159265359f, TRIGER_DIST_MAX = 120.0f, TRIGER_DIST_MIN = 80.0f;
 constexpr int ENEMY_MAX_INDEX = 12;
 
 class Map;
@@ -28,7 +28,7 @@ enum class SpriteType
 
 enum EnemyState
 {
-	Stay, Run, Attack, Killes, Dead
+	Stay, Run, Attack, Dead
 };
 
 enum NpcType
@@ -67,6 +67,7 @@ struct EnemyDef
 struct ConverterDef
 {
 	std::vector<int> callingIndex;
+	int maxSpawnCount;
 };
 
 struct NpcDef
@@ -108,15 +109,15 @@ public:
 	void update(float deltaTime);
 	void move(Map* map, sf::Vector2f move);
 	void takeDamage(float damage);
-	bool canChangeState();
+	virtual bool canChangeState();
 	virtual void changeState(EnemyState newState);
 
 	EnemyDef enemyDef;
 	bool isCanAttack = false;
 	bool isAtack = false;
 	Animator<int> animr;
-protected:
 	float timeAtecked, nowTimeAtack;
+protected:
 	bool isDamaged;
 	EnemyState state;
 
@@ -132,8 +133,11 @@ public:
 	void death() override;
 	void attack(Player* plaer) override;
 	void changeState(EnemyState newState) override;
+	bool canChangeState() override;
 
 	ConverterDef cDef;
+private:
+	int nowSpawnCount;
 };
 
 class Npc : public Sprite
@@ -258,29 +262,29 @@ static std::vector<TraderDef> traderDefs = {
 
 static std::vector<EnemyDef> enemyDefs = {
 	{true,  0.0f,  0.0f,  0,  0.0f, 5.0f, 0.0f },
-	{true,  5.0f,  5.0f,  3, 1.5f, 3.0f, 70.0f  },
-	{true,  5.0f,  8.0f,  5, 1.0f, 4.0f, 90.0f  },
-	{true,  5.0f,  10.0f, 7, 1.5f, 5.0f, 100.0f },
+	{true,  10.0f,  5.0f,  3, 1.5f, 3.0f, 70.0f  },
+	{true,  10.0f,  8.0f,  5, 1.0f, 4.0f, 90.0f  },
+	{true,  10.0f,  10.0f, 7, 1.5f, 5.0f, 100.0f },
 	{true,  20.0f, 8.0f,  9, 1.0f, 4.0f, 120.0f },
 	{true,  20.0f, 10.0f, 10, 1.0f, 5.0f, 200.0f },
-	{true,  5.0f,  12.0f, 13, 1.5f, 6.0f, 150.0f },
+	{true,  10.0f,  12.0f, 13, 1.5f, 6.0f, 150.0f },
 	{true,  20.0f, 20.0f, 14, 1.5f, 3.0f, 300.0f },
-	{true,  5.0f,  15.0f, 15, 1.5f, 6.0f, 200.0f },
-	{true,  5.0f,  20.0f, 18, 1.5f, 6.0f, 200.0f },
+	{true,  10.0f,  15.0f, 15, 1.5f, 6.0f, 200.0f },
+	{true,  10.0f,  20.0f, 18, 1.5f, 6.0f, 200.0f },
 	{true,  20.0f, 22.0f, 19, 1.0f, 5.0f, 180.0f },
 	{false, 20.0f, 35.0f, 20, 1.5f, 4.0f, 300.0f },
-	{true,  5.0f,  26.0f, 25, 1.5f, 4.0f, 320.0f },
-	{true,  5.0f,  30.0f, 10, 1.5f, 5.0f, 2000.0f},
-	{false, 0.0f,  0.0f,  20, 5.0f, 0.0f, 1000.0f},
-	{false, 0.0f,  0.0f,  40, 5.0f, 0.0f, 1000.0f},
-	{false, 0.0f,  0.0f,  60, 5.0f, 0.0f, 1000.0f}
+	{true,  10.0f,  26.0f, 25, 1.5f, 4.0f, 320.0f },
+	{true,  10.0f,  30.0f, 10, 1.5f, 5.0f, 2000.0f},
+	{false, 10.0f,  0.0f,  20, 3.0f, 0.0f, 1000.0f},
+	{false, 10.0f,  0.0f,  40, 3.0f, 0.0f, 1000.0f},
+	{false, 10.0f,  0.0f,  60, 3.0f, 0.0f, 1000.0f}
 };
 
 static std::vector<ConverterDef> converterDefs = {
-	{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}},
-	{{1, 2, 3, 4, 5}},
-	{{5, 6, 7, 8, 9}},
-	{{8, 9, 10, 11, 12}}
+	{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}, 50},
+	{{1, 2, 3, 4, 5}, 10},
+	{{5, 6, 7, 8, 9}, 20},
+	{{8, 9, 10, 11, 12}, 30}
 };
 
 static std::vector<SpriteDef> spriteDefs = {

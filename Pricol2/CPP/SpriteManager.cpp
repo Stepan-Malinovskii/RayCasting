@@ -8,6 +8,9 @@ SpriteManager::SpriteManager(Map* _nowMap, UIManager* _uiManager, ItemManager* _
 {
 	allSprites = new std::vector<std::shared_ptr<Sprite>>();
 	init();
+
+	auto& event = EventSystem::getInstance();
+	event.subscribe<std::pair<int, sf::Vector2i>>("SPAWN_ENEMY", [=](const std::pair<int, sf::Vector2i> pair) { spawnEnemy(pair); });
 }
 
 void SpriteManager::init()
@@ -81,14 +84,14 @@ void SpriteManager::createSpriteFromMapSprite(MapSprite mapSprite)
 void SpriteManager::createConverter(MapSprite mapSprite, SpriteDef def)
 {
 	auto cDef = converterDefs[def.texture - ENEMY_MAX_INDEX];
-	/*auto converter = std::make_shared<Converter>(Converter(def, mapSprite, enemyDefs[mapSprite.spriteDefId], cDef, id));
+	auto converter = std::make_shared<Converter>(Converter(def, mapSprite, enemyDefs[mapSprite.spriteDefId], cDef, id));
 
 	if (converter->spMap.nowHealPoint <= 0.0f) { return; }
 	
-	converter->changeState(Stay);
+	converter->changeState(Attack);
 	enemys.push_back(converter.get());
 	nowMap->setupBlockmap(converter.get());
-	allSprites->push_back(std::move(converter));*/
+	allSprites->push_back(std::move(converter));
 
 	id++;
 }
@@ -105,7 +108,7 @@ void SpriteManager::createEnemy(MapSprite mapSprite, SpriteDef def)
 	}
 	else
 	{
-		enemy->changeState(Stay);
+		enemy->changeState(Attack);
 		enemys.push_back(enemy.get());
 		nowMap->setupBlockmap(enemy.get());
 	}
@@ -227,7 +230,6 @@ void SpriteManager::update(float deltaTime)
 
 		if (enemy->spMap.nowHealPoint <= 0.0f)
 		{
-			enemy->changeState(Killes);
 			killEnemy(enemy);
 		}
 	}
@@ -237,46 +239,48 @@ void SpriteManager::update(float deltaTime)
 
 void SpriteManager::aiControler(float deltaTime)
 {
-	for (auto enemy : enemys)
+	for (size_t i = 0; i < enemys.size(); i++)
 	{
-		if (enemy->isAtack && enemy->animr.get() == 0)
+		if (enemys[i]->isAtack && enemys[i]->nowTimeAtack >= enemys[i]->enemyDef.timeBettwenAtack)
 		{
-			enemy->isAtack = false;
-			if (isEnemyHit(enemy) && Random::bitRandom() < 0.6f) enemy->attack(player.get());
+			enemys[i]->isAtack = false;
+
+			if (isEnemyHit(enemys[i])) enemys[i]->attack(player.get());
+			if (enemys[i]->spDef.type == SpriteType::Convertor || 
+				enemys[i]->spDef.type == SpriteType::Boss) { break; }
 		}
 
-		float distance = GETDIST(enemy->spMap.position, player->enemy->spMap.position);
-		auto newState = determineNewState(enemy, distance);
+		float distance = GETDIST(enemys[i]->spMap.position, player->enemy->spMap.position);
+		auto newState = determineNewState(enemys[i], distance);
 
-		sf::Vector2f toPlayerDir = player->enemy->spMap.position - enemy->spMap.position;
+		sf::Vector2f toPlayerDir = player->enemy->spMap.position - enemys[i]->spMap.position;
 
-		float angle = enemy->spMap.angle * PI / 180.0f;
+		float angle = enemys[i]->spMap.angle * PI / 180.0f;
 		sf::Vector2f dir{ cos(angle), sin(angle) };
 
-		if (newState == Run)
+		if (newState == Run && !enemys[i]->isAtack)
 		{
-			if (Random::bitRandom() > 0.7f) enemy->spMap.angle = std::atan2(toPlayerDir.y, toPlayerDir.x) * 180.0f / PI;
-			enemy->move(nowMap, enemy->enemyDef.speed * deltaTime * dir);
+			if (Random::bitRandom() > 0.7f) enemys[i]->spMap.angle = std::atan2(toPlayerDir.y, toPlayerDir.x) * 180.0f / PI;
+			enemys[i]->move(nowMap, enemys[i]->enemyDef.speed * deltaTime * dir);
 
-			enemy->changeState(Run);
+			enemys[i]->changeState(Run);
 		}
 		else if (newState == Attack)
 		{
-			if (!enemy->canChangeState()) continue;
+			if (!enemys[i]->canChangeState()) continue;
 
-			if (enemy->isCanAttack)
+			if (enemys[i]->isCanAttack)
 			{
-				enemy->isAtack = true;
-				enemy->changeState(Attack);
+				enemys[i]->changeState(Attack);
 			}
 			else
 			{
-				if (Random::bitRandom() > 0.3f) enemy->spMap.angle = std::atan2(toPlayerDir.y, toPlayerDir.x) * 180.0f / PI;
+				if (Random::bitRandom() > 0.3f) enemys[i]->spMap.angle = std::atan2(toPlayerDir.y, toPlayerDir.x) * 180.0f / PI;
 			}
 		}
 		else if (newState == Stay)
 		{
-			enemy->changeState(Stay);
+			enemys[i]->changeState(Stay);
 		}
 	}
 }
@@ -299,6 +303,8 @@ EnemyState SpriteManager::determineNewState(Enemy* enemy, float distance)
 
 bool SpriteManager::isEnemyHit(Enemy* enemy)
 {
+	if (enemy->spDef.type == SpriteType::Convertor || enemy->spDef.type == SpriteType::Boss) return true;
+
 	float angle = enemy->spMap.angle * PI / 180.0f;
 	sf::Vector2f dir{ cos(angle), sin(angle) };
 
@@ -307,10 +313,33 @@ bool SpriteManager::isEnemyHit(Enemy* enemy)
 	{
 		if (hit.sprite == dynamic_cast<Sprite*>(player->enemy))
 		{
-			return true;
+			return true && Random::bitRandom() < 0.6f;
 		}
 	}
 	return false;
+}
+
+void SpriteManager::spawnEnemy(std::pair<int, sf::Vector2i> pair)
+{
+	int x0 = pair.second.x - SPAWN_RADIUS, x1 = pair.second.x + SPAWN_RADIUS;
+	int y0 = pair.second.y - SPAWN_RADIUS, y1 = pair.second.y + SPAWN_RADIUS;
+
+	std::vector<sf::Vector2i> posVec;
+
+	for (int x = x0; x < x1; x++)
+	{
+		for (int y = y0; y < y1; y++)
+		{
+			if (nowMap->blockMap[y][x].size() == 0) { posVec.push_back({ x,y }); }
+		}
+	}
+
+	auto index = Random::intRandom(0, posVec.size() - 1);
+	auto enemyDef = enemyDefs[pair.first];
+	auto spDef = spriteDefs[pair.first];
+	MapSprite spMap = {spDef.texture + 1, (sf::Vector2f)posVec[index], -90.0f, enemyDef.maxHealpoint};
+
+	createEnemy(spMap, spDef);
 }
 
 void SpriteManager::killEnemy(Enemy* enem)

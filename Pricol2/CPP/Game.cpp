@@ -59,6 +59,7 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 		});
 
 	menu->initStartMenu();
+	player->enemy->spMap.nowHealPoint = 100.0f;
 }
 
 Game::~Game()

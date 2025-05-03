@@ -188,9 +188,9 @@ void Editor::windowStateLeftClick()
 				{
 					float nowHp = 10;
 
-					if (nowSpriteDef.type == SpriteType::Enemy)
+					if (nowSpriteDef.type != SpriteType::NPC)
 					{
-						nowHp = enemyDefs[nowSpriteDef.texture].maxHealpoint;
+						nowHp = enemyDefs[nowSpriteDef.texture + 1].maxHealpoint;
 					}
 
 					mapManager->getNowMap()->setMapSprite({ nowSpriteDef.texture + 1, { mapPos.x + 0.5f, mapPos.y + 0.5f }, -90.0f, nowHp });

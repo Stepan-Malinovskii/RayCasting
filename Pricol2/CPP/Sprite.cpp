@@ -137,6 +137,7 @@ void Enemy::changeState(EnemyState newState)
 	}
 	else if (newState == Attack)
 	{
+		isAtack = true;
 		isCanAttack = false;
 		animr.setAnimation(2);
 		nowTimeAtack = 0.0f;
@@ -489,7 +490,7 @@ void MechanicNpc::use()
 
 	Gun* nowGun = player->guns[choose];
 
-	if (player->money < 50 || player->details < 15 || nowGun->upgradeCount > 5) return;
+	if (player->money < 50 || player->details < 15 || nowGun->upgradeCount >= 5) return;
 
 	player->money -= 50;
 	player->details -= 15;
@@ -619,6 +620,7 @@ void QuestNpc::check()
 Converter::Converter(SpriteDef spDef, MapSprite spMap, EnemyDef enemyDef, ConverterDef cDef, int id) :
 	Enemy(spDef, spMap, enemyDef, id), cDef{cDef}
 {
+	nowSpawnCount = (int)(cDef.maxSpawnCount * spMap.nowHealPoint / enemyDef.maxHealpoint);
 	textSize = texture->getSize().y;
 	Animation<int> stay({ {0.0f, 0} });
 	Animation<int> attack({ {0.0f, 0}, {enemyDef.timeBettwenAtack, 0 }, {enemyDef.timeBettwenAtack, 0 } });
@@ -633,16 +635,16 @@ void Converter::death()
 
 void Converter::attack(Player* plaer)
 {
+	nowSpawnCount--;
 	auto& event = EventSystem::getInstance();
-	event.trigger<int>("SPAWN_ENEMY", cDef.callingIndex[Random::intRandom(0, cDef.callingIndex.size() - 1)]);
+	event.trigger<std::pair<int, sf::Vector2i>>("SPAWN_ENEMY", { cDef.callingIndex[Random::intRandom(0, cDef.callingIndex.size() - 1)], (sf::Vector2i)spMap.position});
 }
 
 void Converter::changeState(EnemyState newState)
 {
-	if (state == Stay || state == Run) return;
-
-	if (state == Attack)
+	if (newState == Attack)
 	{
+		isAtack = true;
 		isCanAttack = false;
 		animr.setAnimation(2);
 		nowTimeAtack = 0.0f;
@@ -651,4 +653,11 @@ void Converter::changeState(EnemyState newState)
 	{
 		death();
 	}
+
+	state = newState;
+}
+
+bool Converter::canChangeState()
+{
+	return !isAtack || nowSpawnCount > 0;
 }

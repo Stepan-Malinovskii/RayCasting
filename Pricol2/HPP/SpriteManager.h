@@ -10,6 +10,8 @@
 #include "DataBase.h"
 #include "MapManager.h"
 
+constexpr int SPAWN_RADIUS = 8;
+
 class SpriteManager
 {
 public:
@@ -21,19 +23,20 @@ public:
 	Npc* getNpc(int id);
 	std::vector<std::shared_ptr<Sprite>>* getDeteachSprite();
 private:
-	int id;
-	void killEnemy(Enemy* enem);
-	EnemyState determineNewState(Enemy* enemy, float distance);
+	void init();
 	void createSpriteFromMapSprite(MapSprite mapSprite);
 	void createConverter(MapSprite mapSprite, SpriteDef def);
 	void createEnemy(MapSprite mapSprite, SpriteDef def);
+	void createNpc(MapSprite mapSprite, SpriteDef);
 	void createPlayer(MapSprite mapSprite, SpriteDef def, PlayerDef plDef);
-	void createNpc(MapSprite mapSprite, SpriteDef );
 	void createDefaultPlayer(PlayerDef plDef);
 	void aiControler(float deltaTime);
+	void killEnemy(Enemy* enem);
+	EnemyState determineNewState(Enemy* enemy, float distance);
 	bool isEnemyHit(Enemy* enemy);
-	void init();
+	void spawnEnemy(std::pair<int, sf::Vector2i> pair);
 
+	int id;
 	UIManager* uiManager;
 	ItemManager* itemManager;
 	std::vector<std::shared_ptr<Sprite>>* allSprites;
