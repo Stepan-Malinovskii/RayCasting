@@ -247,7 +247,7 @@ void SpriteManager::aiControler(float deltaTime)
 	{
 		float distance = sqrt(GETDIST(enemys[i]->spMap.position, player->enemy->spMap.position));
 
-		if (enemys[i]->isAtack && enemys[i]->nowTimeAtack >= enemys[i]->enemyDef.timeBettwenAtack)
+		if (enemys[i]->isAtack && enemys[i]->isCanAttack)
 		{
 			enemys[i]->isAtack = false;
 
@@ -257,16 +257,13 @@ void SpriteManager::aiControler(float deltaTime)
 				enemys[i]->spDef.type == SpriteType::Boss) { break; }
 		}
 
-		sf::Vector2f toPlayerDir = player->enemy->spMap.position - enemys[i]->spMap.position;
-
-		enemys[i]->enemyMechenic(distance, toPlayerDir, nowMap, deltaTime);
+		enemys[i]->enemyMechenic(distance, player->enemy->spMap.position - enemys[i]->spMap.position,
+								nowMap, deltaTime);
 	}
 }
 
-bool isPointInAttackRect(sf::Vector2f point,
-	sf::Vector2f pos,
-	sf::Vector2f dir,
-	float attackDist)
+bool isPointInAttackRect(sf::Vector2f point, sf::Vector2f pos,
+	sf::Vector2f dir, float attackDist)
 {
 	float width = attackDist / 3.0f;
 

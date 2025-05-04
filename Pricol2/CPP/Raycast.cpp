@@ -81,8 +81,7 @@ RayHit raycast(Map* map, sf::Vector2f pos, sf::Vector2f dir,
 
 			if (tmin < tmax)
 			{
-				int poss = pitch * sqrt(SQUARE(pos.x - sprite->spMap.position.x) +
-					SQUARE(pos.y - sprite->spMap.position.y)) / 3;
+				int poss = pitch * sqrt(GETDIST(pos, sprite->spMap.position)) / 3;
 				if (poss - 20 < sprite->textSize && poss + 20 > -sprite->textSize)
 				{
 					hitSprite = sprite;
