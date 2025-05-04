@@ -56,7 +56,7 @@ struct SpriteDef
 struct EnemyDef
 {
 	bool isCanRun;
-	float atackDist;
+	float attackDist;
 	float damage;
 	int midleDrop;
 	float timeBettwenAtack;
@@ -109,6 +109,8 @@ public:
 	void update(float deltaTime);
 	void move(Map* map, sf::Vector2f move);
 	void takeDamage(float damage);
+	EnemyState determineNewState(float dist);
+	void enemyMechenic(float dist, sf::Vector2f toPlayerDir, Map* nowMap, float deltaTime);
 	virtual bool canChangeState();
 	virtual void changeState(EnemyState newState);
 
@@ -274,10 +276,10 @@ static std::vector<EnemyDef> enemyDefs = {
 	{true,  7.0f,  22.0f, 19, 1.0f, 5.0f, 180.0f },
 	{false, 7.0f,  35.0f, 20, 1.5f, 4.0f, 300.0f },
 	{true,  3.0f,  26.0f, 25, 1.5f, 4.0f, 320.0f },
-	{true,  3.0f,  30.0f, 10, 1.5f, 5.0f, 2000.0f},
-	{false, 6.0f,  0.0f,  20, 3.0f, 0.0f, 100.0f},
-	{false, 6.0f,  0.0f,  40, 3.0f, 0.0f, 100.0f},
-	{false, 6.0f,  0.0f,  60, 3.0f, 0.0f, 100.0f}
+	{true,  3.0f,  30.0f, 10, 1.5f, 5.0f, 3000.0f},
+	{false, 6.0f,  0.0f,  20, 3.0f, 0.0f, 1000.0f},
+	{false, 6.0f,  0.0f,  40, 3.0f, 0.0f, 1500.0f},
+	{false, 6.0f,  0.0f,  60, 3.0f, 0.0f, 2000.0f}
 };
 
 static std::vector<ConverterDef> converterDefs = {

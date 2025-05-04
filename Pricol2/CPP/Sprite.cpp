@@ -163,6 +163,55 @@ void Enemy::takeDamage(float damage)
 	timeAtecked = 0;
 }
 
+EnemyState Enemy::determineNewState(float dist)
+{
+	if (dist < enemyDef.attackDist)
+	{
+		return Attack;
+	}
+	else if (dist < TRIGER_DIST)
+	{
+		return Run;
+	}
+	else
+	{
+		return Stay;
+	}
+}
+
+void Enemy::enemyMechenic(float dist, sf::Vector2f toPlayerDir, Map* nowMap, float deltaTime)
+{
+	auto newState = determineNewState(dist);
+
+	float angle = spMap.angle * PI / 180.0f;
+	sf::Vector2f dir{ cos(angle), sin(angle) };
+
+	if (newState == Run && !isAtack)
+	{
+		if (Random::bitRandom() > 0.7f) spMap.angle = std::atan2(toPlayerDir.y, toPlayerDir.x) * 180.0f / PI;
+		move(nowMap, enemyDef.speed * deltaTime * dir);
+
+		changeState(Run);
+	}
+	else if (newState == Attack)
+	{
+		if (!canChangeState()) return;
+
+		if (isCanAttack)
+		{
+			changeState(Attack);
+		}
+		else
+		{
+			if (Random::bitRandom() > 0.3f) spMap.angle = std::atan2(toPlayerDir.y, toPlayerDir.x) * 180.0f / PI;
+		}
+	}
+	else if (newState == Stay)
+	{
+		changeState(Stay);
+	}
+}
+
 bool Enemy::checkCollision(Map* map, sf::Vector2f newPos, bool xAxis)
 {
 	sf::Vector2f thisSize{ spDef.size / 2.0f, spDef.size / 2.0f };

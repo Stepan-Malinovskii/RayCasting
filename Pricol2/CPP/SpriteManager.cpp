@@ -3,6 +3,7 @@
 
 #define SQUARE(a) ((a) * (a))
 #define GETDIST(a,b) (SQUARE(a.x - b.x) + SQUARE(a.y - b.y))
+#define DOT(a,b) (a.x * b.x + a.y * b.y)
 
 SpriteManager::SpriteManager(Map* _nowMap, UIManager* _uiManager, ItemManager* _itemManager) : 
 	nowMap{ _nowMap }, uiManager{ _uiManager }, itemManager{ _itemManager }, id {1}
@@ -244,87 +245,54 @@ void SpriteManager::aiControler(float deltaTime)
 {
 	for (size_t i = 0; i < enemys.size(); i++)
 	{
+		float distance = sqrt(GETDIST(enemys[i]->spMap.position, player->enemy->spMap.position));
+
 		if (enemys[i]->isAtack && enemys[i]->nowTimeAtack >= enemys[i]->enemyDef.timeBettwenAtack)
 		{
 			enemys[i]->isAtack = false;
 
-			if (isEnemyHit(enemys[i])) enemys[i]->attack(player.get());
+			if (isEnemyHit(enemys[i], distance)) enemys[i]->attack(player.get());
+
 			if (enemys[i]->spDef.type == SpriteType::Convertor || 
 				enemys[i]->spDef.type == SpriteType::Boss) { break; }
 		}
 
-		float distance = sqrt(GETDIST(enemys[i]->spMap.position, player->enemy->spMap.position));
-		auto newState = determineNewState(enemys[i], distance);
-
 		sf::Vector2f toPlayerDir = player->enemy->spMap.position - enemys[i]->spMap.position;
 
-		float angle = enemys[i]->spMap.angle * PI / 180.0f;
-		sf::Vector2f dir{ cos(angle), sin(angle) };
-
-		if (newState == Run && !enemys[i]->isAtack)
-		{
-			if (Random::bitRandom() > 0.7f) enemys[i]->spMap.angle = std::atan2(toPlayerDir.y, toPlayerDir.x) * 180.0f / PI;
-			enemys[i]->move(nowMap, enemys[i]->enemyDef.speed * deltaTime * dir);
-
-			enemys[i]->changeState(Run);
-		}
-		else if (newState == Attack)
-		{
-			if (!enemys[i]->canChangeState()) continue;
-
-			if (enemys[i]->isCanAttack)
-			{
-				enemys[i]->changeState(Attack);
-			}
-			else
-			{
-				if (Random::bitRandom() > 0.3f) enemys[i]->spMap.angle = std::atan2(toPlayerDir.y, toPlayerDir.x) * 180.0f / PI;
-			}
-		}
-		else if (newState == Stay)
-		{
-			enemys[i]->changeState(Stay);
-		}
+		enemys[i]->enemyMechenic(distance, toPlayerDir, nowMap, deltaTime);
 	}
 }
 
-EnemyState SpriteManager::determineNewState(Enemy* enemy, float distance)
+bool isPointInAttackRect(sf::Vector2f point,
+	sf::Vector2f pos,
+	sf::Vector2f dir,
+	float attackDist)
 {
-	if (distance < enemy->enemyDef.atackDist)
-	{
-		return Attack;
-	}
-	else if (distance < TRIGER_DIST)
-	{
-		return Run;
-	}
-	else
-	{
-		return Stay;
-	}
+	float width = attackDist / 3.0f;
+
+	sf::Vector2f rel = point - pos;
+
+	float projForward = DOT(rel, dir);
+	float projLeft = DOT(rel, sf::Vector2f(-dir.y, dir.x));
+
+	return (projForward >= 0.0f && projForward <= attackDist + 1.0f &&
+		projLeft >= -width / 2.0f && projLeft <= width / 2.0f);
 }
 
-bool SpriteManager::isEnemyHit(Enemy* enemy)
+bool SpriteManager::isEnemyHit(Enemy* enemy, float distance)
 {
-	if (enemy->spDef.type == SpriteType::Convertor || enemy->spDef.type == SpriteType::Boss) return true;
-
 	float angle = enemy->spMap.angle * PI / 180.0f;
 	sf::Vector2f dir{ cos(angle), sin(angle) };
 
-	RayHit hit = raycast(nowMap, enemy->spMap.position, dir, false, enemy, sqrt(GETDIST(player->enemy->spMap.position, enemy->spMap.position)));
+	RayHit hit = raycast(nowMap, enemy->spMap.position, dir, false, enemy, distance);
 	if (hit.cell != 0) return false;
-	
-	int h = enemy->enemyDef.atackDist;
-	sf::Vector2f v = { dir.x * (h + 1.0f), dir.y * (h + 1.0f)};
-	sf::Vector2f u = { -dir.y * h / 3.0f, dir.x * h / 3.0f};
 
-	sf::ConvexShape shape(4);
-	shape.setPoint(0, enemy->spMap.position + u / 2.0f);
-	shape.setPoint(1, enemy->spMap.position + v - u / 2.0f);
-	shape.setPoint(2, enemy->spMap.position + v + u / 2.0f);
-	shape.setPoint(3, enemy->spMap.position - u / 2.0f);
-
-	return shape.getLocalBounds().contains(player->enemy->spMap.position);	
+	return isPointInAttackRect(
+		player->enemy->spMap.position,
+		enemy->spMap.position,
+		dir,
+		enemy->enemyDef.attackDist
+	);
 }
 
 void SpriteManager::spawnEnemy(std::pair<int, sf::Vector2i> pair)

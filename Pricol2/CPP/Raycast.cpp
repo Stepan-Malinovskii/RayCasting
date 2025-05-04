@@ -4,7 +4,9 @@ RayHit raycast(Map* map, sf::Vector2f pos, sf::Vector2f dir,
 	bool checkSprite, Sprite* ignore, int maxDist, float pitch)
 {
 	float origin[2] = { pos.x, pos.y };
-	float dir_inv[2] = { 1.0f / dir.x, 1.0f / dir.y };
+	float dir_inv_x = dir.x == 0 ? INFINITY : 1.0f / dir.x;
+	float dir_inv_y = dir.y == 0 ? INFINITY : 1.0f / dir.y;
+	float dir_inv[2] = { dir_inv_x, dir_inv_y };
 	sf::Vector2f deltaDist{ abs(dir_inv[0]), abs(dir_inv[1]) };
 	sf::Vector2i mapPos{ pos };
 	sf::Vector2i step;

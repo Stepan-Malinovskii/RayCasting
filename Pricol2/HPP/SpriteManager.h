@@ -33,8 +33,7 @@ private:
 	void createDefaultPlayer(PlayerDef plDef);
 	void aiControler(float deltaTime);
 	void killEnemy(Enemy* enem);
-	EnemyState determineNewState(Enemy* enemy, float distance);
-	bool isEnemyHit(Enemy* enemy);
+	bool isEnemyHit(Enemy* enemy, float distance);
 	void spawnEnemy(std::pair<int, sf::Vector2i> pair);
 
 	int id;
