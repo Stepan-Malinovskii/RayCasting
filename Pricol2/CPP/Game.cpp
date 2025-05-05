@@ -40,6 +40,9 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 	player->setGun(itemManager->getGunByIndex(2), 1);
 	auto& questM = QuestManager::getInstance();
 	questM.deleteAllQuest();
+	auto& state = GameState::getInstance();
+	state.data.isFirstGame = false;
+	state.data.killFirst = false;state.data.killSecond = false;state.data.killTherd = false;
 		});
 
 	event.subscribe<int>("WIN_GAME", [=](const int NON) { menu->initStartMenu();
@@ -47,6 +50,10 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 	player->setGun(itemManager->getGunByIndex(2), 1);
 	auto& questM = QuestManager::getInstance();
 	questM.deleteAllQuest();
+	auto& state = GameState::getInstance();
+	state.data.isFirstGame = true;
+	state.data.killFirst = false;state.data.killSecond = false;state.data.killTherd = false;
+	menu->initStartMenu();
 		});
 
 	event.subscribe<RenderState*>("SWAP_STATE", [=](RenderState* state) {

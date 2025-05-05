@@ -429,7 +429,26 @@ void TravelerNpc::init()
 		uiManager->deleteNow();
 
 		auto result = std::map<int, Itemble*>();
-		for (int i = 0; i < travelerDefs.size(); i++)
+		result[0] = itemManager->getItemble(travelerDefs[0].id);
+
+		int maxSize = 1;
+		auto& state = GameState::getInstance();
+		int levelN = state.data.levelNumber;
+		if (levelN < 3) {}
+		else if (levelN < 6)
+		{
+			maxSize = 2;
+		}
+		else if (levelN < 9)
+		{
+			maxSize = 3;
+		}
+		else if (levelN < 12)
+		{
+			maxSize = 4;
+		}
+
+		for (int i = 1; i < maxSize; i++)
 		{
 			result[i] = itemManager->getItemble(travelerDefs[i].id);
 		}
@@ -681,6 +700,20 @@ Converter::Converter(SpriteDef spDef, MapSprite spMap, EnemyDef enemyDef, Conver
 
 void Converter::death()
 {
+	auto& state = GameState::getInstance();
+	if (spDef.texture == 13)
+	{
+		state.data.killFirst = true;
+	}
+	else if (spDef.texture == 14)
+	{
+		state.data.killSecond = true;
+	}
+	else if (spDef.texture == 15)
+	{
+		state.data.killTherd = true;
+	}
+
 	isDamaged = false;
 	animr.setAnimation(3);
 	auto& event = EventSystem::getInstance();

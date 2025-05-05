@@ -25,8 +25,6 @@ int main()
 		if (!movie.openFromFile("Sound/startIntroVideo.mp4")) return;
 		movie.fit(0.0f, 0.0f, (float)window.getSize().x, (float)window.getSize().y);
 		movie.play();
-		auto& state = GameState::getInstance();
-		state.data.isFirstGame = false;
 		SoundManager::stopAllSound();
 		SoundManager::playerMusic(StartIntro);
 
@@ -46,8 +44,6 @@ int main()
 		if (!movie.openFromFile("Sound/endIntroVideo.mp4")) return;
 		movie.fit(0.0f, 0.0f, (float)window.getSize().x, (float)window.getSize().y);
 		movie.play();
-		auto& state = GameState::getInstance();
-		state.data.isFirstGame = true;
 		SoundManager::stopAllSound();
 		SoundManager::playerMusic(EndIntro);
 

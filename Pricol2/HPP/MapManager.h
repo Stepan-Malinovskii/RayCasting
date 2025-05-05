@@ -41,9 +41,9 @@ private:
 
 static std::vector<std::string> mapFileNames{
 	"base.map",
-	"arena1.map",
-	"arena2.map",
-	"arena3.map",
+	"converter1.map",
+	"converter2.map",
+	"converter3.map",
 	"boss.map" };
 
 #endif // !MAPM
