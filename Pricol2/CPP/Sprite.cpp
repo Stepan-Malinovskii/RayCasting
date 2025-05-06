@@ -434,18 +434,23 @@ void TravelerNpc::init()
 		int maxSize = 1;
 		auto& state = GameState::getInstance();
 		int levelN = state.data.levelNumber;
-		if (levelN < 3) {}
-		else if (levelN < 6)
+		if (state.data.killFirst &&
+			state.data.killSecond &&
+			state.data.killTherd)
 		{
-			maxSize = 2;
+			maxSize = 5;
 		}
-		else if (levelN < 9)
+		else if (levelN > 12)
+		{
+			maxSize = 4;
+		}
+		else if (levelN > 9)
 		{
 			maxSize = 3;
 		}
-		else if (levelN < 12)
+		else if (levelN > 6)
 		{
-			maxSize = 4;
+			maxSize = 2;
 		}
 
 		for (int i = 1; i < maxSize; i++)

@@ -23,6 +23,6 @@ std::set<sf::Vector2i, Vector2iCompare> Random::uniquePoints(sf::IntRect zone, i
 		points.insert({ intRandom(zone.left, (zone.left + zone.width)),
 						intRandom(zone.top, (zone.top + zone.height))});
 	}
-
+	int a = 1;
 	return points;
 }

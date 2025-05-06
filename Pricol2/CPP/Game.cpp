@@ -67,6 +67,9 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 
 	menu->initStartMenu();
 	player->enemy->spMap.nowHealPoint = 100.0f;
+	player->money = 1000.0f;
+	auto& state = GameState::getInstance();
+	state.data.levelNumber = 13;
 }
 
 Game::~Game()

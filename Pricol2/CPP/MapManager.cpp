@@ -136,6 +136,15 @@ sf::Vector2f MapManager::nextLocation(int index)
 		else
 		{
 			load(mapFileNames[index]);
+			for (auto sp : nowMap->sprites)
+			{
+				if (sp.spriteDefId == 0)
+				{
+					startPos = sp.position;
+					break;
+				}
+			}
+
 		}
 	}
 
@@ -365,8 +374,8 @@ void MapManager::writeRoom(sf::IntRect rect, int layer, int value)
 void MapManager::writeEnemy(std::vector<sf::IntRect> rooms)
 {
 	auto& state = GameState::getInstance();
-	int midleRoomCount = std::min(ENEMY_LEVEL_COUNT, (state.data.levelNumber + 1) * 7) / (int)rooms.size();
-	int minEnemy = std::max((int)((state.data.levelNumber + 1) * 0.5f), 1);
+	int midleRoomCount = std::min(ENEMY_LEVEL_COUNT, (state.data.levelNumber + 1) * 7) / (float)rooms.size();
+	int minEnemy = std::min((int)((state.data.levelNumber + 1) * 0.5f), ENEMY_MAX_INDEX - 5);
 	int maxEnemy = std::min((int)((state.data.levelNumber + 1) * 1.2f), ENEMY_MAX_INDEX);
 
 	for (auto r : rooms)
