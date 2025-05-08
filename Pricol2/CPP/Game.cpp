@@ -35,41 +35,35 @@ Game::Game(sf::RenderWindow* _window, MapManager* _mapManager) :
 			spManager->resetMap(mapManager->getNowMap(), pos);
 		});
 
-	event.subscribe<int>("RESET_GAME", [=](const int NON) { currentState = &playState;
-	player->guns[1] = nullptr; player->guns[2] = nullptr; invent->takeItem(itemManager->getGunByIndex(2), 1);
-	player->setGun(itemManager->getGunByIndex(2), 1);
-	auto& questM = QuestManager::getInstance();
-	questM.deleteAllQuest();
-	auto& state = GameState::getInstance();
-	state.data.isFirstGame = false;
-	state.data.killFirst = false;state.data.killSecond = false;state.data.killTherd = false;
+	event.subscribe<int>("RESET_GAME", [=](const int NON) {
+		resetGame();
+		auto& state = GameState::getInstance();
+		state.data.isFirstGame = false;
+		currentState = &playState;
 		});
 
-	event.subscribe<int>("WIN_GAME", [=](const int NON) { menu->initStartMenu();
-		player->guns[1] = nullptr; player->guns[2] = nullptr; invent->takeItem(itemManager->getGunByIndex(2), 1);
-	player->setGun(itemManager->getGunByIndex(2), 1);
-	auto& questM = QuestManager::getInstance();
-	questM.deleteAllQuest();
-	auto& state = GameState::getInstance();
-	state.data.isFirstGame = true;
-	state.data.killFirst = false;state.data.killSecond = false;state.data.killTherd = false;
-	menu->initStartMenu();
+	event.subscribe<int>("WIN_GAME", [=](const int NON) {
+		resetGame();
+		auto& state = GameState::getInstance();
+		state.data.isFirstGame = true;
+		menu->initStartMenu();
 		});
 
 	event.subscribe<RenderState*>("SWAP_STATE", [=](RenderState* state) {
 		uiManager->deleteNow();
-		if (state) { currentState = state; }
-		else
-		{
-			currentState = &playState;
-		}
+		currentState = state ? state : &playState;
+		});
+
+	event.subscribe<int>("PLAYERDEAD", [=](const int NON) {
+		spManager->resetOldPlayer();
+		auto& event = EventSystem::getInstance();
+		event.trigger<int>("SWAPLOC", BASE_N);
+		auto& state = GameState::getInstance();
+		state.data.levelNumber--;
+		menu->initResetMenu();
 		});
 
 	menu->initStartMenu();
-	player->enemy->spMap.nowHealPoint = 100.0f;
-	player->money = 1000.0f;
-	auto& state = GameState::getInstance();
-	state.data.levelNumber = 13;
 }
 
 Game::~Game()
@@ -80,6 +74,20 @@ Game::~Game()
 	delete uiManager;
 	delete invent;
 	delete menu;
+}
+
+void Game::resetGame()
+{
+	player->guns[1] = nullptr;
+	player->guns[2] = nullptr;
+	invent->takeItem(itemManager->getGunByIndex(2), 1);
+	player->setGun(itemManager->getGunByIndex(2), 1);
+	auto& questM = QuestManager::getInstance();
+	questM.deleteAllQuest();
+	auto& state = GameState::getInstance();
+	state.data.killFirst = false;
+	state.data.killSecond = false;
+	state.data.killTherd = false;
 }
 
 void Game::initPlayer()

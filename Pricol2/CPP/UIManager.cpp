@@ -96,6 +96,26 @@ void UIManager::initDialog(std::map<int, std::wstring, std::greater<int>> varian
 	}
 }
 
+void UIManager::initResetMenu()
+{
+	background = sf::Sprite(Resources::menuBackground);
+	background.setScale({ (float)SCREEN_W / Resources::menuBackground.getSize().x,
+		(float)SCREEN_H / Resources::menuBackground.getSize().y });
+
+	sf::Text text(L"ÏÐÎÄÎËÆÈÒÜ ÈÃÐÓ", Resources::UIFont, 50);
+	sf::RectangleShape shape({ text.getLocalBounds().width + 20.0f, 60.0f });
+	shape.setFillColor(sf::Color(100, 100, 100));
+	Button button(Group(shape, text));
+	button.setPosition({ (float)SCREEN_W / 2.0f, 2.0f * (float)SCREEN_H / 3.0f - 35.0f });
+	button.setFunc([=]() { keyButton = 0;});
+	buttons.push_back(button);
+
+	button.setString(L"ÂÛÕÎÄ");
+	button.setPosition({ (float)SCREEN_W / 2.0f, 2.0f * (float)SCREEN_H / 3.0f + 35.0f });
+	button.setFunc([=]() { keyButton = 1;});
+	buttons.push_back(button);
+}
+
 void UIManager::initStartMenu()
 {
 	background = sf::Sprite(Resources::menuBackground);
@@ -741,7 +761,7 @@ int UIManager::checkButton()
 	{
 		if (buttons[i].isClicked(worldPos))
 		{
-			if (choseBut) choseBut->setFillColor(sf::Color(50, 50, 50));
+			if (choseBut) choseBut->setFillColor(sf::Color(70, 70, 70));
 			choseBut = &buttons[i];
 			choseBut->setFillColor(sf::Color::Red);
 			buttons[i].use();

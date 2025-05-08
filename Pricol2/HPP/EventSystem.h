@@ -97,4 +97,5 @@ private:
         return std::static_pointer_cast<Event<T>>(events[eventName]);
     }
 };
+
 #endif // !EVENT

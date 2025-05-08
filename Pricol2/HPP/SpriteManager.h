@@ -10,8 +10,6 @@
 #include "DataBase.h"
 #include "MapManager.h"
 
-constexpr int SPAWN_RADIUS = 8;
-
 class SpriteManager
 {
 public:
@@ -19,12 +17,14 @@ public:
 	~SpriteManager();
 	void update(float deltaTime);
 	void resetMap(Map* newMap, sf::Vector2f playerPos);
+	void resetOldPlayer();
 	Player* getPlayer();
 	Npc* getNpc(int id);
 	std::vector<std::shared_ptr<Sprite>>* getDeteachSprite();
 private:
 	void init();
 	void createSpriteFromMapSprite(MapSprite mapSprite);
+	void createBoss(MapSprite spMap, SpriteDef spDef);
 	void spawnPortal(sf::Vector2f pos);
 	void createConverter(MapSprite mapSprite, SpriteDef def);
 	void createEnemy(MapSprite mapSprite, SpriteDef def);

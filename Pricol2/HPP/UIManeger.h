@@ -22,6 +22,7 @@ public:
 	void drawPlayerUI(Player* player);
 	void initDialog(std::map<int, std::wstring, std::greater<int>> variants,
 		std::wstring npcName);
+	void initResetMenu();
 	void initStartMenu();
 	void initGameMenu();
 	void initSetting();

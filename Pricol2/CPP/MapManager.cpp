@@ -19,6 +19,7 @@ MapManager::MapManager(sf::RenderWindow* _window) :
 		auto& state = GameState::getInstance();
 		state.data.isLevelBase = true;
 		state.data.levelNumber = 0;
+		event.trigger<int>("SWAPLOC", 0);
 		});
 }
 

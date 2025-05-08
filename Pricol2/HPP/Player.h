@@ -77,6 +77,7 @@ private:
 	int nowGun;
 	float nowSpeed, boostSpeed, shakeTime;
 
+	void resetPlayer();
 	void shakeCamera(float deltaTime, bool isRun);
 	void gravity(float deltaTime);
 };

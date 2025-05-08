@@ -100,14 +100,12 @@ void Renderer::Draw3DView(Player* player, Map* map, std::vector<std::shared_ptr<
 	}
 
 	//SpritePart
-	auto comperer = [player](const std::shared_ptr<Sprite> a, const std::shared_ptr<Sprite> b)
-		{
-			return COMPARER(a->spMap.position, b->spMap.position, player->enemy->spMap.position);
-		};
-
-
 	threads.addTask([&]() {
-		std::sort(sprites->begin(), sprites->end(), comperer);});
+		std::sort(sprites->begin(), sprites->end(), 
+		[player](const std::shared_ptr<Sprite> a, const std::shared_ptr<Sprite> b)
+			{
+				return COMPARER(a->spMap.position, b->spMap.position, player->enemy->spMap.position);
+			});});
 
 	//SkyPart
 	sf::Vector2u skyTextureSize = Resources::skyTextures.getSize();

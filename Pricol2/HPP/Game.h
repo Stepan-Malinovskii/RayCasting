@@ -32,6 +32,7 @@ public:
 	void save();
 	void editor(); //Удалить после конца
 private:
+	void resetGame();
 	void getInput(float deltaTime);
 	void initPlayer();
 

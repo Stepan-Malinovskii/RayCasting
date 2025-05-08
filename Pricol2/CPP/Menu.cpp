@@ -4,7 +4,8 @@ Menu::Menu(sf::RenderWindow* _window, UIManager* _uiManager, Player* _player) :
 	uiManager{_uiManager}, window{_window}, isKeyPressed{false}, player{_player},
 	startMenuState{[=](float deltaTime) {updateStartMenu();}, [=]() {draw();}},
 	gameMenuState{[=](float deltaTime) {updateGameMenu();},[=]() {draw();} },
-	settingState{ [=](float deltaTime) {updateSetting();}, [=]() {draw();} } {}
+	settingState{ [=](float deltaTime) {updateSetting();}, [=]() {draw();} },
+	resetState{ [=](float deltaTime) {updateResetMenu();}, [=]() {draw();} } {}
 
 void Menu::initStartMenu()
 {
@@ -31,17 +32,48 @@ void Menu::initSetting()
 	uiManager->initSetting();
 }
 
+void Menu::initResetMenu()
+{
+	auto& event = EventSystem::getInstance();
+	event.trigger<RenderState*>("SWAP_STATE", &resetState);
+	window->setMouseCursorVisible(true);
+	uiManager->initResetMenu();
+}
+
 void Menu::stop()
 {
 	auto& event = EventSystem::getInstance();
 	event.trigger<RenderState*>("SWAP_STATE", nullptr);
 	window->setMouseCursorVisible(false);
-	uiManager->deleteNow();
 	auto& state = GameState::getInstance();
 	SoundManager::playerMusic(state.data.isLevelBase ? BaseSound : LevelSound);
 }
 
 void Menu::draw() { uiManager->drawNow(); }
+
+void Menu::updateResetMenu()
+{
+	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	{
+		isKeyPressed = false;
+		return;
+	}
+
+	if (isKeyPressed) return;
+
+	isKeyPressed = true;
+
+	int key = uiManager->checkButton();
+
+	if (key == -1) return;
+
+	stop();
+	if (key == 0) {}
+	else if (key == 1)
+	{
+		initStartMenu();
+	}
+}
 
 void Menu::updateStartMenu()
 {

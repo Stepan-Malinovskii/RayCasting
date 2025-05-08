@@ -1,8 +1,6 @@
 #include "SpriteManager.h"
 #include "SFML/Graphics/ConvexShape.hpp"
 
-#define SQUARE(a) ((a) * (a))
-#define GETDIST(a,b) (SQUARE(a.x - b.x) + SQUARE(a.y - b.y))
 #define DOT(a,b) (a.x * b.x + a.y * b.y)
 
 SpriteManager::SpriteManager(Map* _nowMap, UIManager* _uiManager, ItemManager* _itemManager) : 
@@ -68,7 +66,6 @@ void SpriteManager::init()
 void SpriteManager::createSpriteFromMapSprite(MapSprite mapSprite)
 {
 	auto def = spriteDefs[mapSprite.spriteDefId];
-
 	if (def.type == SpriteType::Enemy)
 	{
 		createEnemy(mapSprite, def);
@@ -81,8 +78,31 @@ void SpriteManager::createSpriteFromMapSprite(MapSprite mapSprite)
 	{
 		createConverter(mapSprite, def);
 	}
+	else if (def.type == SpriteType::Boss)
+	{
+		createBoss(mapSprite, def);
+	}
 	
 	id++;
+}
+
+void SpriteManager::createBoss(MapSprite spMap, SpriteDef spDef)
+{
+	auto enemy = enemyDefs[spMap.spriteDefId];
+	auto cDef = converterDefs[spDef.texture - ENEMY_MAX_INDEX];
+	auto boss = std::make_shared<Boss>(Boss(spDef, spMap, enemy, cDef, id));
+	if (spMap.nowHealPoint <= 0.0f)
+	{
+		boss->changeState(Dead);
+	}
+	else
+	{
+		boss->changeState(Attack);
+		enemys.push_back(boss.get());
+		nowMap->setupBlockmap(boss.get());
+	}
+
+	allSprites->push_back(std::move(boss));
 }
 
 void SpriteManager::createConverter(MapSprite mapSprite, SpriteDef def)
@@ -96,14 +116,10 @@ void SpriteManager::createConverter(MapSprite mapSprite, SpriteDef def)
 	enemys.push_back(converter.get());
 	nowMap->setupBlockmap(converter.get());
 	allSprites->push_back(std::move(converter));
-
-	id++;
 }
 
 void SpriteManager::createEnemy(MapSprite mapSprite, SpriteDef def)
 {
-	if (mapSprite.spriteDefId == 0) return;
-
 	auto enemy = std::make_shared<Enemy>(def, mapSprite, enemyDefs[mapSprite.spriteDefId], id);
 	
 	if (enemy->spMap.nowHealPoint <= 0.0f)
@@ -208,11 +224,28 @@ void SpriteManager::resetMap(Map* newMap, sf::Vector2f pos)
 	nowMap = newMap;
 	init();
 
-	if (pos.x != 0.0f && pos.y != 0) // Убрать проверку потом 
+	if (pos.x != 0.0f && pos.y != 0)
 	{
 		player->enemy->spMap.position = pos;
 	}
 	player->setNemMap(newMap);
+}
+
+void SpriteManager::resetOldPlayer()
+{
+	auto& data = Data::getInstance();
+	PlayerDef plDef = data.getPlayerData();
+
+	player->enemy->enemyDef.maxHealpoint = plDef.maxHp;
+	player->enemy->spMap.nowHealPoint = plDef.nowHp;
+	player->maxEnergy = plDef.maxEnergy;
+	player->nowEnergy = plDef.nowEnergy;
+	player->defence = plDef.defence;
+	player->maxStrenght = plDef.maxStrenght;
+	player->nowStrenght = plDef.nowStrenght;
+	player->patrons = plDef.countpantrons;
+	player->money = plDef.money;
+	player->details = plDef.details;
 }
 
 Player* SpriteManager::getPlayer() { return player.get(); }
@@ -243,18 +276,22 @@ void SpriteManager::update(float deltaTime)
 
 void SpriteManager::aiControler(float deltaTime)
 {
-	for (size_t i = 0; i < enemys.size(); i++)
+	for (size_t i = 0; i < enemys.size();i++)
 	{
 		float distance = sqrt(GETDIST(enemys[i]->spMap.position, player->enemy->spMap.position));
 
 		if (enemys[i]->isAtack && enemys[i]->isCanAttack)
 		{
 			enemys[i]->isAtack = false;
-
+			enemys[i]->isCanAttack = false;
 			if (isEnemyHit(enemys[i], distance)) enemys[i]->attack(player.get());
 
-			if (enemys[i]->spDef.type == SpriteType::Convertor || 
-				enemys[i]->spDef.type == SpriteType::Boss) { break; }
+			if (player->enemy->spMap.nowHealPoint <= 0.0f)
+			{
+				auto& event = EventSystem::getInstance();
+				event.trigger<int>("PLAYERDEAD", 0);
+				break;
+			}
 		}
 
 		enemys[i]->enemyMechenic(distance, player->enemy->spMap.position - enemys[i]->spMap.position,
@@ -265,15 +302,13 @@ void SpriteManager::aiControler(float deltaTime)
 bool isPointInAttackRect(sf::Vector2f point, sf::Vector2f pos,
 	sf::Vector2f dir, float attackDist)
 {
-	float width = attackDist / 3.0f;
-
 	sf::Vector2f rel = point - pos;
 
 	float projForward = DOT(rel, dir);
 	float projLeft = DOT(rel, sf::Vector2f(-dir.y, dir.x));
 
 	return (projForward >= 0.0f && projForward <= attackDist + 1.0f &&
-		projLeft >= -width / 2.0f && projLeft <= width / 2.0f);
+		projLeft >= -1.0f / 2.0f && projLeft <= 1.0f / 2.0f);
 }
 
 bool SpriteManager::isEnemyHit(Enemy* enemy, float distance)
@@ -294,8 +329,8 @@ bool SpriteManager::isEnemyHit(Enemy* enemy, float distance)
 
 void SpriteManager::spawnEnemy(std::pair<int, sf::Vector2i> pair)
 {
-	int x0 = pair.second.x - SPAWN_RADIUS, x1 = pair.second.x + SPAWN_RADIUS;
-	int y0 = pair.second.y - SPAWN_RADIUS, y1 = pair.second.y + SPAWN_RADIUS;
+	int x0 = std::max(pair.second.x - SPAWN_RADIUS, 0), x1 = std::min(pair.second.x + SPAWN_RADIUS, (int)nowMap->blockMap[0].size());
+	int y0 = std::max(pair.second.y - SPAWN_RADIUS, 0), y1 = std::min(pair.second.y + SPAWN_RADIUS, (int)nowMap->blockMap.size());
 
 	std::vector<sf::Vector2i> posVec;
 
@@ -313,6 +348,7 @@ void SpriteManager::spawnEnemy(std::pair<int, sf::Vector2i> pair)
 	MapSprite spMap = {spDef.texture + 1, (sf::Vector2f)posVec[index], -90.0f, enemyDef.maxHealpoint};
 
 	createEnemy(spMap, spDef);
+	id++;
 }
 
 void SpriteManager::spawnPortal(sf::Vector2f pos)
@@ -324,7 +360,9 @@ void SpriteManager::spawnPortal(sf::Vector2f pos)
 
 void SpriteManager::killEnemy(Enemy* enem)
 {
+	SpriteType t = enem->spDef.type;
 	enem->changeState(Dead);
+	if (t == SpriteType::Boss) { return; }
 
 	int details = Random::intRandom((int)(enem->enemyDef.midleDrop * 0.8f), (int)(enem->enemyDef.midleDrop * 1.2f));
 	player->details += details;

@@ -13,7 +13,7 @@
 #include <iostream>
 
 constexpr float PI = 3.14159265359f, TRIGER_DIST = 12.0f;
-constexpr int ENEMY_MAX_INDEX = 12, PORTAL_INDEX = 17;
+constexpr int ENEMY_MAX_INDEX = 12, PORTAL_INDEX = 17, SPAWN_RADIUS = 8;
 
 class Map;
 class Gun;
@@ -28,7 +28,7 @@ enum class SpriteType
 
 enum EnemyState
 {
-	Stay, Run, Attack, Dead
+	Stay, Run, Attack, Spawn, Dead
 };
 
 enum NpcType
@@ -108,9 +108,9 @@ public:
 	virtual void attack(Player* player);
 	void update(float deltaTime);
 	void move(Map* map, sf::Vector2f move);
-	void takeDamage(float damage);
-	EnemyState determineNewState(float dist);
-	void enemyMechenic(float dist, sf::Vector2f toPlayerDir, Map* nowMap, float deltaTime);
+	virtual void takeDamage(float damage);
+	virtual EnemyState determineNewState(float dist);
+	virtual void enemyMechenic(float dist, sf::Vector2f toPlayerDir, Map* nowMap, float deltaTime);
 	virtual bool canChangeState();
 	virtual void changeState(EnemyState newState);
 
@@ -132,10 +132,28 @@ class Converter : public Enemy
 {
 public:
 	Converter(SpriteDef spDef, MapSprite spMap, EnemyDef enemyDef, ConverterDef cDef, int id);
+	void takeDamage(float damege) override;
 	void death() override;
 	void attack(Player* plaer) override;
 	void changeState(EnemyState newState) override;
 	bool canChangeState() override;
+	void enemyMechenic(float dist, sf::Vector2f toPlayerDir, Map* nowMap, float deltaTime) override;
+	EnemyState determineNewState(float dist) override;
+
+	ConverterDef cDef;
+private:
+	int nowSpawnCount;
+};
+
+class Boss : public Enemy
+{
+public:
+	Boss(SpriteDef spDef, MapSprite spMap, EnemyDef enemyDef, ConverterDef cDef, int id);
+	void death() override;
+	void attack(Player* plaer) override;
+	void changeState(EnemyState newState) override;
+	void enemyMechenic(float dist, sf::Vector2f toPlayerDir, Map* nowMap, float deltaTime) override;
+	EnemyState determineNewState(float dist) override;
 
 	ConverterDef cDef;
 private:
@@ -276,14 +294,14 @@ static std::vector<EnemyDef> enemyDefs = {
 	{true,  7.0f,  22.0f, 19, 1.0f, 5.0f, 180.0f },
 	{false, 7.0f,  35.0f, 20, 1.5f, 4.0f, 300.0f },
 	{true,  3.0f,  26.0f, 25, 1.5f, 4.0f, 320.0f },
-	{true,  3.0f,  30.0f, 10, 1.5f, 5.0f, 3000.0f},
-	{false, 6.0f,  0.0f,  20, 3.0f, 0.0f, 1000.0f},
-	{false, 6.0f,  0.0f,  40, 3.0f, 0.0f, 1500.0f},
-	{false, 6.0f,  0.0f,  60, 3.0f, 0.0f, 2000.0f}
+	{true,  3.0f,  30.0f, 10, 1.5f, 5.0f, 2000.0f},
+	{false, 6.0f,  0.0f,  20, 3.0f, 0.0f, 100.0f},
+	{false, 6.0f,  0.0f,  40, 3.0f, 0.0f, 100.0f},
+	{false, 6.0f,  0.0f,  60, 3.0f, 0.0f, 100.0f}
 };
 
 static std::vector<ConverterDef> converterDefs = {
-	{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}, 50},
+	{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}, 5},
 	{{1, 2, 3, 4, 5}, 10},
 	{{5, 6, 7, 8, 9}, 20},
 	{{8, 9, 10, 11, 12}, 30}

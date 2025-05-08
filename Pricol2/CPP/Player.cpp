@@ -12,26 +12,34 @@ Player::Player(Enemy* _sprite, PlayerDef def, Map* _nowMap) :
 	enemy->textSize = 104;
 
 	auto& event = EventSystem::getInstance();
-	event.subscribe<int>("SAVE", [=](const int NON) 
-		{
+	event.subscribe<int>("SAVE", [=](const int NON) {
 			auto& data = Data::getInstance();
 			data.savePlayerData(this);
 		});
 
-	event.subscribe<int>("RESET_GAME", [=](const int NON) {
-		nowEnergy = 2.0f; maxEnergy = 2.0f; defence = 0.0f; nowStrenght = 0.0f; maxStrenght = 0.0f;
-		patrons = 200; money = 500; details = 0; nowHeal = nullptr; enemy->enemyDef.maxHealpoint = 100.0f; enemy->spMap.nowHealPoint = 100.0f;
-		});
+	event.subscribe<int>("RESET_GAME", [=](const int NON) { resetPlayer(); });
 
-	event.subscribe<int>("WIN_GAME", [=](const int NON) {
-		nowEnergy = 2.0f; maxEnergy = 2.0f; defence = 0.0f; nowStrenght = 0.0f; maxStrenght = 0.0f;
-		patrons = 200; money = 500; details = 0; nowHeal = nullptr; enemy->enemyDef.maxHealpoint = 100.0f; enemy->spMap.nowHealPoint = 100.0f;
-		});
+	event.subscribe<int>("WIN_GAME", [=](const int NON) { resetPlayer(); });
 }
 
 Player::~Player()
 {
 	auto& event = EventSystem::getInstance();
+}
+
+void Player::resetPlayer()
+{
+	nowEnergy = 2.0f;
+	maxEnergy = 2.0f;
+	defence = 0.0f;
+	nowStrenght = 0.0f;
+	maxStrenght = 0.0f;
+	patrons = 200;
+	money = 500;
+	details = 0;
+	nowHeal = nullptr;
+	enemy->enemyDef.maxHealpoint = 100.0f;
+	enemy->spMap.nowHealPoint = 100.0f;
 }
 
 Gun* Player::setGun(Gun* gun, int pos) 

@@ -13,8 +13,10 @@ public:
 	void initStartMenu();
 	void initGameMenu();
 	void initSetting();
+	void initResetMenu();
 	void stop();
 	void draw();
+	void updateResetMenu();
 	void updateStartMenu();
 	void updateGameMenu();
 	void updateSetting();
@@ -23,6 +25,7 @@ private:
 	sf::RenderWindow* window;
 	Player* player;
 	UIManager* uiManager;
+	RenderState resetState;
 	RenderState startMenuState;
 	RenderState gameMenuState;
 	RenderState settingState;
