@@ -10,7 +10,7 @@ int main()
 {
 	Resources::initResources();
 
-	sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H), "Game");
+	sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H), "Game", sf::Style::Fullscreen);
 	window.setIcon(Resources::gameIcon.getSize().x, Resources::gameIcon.getSize().y, Resources::gameIcon.getPixelsPtr());
 	window.setFramerateLimit(60);
 	window.setMouseCursorVisible(false);

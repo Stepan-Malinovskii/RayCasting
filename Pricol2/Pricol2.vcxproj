@@ -183,6 +183,7 @@
     <ClInclude Include="HPP\Raycast.h" />
     <ClInclude Include="HPP\Renderer.h" />
     <ClInclude Include="HPP\RenderState.h" />
+    <ClInclude Include="HPP\resource.h" />
     <ClInclude Include="HPP\Resources.h" />
     <ClInclude Include="HPP\sfmlExtantion.h" />
     <ClInclude Include="HPP\SoundManager.h" />
@@ -190,7 +191,6 @@
     <ClInclude Include="HPP\SpriteManager.h" />
     <ClInclude Include="HPP\UIManeger.h" />
     <ClInclude Include="HPP\Weapon.h" />
-    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Data\KeyData.txt" />
