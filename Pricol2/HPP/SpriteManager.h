@@ -32,7 +32,7 @@ private:
 	void createPlayer(MapSprite mapSprite, SpriteDef def, PlayerDef plDef);
 	void createDefaultPlayer(PlayerDef plDef);
 	void aiControler(float deltaTime);
-	void killEnemy(Enemy* enem);
+	bool killEnemy(Enemy* enem);
 	bool isEnemyHit(Enemy* enemy, float distance);
 	void spawnEnemy(std::pair<int, sf::Vector2i> pair);
 
