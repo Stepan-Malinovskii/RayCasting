@@ -8,7 +8,10 @@ enum class State{Editor, Game};
 
 int main()
 {
+	Resources::initResources();
+
 	sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H), "Game");
+	window.setIcon(Resources::gameIcon.getSize().x, Resources::gameIcon.getSize().y, Resources::gameIcon.getPixelsPtr());
 	window.setFramerateLimit(60);
 	window.setMouseCursorVisible(false);
 
@@ -18,7 +21,6 @@ int main()
 	editorWindow.setVisible(false);
 
 	State state = State::Game;
-	Resources::initResources();
 	auto& event = EventSystem::getInstance();
 	event.subscribe<int>("RESET_GAME", [&](const int NON) {
 		sfe::Movie movie;
@@ -30,6 +32,15 @@ int main()
 
 		while (movie.getStatus() == sfe::Status::Playing) // Вернуть в итоговой версии
 		{
+			sf::Event event;
+			while (window.pollEvent(event)) 
+			{
+				if (event.type == sf::Event::Closed)
+				{
+					window.close();
+					return;
+				}
+			}
 			window.clear();	
 			movie.update();
 			window.draw(movie);
@@ -49,6 +60,15 @@ int main()
 
 		while (movie.getStatus() == sfe::Status::Playing) // Вернуть в итоговой версии
 		{
+			sf::Event event;
+			while (window.pollEvent(event))
+			{
+				if (event.type == sf::Event::Closed)
+				{
+					window.close();
+					return;
+				}
+			}
 			window.clear();
 			movie.update();
 			window.draw(movie);

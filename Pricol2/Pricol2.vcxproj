@@ -190,11 +190,18 @@
     <ClInclude Include="HPP\SpriteManager.h" />
     <ClInclude Include="HPP\UIManeger.h" />
     <ClInclude Include="HPP\Weapon.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Data\KeyData.txt" />
     <Text Include="Data\TextData.txt" />
     <Text Include="Data\КЛЮЧИ.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Texture\gameIcon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Pricol2.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
